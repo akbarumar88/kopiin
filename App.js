@@ -38,7 +38,10 @@ import Home from './src/components/dashboard/Home';
 import Feed from './src/components/dashboard/Feed';
 import Keranjang from './src/components/dashboard/Keranjang';
 import Akun from './src/components/dashboard/Akun';
+import Login from './src/components/dashboard/Login';
+import Dashboard from './src/components/dashboard/Index';
 import {theme} from './src/utilitas/Config';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -49,6 +52,7 @@ class App extends Component {
 
     this.state = {
       loading: true,
+      userToken: null,
     };
   }
 
@@ -56,72 +60,42 @@ class App extends Component {
     setTimeout(() => {
       this.setState({loading: false});
     }, 1000);
+    // Cek login
+    this.loginCek();
   }
+
+  loginCek = async () => {
+    let userToken = await AsyncStorage.getItem('userToken');
+    this.setState({userToken});
+  };
+
   render() {
-    const {loading} = this.state;
+    const {loading, userToken} = this.state;
     return (
       <NativeBaseProvider>
         <NavigationContainer>
-          <Tab.Navigator
-            activeColor={theme.primary}
-            inactiveColor={'#444'}
-            barStyle={{backgroundColor: '#fff'}}>
-            <Tab.Screen
-              name="Home"
-              component={Home}
-              options={{
-                tabBarIcon: ({focused, color}) => {
-                  // console.warn({focused,color})
-                  return <Ionicons name="md-home" color={color} size={24} />;
-                },
-              }}
+          <Stack.Navigator initialRouteName="Splash">
+            <Stack.Screen
+              name="Splash"
+              component={Splash}
+              options={{headerShown: false}}
             />
-            <Tab.Screen
-              name="Feed"
-              component={Feed}
-              options={{
-                tabBarIcon: ({focused, color}) => {
-                  // console.warn({focused,color})
-                  return <Ionicons name="md-sync" color={color} size={24} />;
-                },
-              }}
+            <Stack.Screen
+              name="Dashboard"
+              component={Dashboard}
+              options={{headerShown: false}}
             />
-            <Tab.Screen
-              name="Keranjang"
-              component={Keranjang}
-              options={{
-                tabBarIcon: ({focused, color}) => {
-                  // console.warn({focused,color})
-                  return <Ionicons name="md-cart" color={color} size={24} />;
-                },
-              }}
-            />
-            <Tab.Screen
-              name="Akun"
-              component={Akun}
-              options={{
-                tabBarIcon: ({focused, color}) => {
-                  // console.warn({focused,color})
-                  return <Ionicons name="md-person" color={color} size={24} />;
-                },
-              }}
-            />
-          </Tab.Navigator>
-          {/* <Stack.Navigator initialRouteName="Splash">
-            {loading ? (
-              <Stack.Screen
-                component={Splash}
-                name="Splash"
-                options={{headerShown: false}}
-              />
-            ) : (
-              <Stack.Screen component={Home} name={'Home'} options={{}} />
-            )}
-          </Stack.Navigator> */}
+          </Stack.Navigator>
         </NavigationContainer>
       </NativeBaseProvider>
     );
   }
+
+  bottomNavigation = () => {};
+
+  splashScreen = () => {
+    return;
+  };
 }
 
 const styles = StyleSheet.create({

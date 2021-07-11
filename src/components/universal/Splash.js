@@ -3,7 +3,11 @@ import { View} from 'react-native';
 import {NativeBaseProvider, Box, Row, Text} from 'native-base';
 
 export default class Splash extends Component {
-  componentDidMount() {}
+  componentDidMount() {
+    setTimeout(() => {
+      this.props.navigation.navigate('Dashboard');
+    }, 1000);
+  }
 
   render() {
     return (
