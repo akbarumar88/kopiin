@@ -120,6 +120,7 @@ export default class Register extends React.Component {
                   onSubmitEditing={() => {
                     this.iemail.focus();
                   }}
+                  autoCapitalize="words"
                 />
                 <FormControl.ErrorMessage
                   _text={{fontSize: 'xs', color: 'error.500', fontWeight: 500}}>
