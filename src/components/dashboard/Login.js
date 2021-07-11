@@ -132,28 +132,17 @@ export default class Login extends React.Component {
                   Login
                 </Button>
 
-                <HStack justifyContent="center" alignItem="center">
-                  {/* <IconButton
-                    variant="unstyled"
-                    startIcon={
-                      <Icon
-                        as={<MaterialCommunityIcons name="facebook" />}
-                        color="muted.700"
-                        size="sm"
-                      />
-                    }
-                  /> */}
-                  <IconButton
-                    variant="unstyled"
-                    startIcon={
-                      <Icon
-                        as={<MaterialCommunityIcons name="google" />}
-                        color="muted.700"
-                        size="sm"
-                      />
-                    }
-                  />
-                </HStack>
+                <Button
+                  mt={1}
+                  onPress={this.googleSignIn}
+                  isLoadingText={'login gan'}
+                  isLoading={loggingIn}
+                  bgColor={'red.600'}
+                  _text={{color: 'white'}}
+                  startIcon={<Icon as={MaterialCommunityIcons} name="google" size={5} />}>
+                  Login Dengan Google
+                </Button>
+
               </VStack>
 
               <HStack justifyContent="center">
@@ -164,8 +153,7 @@ export default class Login extends React.Component {
                   onPress={_ => {
                     this.props.navigation.navigate('Register');
                   }}
-                  _text={{color: theme.primary, bold: true, fontSize: 'sm'}}
-                  href="Register">
+                  _text={{color: theme.primary, bold: true, fontSize: 'sm'}}>
                   Daftar
                 </Link>
               </HStack>

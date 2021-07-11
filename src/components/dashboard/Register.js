@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {Alert} from 'react-native'
 import {
   NativeBaseProvider,
   Box,
@@ -17,7 +18,13 @@ import {
   Divider,
   ScrollView,
 } from 'native-base';
-import {theme} from '../../utilitas/Config';
+import {OAUTH_CLIENT_ID, theme} from '../../utilitas/Config';
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+  statusCodes,
+} from '@react-native-community/google-signin';
+import auth from '@react-native-firebase/auth';
 
 export default class Register extends React.Component {
   constructor(props) {
@@ -32,6 +39,31 @@ export default class Register extends React.Component {
     };
   }
 
+  componentDidMount() {
+    GoogleSignin.configure({
+      webClientId: OAUTH_CLIENT_ID, // client ID of type WEB for your server (needed to verify user ID and offline access)
+      offlineAccess: false, // if you want to access Google API on behalf of the user FROM YOUR SERVER
+    });
+  }
+
+  onAuthStateChanged=(user) => {
+    console.warn(user)
+  }
+
+  componentWillUnmount() {
+    // Unsubscribe Firebase Auth
+    this.signOutGoogle()
+  }
+  
+  signOutGoogle=async() => {
+    try {
+      await GoogleSignin.revokeAccess();
+      await GoogleSignin.signOut();
+    } catch (error) {
+      Alert.alert('Terjadi kesalahan saat logout... ', error.toString());
+    }
+  }
+  
   validate = () => {
     const {form} = this.state;
     let error;
@@ -71,14 +103,52 @@ export default class Register extends React.Component {
     if (error) {
       return;
     }
+    this.login()
+  };
+
+  login=() => {
+    
+  }
+
+  googleSignIn = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const {user} = await GoogleSignin.signIn();
+
+      // console.warn('gan', user)
+      this.setState(s => ({
+        form: {
+          ...s.form,
+          email: user.email,
+          nama: user.name,
+          username: user.email.replace(/@gmail.com/, ''),
+        },
+      }));
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // user cancelled the login flow
+        alert('Cancel');
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        alert('Signin in progress');
+        // operation (f.e. sign in) is in progress already
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        alert('PLAY_SERVICES_NOT_AVAILABLE');
+        // play services not available or outdated
+      } else {
+        // some other error happened
+        console.warn(error.message)
+        Alert.alert('Terjadi kesalahan saat register dengan Google... ', error.toString());
+        setError(error);
+      }
+    }
   };
 
   render() {
-    const {loggingIn, error, showpass, showkonfpass} = this.state;
+    const {loggingIn, error, showpass, showkonfpass, form} = this.state;
     return (
       <NativeBaseProvider>
         <ScrollView>
-          <Box flex={1} p={2} w="90%" mx="auto">
+          <Box flex={1} p={2} w="90%" mx="auto" pb={8}>
             <Heading size="lg" color={theme.primary}>
               Daftar
             </Heading>
@@ -99,6 +169,7 @@ export default class Register extends React.Component {
                   onChangeText={val => {
                     this.setState({form: {...this.state.form, username: val}});
                   }}
+                  value={form.username}
                 />
 
                 <FormControl.ErrorMessage
@@ -121,6 +192,7 @@ export default class Register extends React.Component {
                     this.iemail.focus();
                   }}
                   autoCapitalize="words"
+                  value={form.nama}
                 />
                 <FormControl.ErrorMessage
                   _text={{fontSize: 'xs', color: 'error.500', fontWeight: 500}}>
@@ -142,6 +214,7 @@ export default class Register extends React.Component {
                   onSubmitEditing={() => {
                     this.ipass.focus();
                   }}
+                  value={form.email}
                 />
                 <FormControl.ErrorMessage
                   _text={{fontSize: 'xs', color: 'error.500', fontWeight: 500}}>
@@ -234,8 +307,19 @@ export default class Register extends React.Component {
                   Daftar
                 </Button>
 
-                <HStack justifyContent="center" alignItem="center">
-                  {/* <IconButton
+                <Button
+                  mt={1}
+                  onPress={this.googleSignIn}
+                  isLoadingText={'login gan'}
+                  isLoading={loggingIn}
+                  bgColor={'red.600'}
+                  _text={{color: 'white'}}
+                  startIcon={<Icon as={MaterialCommunityIcons} name="google" size={5} />}>
+                  Daftar Dengan Google
+                </Button>
+ 
+                {/* <HStack justifyContent="center" alignItem="center">
+                  <IconButton
                 variant="unstyled"
                 startIcon={
                   <Icon
@@ -244,7 +328,7 @@ export default class Register extends React.Component {
                     size="sm"
                   />
                 }
-              /> */}
+              />
                   <IconButton
                     variant="unstyled"
                     startIcon={
@@ -255,7 +339,7 @@ export default class Register extends React.Component {
                       />
                     }
                   />
-                </HStack>
+                </HStack> */}
               </VStack>
             </VStack>
           </Box>
