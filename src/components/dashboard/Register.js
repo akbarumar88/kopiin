@@ -46,13 +46,11 @@ export default class Register extends React.Component {
     });
   }
 
-  onAuthStateChanged=(user) => {
-    console.warn(user)
-  }
-
-  componentWillUnmount() {
-    // Unsubscribe Firebase Auth
-    this.signOutGoogle()
+  async componentWillUnmount() {
+    if (await GoogleSignin.isSignedIn()) {
+      // Logout Google Account, agar tidak auto signed-in
+      this.signOutGoogle()
+    }
   }
   
   signOutGoogle=async() => {
@@ -127,7 +125,7 @@ export default class Register extends React.Component {
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
-        alert('Cancel');
+        Alert.alert('Cancel');
       } else if (error.code === statusCodes.IN_PROGRESS) {
         alert('Signin in progress');
         // operation (f.e. sign in) is in progress already
