@@ -27,6 +27,16 @@ export default class Index extends Component {
     };
   }
 
+  componentDidMount() {
+    // Cek login
+    this.loginCek();
+  }
+
+  loginCek = async () => {
+    let userToken = await AsyncStorage.getItem('token');
+    this.setState({userToken});
+  };
+
   render() {
     const {userToken} = this.state;
     return (

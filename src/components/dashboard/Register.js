@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Alert} from 'react-native'
+import {Alert,ToastAndroid} from 'react-native';
 import {
   NativeBaseProvider,
   Box,
@@ -17,16 +17,22 @@ import {
   HStack,
   Divider,
   ScrollView,
+  useToast,
 } from 'native-base';
-import {OAUTH_CLIENT_ID, theme} from '../../utilitas/Config';
+import {BASE_URL, OAUTH_CLIENT_ID, theme} from '../../utilitas/Config';
 import {
   GoogleSignin,
   GoogleSigninButton,
   statusCodes,
 } from '@react-native-community/google-signin';
 import auth from '@react-native-firebase/auth';
+import axios from 'axios';
+import QueryString from 'qs';
+import AlertOkV2 from '../universal/AlertOkV2';
+import { errMsg } from '../../utilitas/Function';
+import AsyncStorage from '@react-native-community/async-storage';
 
-export default class Register extends React.Component {
+class Register extends React.Component {
   constructor(props) {
     super(props);
 
@@ -49,19 +55,19 @@ export default class Register extends React.Component {
   async componentWillUnmount() {
     if (await GoogleSignin.isSignedIn()) {
       // Logout Google Account, agar tidak auto signed-in
-      this.signOutGoogle()
+      this.signOutGoogle();
     }
   }
-  
-  signOutGoogle=async() => {
+
+  signOutGoogle = async () => {
     try {
       await GoogleSignin.revokeAccess();
       await GoogleSignin.signOut();
     } catch (error) {
       Alert.alert('Terjadi kesalahan saat logout... ', error.toString());
     }
-  }
-  
+  };
+
   validate = () => {
     const {form} = this.state;
     let error;
@@ -71,14 +77,21 @@ export default class Register extends React.Component {
     if (!form.nama) {
       error = {...error, nama: 'Nama harus diisi'};
     }
-    if (!form.email) {
-      error = {...error, email: 'Email harus diisi'};
+
+    if (!form.notelp) {
+      error = {...error, notelp: 'No.telopon harus diisi'};
+    } else if (form.notelp.length < 9) {
+      error = {...error, notelp: 'No. telepon terlalu pendek'};
+    } else if (
+      !form.notelp.match(/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/)
+    ) {
+      error = {...error, notelp: 'No. telepon tidak valid'};
     }
 
     if (!form.pass) {
       error = {...error, pass: 'Password harus diisi'};
-    } else if (form.pass.length < 5) {
-      error = {...error, pass: 'Password harus minimal 5 karakter'};
+    } else if (form.pass.length < 8) {
+      error = {...error, pass: 'Password harus minimal 8 karakter'};
     }
 
     if (!form.konfpass) {
@@ -101,19 +114,60 @@ export default class Register extends React.Component {
     if (error) {
       return;
     }
-    this.login()
+    this.register();
   };
 
-  login=() => {
-    
-  }
+  register = () => {
+    const {form} = this.state
+    this.setState({loggingIn: true})
+    axios
+      .post(
+        `${BASE_URL()}/auth/register`,
+        QueryString.stringify({
+          username: form.username,
+          nama_lengkap: form.nama,
+          email: form.email,
+          password: form.pass,
+          no_telp: form.notelp,
+        }),
+      )
+      .then(async ({data}) => {
+        this.setState({loggingIn: false})
+        if (!data.status) {
+          this.alert.show({
+            message:
+              'Terjadi kesalahan saat register. harap coba lagi beberapa saat.',
+          });
+          return;
+        }
+        ToastAndroid.show('Pendaftaran Berhasil, anda akan diarahkan ke halaman home.', ToastAndroid.SHORT);
+        let sessionData = [
+          ['nama', form.nama],
+          ['username', form.username],
+          ['email', form.email],
+          ['notelp', form.notelp],
+          ['token', data.token],
+        ]
+        // console.warn(sessionData)
+        await AsyncStorage.multiSet(sessionData);
+        this.props.navigation.reset({index: 0, routes: [{name: 'Dashboard'}]});
+      })
+      .catch(e => {
+        this.setState({loggingIn: false})
+        this.alert.show({
+          message:
+            e.response?.data?.errorMessage ?? errMsg('Register'),
+        });
+        console.warn(e.response?.data ?? e.message);
+      });
+  };
 
   googleSignIn = async () => {
     try {
       await GoogleSignin.hasPlayServices();
       const {user} = await GoogleSignin.signIn();
 
-      // console.warn('gan', user)
+      // console.warn('1', user);
       this.setState(s => ({
         form: {
           ...s.form,
@@ -134,8 +188,11 @@ export default class Register extends React.Component {
         // play services not available or outdated
       } else {
         // some other error happened
-        console.warn(error.message)
-        Alert.alert('Terjadi kesalahan saat register dengan Google... ', error.toString());
+        console.warn(error.message);
+        Alert.alert(
+          'Terjadi kesalahan saat register dengan Google... ',
+          error.toString(),
+        );
         setError(error);
       }
     }
@@ -145,8 +202,9 @@ export default class Register extends React.Component {
     const {loggingIn, error, showpass, showkonfpass, form} = this.state;
     return (
       <NativeBaseProvider>
+        <AlertOkV2 ref={ref => (this.alert = ref)} />
         <ScrollView>
-          <Box flex={1} p={2} w="90%" mx="auto" pb={8}>
+          <Box flex={1} paddingX={8} pb={8} bg="white">
             <Heading size="lg" color={theme.primary}>
               Daftar
             </Heading>
@@ -168,6 +226,7 @@ export default class Register extends React.Component {
                     this.setState({form: {...this.state.form, username: val}});
                   }}
                   value={form.username}
+                  autoCapitalize="none"
                 />
 
                 <FormControl.ErrorMessage
@@ -187,7 +246,7 @@ export default class Register extends React.Component {
                     this.setState({form: {...this.state.form, nama: val}});
                   }}
                   onSubmitEditing={() => {
-                    this.iemail.focus();
+                    this.inotelp.focus();
                   }}
                   autoCapitalize="words"
                   value={form.nama}
@@ -195,6 +254,33 @@ export default class Register extends React.Component {
                 <FormControl.ErrorMessage
                   _text={{fontSize: 'xs', color: 'error.500', fontWeight: 500}}>
                   {error.nama}
+                </FormControl.ErrorMessage>
+              </FormControl>
+
+              <FormControl isRequired isInvalid={'notelp' in error}>
+                <FormControl.Label
+                  _text={{color: 'muted.700', fontSize: 'sm', fontWeight: 600}}>
+                  No. Telepon
+                </FormControl.Label>
+                <Input
+                  ref={ref => (this.inotelp = ref)}
+                  onChangeText={val => {
+                    if (val.match(/[^0-9]/)) {
+                      // Jika menemukan selain angka, maka ignore.
+                      return;
+                    }
+                    this.setState({form: {...this.state.form, notelp: val}});
+                  }}
+                  onSubmitEditing={() => {
+                    this.iemail.focus();
+                  }}
+                  autoCapitalize="words"
+                  value={form.notelp}
+                  keyboardType="number-pad"
+                />
+                <FormControl.ErrorMessage
+                  _text={{fontSize: 'xs', color: 'error.500', fontWeight: 500}}>
+                  {error.notelp}
                 </FormControl.ErrorMessage>
               </FormControl>
 
@@ -213,6 +299,7 @@ export default class Register extends React.Component {
                     this.ipass.focus();
                   }}
                   value={form.email}
+                  autoCapitalize={'none'}
                 />
                 <FormControl.ErrorMessage
                   _text={{fontSize: 'xs', color: 'error.500', fontWeight: 500}}>
@@ -298,7 +385,6 @@ export default class Register extends React.Component {
               <VStack space={2}>
                 <Button
                   onPress={this.validate}
-                  isLoadingText={'login gan'}
                   isLoading={loggingIn}
                   bgColor={theme.primary}
                   _text={{color: 'white'}}>
@@ -308,14 +394,15 @@ export default class Register extends React.Component {
                 <Button
                   mt={1}
                   onPress={this.googleSignIn}
-                  isLoadingText={'login gan'}
-                  isLoading={loggingIn}
+                  disabled={loggingIn}
                   bgColor={'red.600'}
                   _text={{color: 'white'}}
-                  startIcon={<Icon as={MaterialCommunityIcons} name="google" size={5} />}>
-                  Daftar Dengan Google
+                  startIcon={
+                    <Icon as={MaterialCommunityIcons} name="google" size={5} />
+                  }>
+                  Gunakan Akun Google
                 </Button>
- 
+
                 {/* <HStack justifyContent="center" alignItem="center">
                   <IconButton
                 variant="unstyled"
@@ -346,3 +433,13 @@ export default class Register extends React.Component {
     );
   }
 }
+
+function withHook(Component) {
+  return function (props) {
+    // console.warn('gan',props)
+    const toast = useToast();
+    return <Component {...props} toast={toast} />;
+  };
+}
+
+export default (Register);
