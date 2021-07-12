@@ -10,9 +10,13 @@ import {
   ScrollView,
   Select,
   TextArea,
+  Icon,
 } from 'native-base';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {theme} from '../../utilitas/Config';
 import {BASE_URL} from './../../utilitas/Config';
+
+import AsyncStorage from '@react-native-community/async-storage';
 export default class AddProduct extends React.Component {
   constructor(props) {
     super(props);
@@ -26,18 +30,21 @@ export default class AddProduct extends React.Component {
   }
 
   componentDidMount() {
+    this.getKategori();
+  }
+
+  getKategori = () => {
     fetch(BASE_URL() + '/kategori').then(res => {
       res.json().then(e => {
         this.setState({kategori: e.data});
-
         this.setState({form: {...this.state.form, kategori: e.data[0].id}});
       });
     });
-  }
+  };
 
   async componentWillUnmount() {}
 
-  validate = () => {
+  validate = async () => {
     const {form, variasi} = this.state;
     let error;
     if (!form.namaBarang) {
@@ -58,6 +65,9 @@ export default class AddProduct extends React.Component {
         error = {...error, variasi: 'Variasi Barang harus diisi'};
       }
     });
+
+    let username = await AsyncStorage.getItem('username');
+    console.log(username);
 
     this.setState({error: error ?? {}});
     if (error) {
@@ -218,9 +228,8 @@ export default class AddProduct extends React.Component {
                         }}
                         roundedLeft={0}
                         roundedRight="md"
-                        colorScheme="danger">
-                        Hapus
-                      </Button>
+                        endIcon={<Ionicons name="trash" color="white" />}
+                        colorScheme="danger"></Button>
                     }
                     key={index}
                     placeholder={'Varian ' + (index + 1)}

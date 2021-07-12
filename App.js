@@ -84,7 +84,11 @@ class App extends Component {
               options={{headerShown: false}}
             />
             <Stack.Screen name="Register" component={Register} />
-            <Stack.Screen name="AddProduct" component={AddProduct} />
+            <Stack.Screen
+              name="AddProduct"
+              options={{title: 'Tambah Produk'}}
+              component={AddProduct}
+            />
             <Stack.Screen name="Shop" component={Shop} />
           </Stack.Navigator>
         </NavigationContainer>

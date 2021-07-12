@@ -24,13 +24,17 @@ export default class Shop extends React.Component {
   }
 
   componentDidMount() {
+    this.getJenisToko();
+  }
+
+  getJenisToko = () => {
     fetch(BASE_URL() + '/jenis').then(res => {
       res.json().then(e => {
         this.setState({jenis: e.data});
         this.setState({form: {...this.state.form, jenis: e.data[0].id}});
       });
     });
-  }
+  };
 
   async componentWillUnmount() {}
 
@@ -57,7 +61,7 @@ export default class Shop extends React.Component {
         <ScrollView>
           <Box flex={1} p={2} w="90%" mx="auto" pb={8}>
             <Heading size="lg" color={theme.primary}>
-              Buat Toko
+              Ubah Toko
             </Heading>
 
             <VStack space={4} mt={5}>
