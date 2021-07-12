@@ -231,7 +231,6 @@ export default class AddProduct extends React.Component {
                   {error.variasi}
                 </FormControl.ErrorMessage>
               </FormControl>
-
               <Button
                 onPress={() => {
                   this.setState({variasi: [...this.state.variasi, '']});
