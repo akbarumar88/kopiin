@@ -1,4 +1,4 @@
-package com.kopiin;
+package com.ekopee;
 
 import com.facebook.react.ReactActivity;
 

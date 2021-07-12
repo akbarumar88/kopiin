@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "616135197831",
+    "project_id": "kopiin",
+    "storage_bucket": "kopiin.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:616135197831:android:37076211e2ba1173a2e422",
+        "android_client_info": {
+          "package_name": "com.ekopee"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "616135197831-uq3pv5taf6abv6qp3jqg95plrck3sdsl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ekopee",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "616135197831-q5l8h7jkl8i2mrpnusbah1mcjiai8de0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfRZumbaES2QUqG1RHJPEiZDKaBNfVQc4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "616135197831-q5l8h7jkl8i2mrpnusbah1mcjiai8de0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

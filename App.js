@@ -39,6 +39,7 @@ import Feed from './src/components/dashboard/Feed';
 import Keranjang from './src/components/dashboard/Keranjang';
 import Akun from './src/components/dashboard/Akun';
 import Login from './src/components/dashboard/Login';
+import Register from './src/components/dashboard/Register';
 import Dashboard from './src/components/dashboard/Index';
 import {theme} from './src/utilitas/Config';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -60,21 +61,14 @@ class App extends Component {
     setTimeout(() => {
       this.setState({loading: false});
     }, 1000);
-    // Cek login
-    this.loginCek();
   }
-
-  loginCek = async () => {
-    let userToken = await AsyncStorage.getItem('userToken');
-    this.setState({userToken});
-  };
 
   render() {
     const {loading, userToken} = this.state;
     return (
       <NativeBaseProvider>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="Splash">
+          <Stack.Navigator initialRouteName="Splash" screenOptions={{headerShown:true}}>
             <Stack.Screen
               name="Splash"
               component={Splash}
@@ -85,6 +79,7 @@ class App extends Component {
               component={Dashboard}
               options={{headerShown: false}}
             />
+            <Stack.Screen name="Register" component={Register} />
           </Stack.Navigator>
         </NavigationContainer>
       </NativeBaseProvider>
