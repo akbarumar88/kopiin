@@ -223,7 +223,7 @@ export default class AddProduct extends React.Component {
                       </Button>
                     }
                     key={index}
-                    placeholder={'Variasi ' + (index + 1)}
+                    placeholder={'Varian ' + (index + 1)}
                   />
                 ))}
                 <FormControl.ErrorMessage
@@ -237,7 +237,7 @@ export default class AddProduct extends React.Component {
                   this.setState({variasi: [...this.state.variasi, '']});
                 }}
                 _text={{color: 'white'}}>
-                Tambah Variasi
+                Tambah Varian
               </Button>
 
               <VStack space={1}>
