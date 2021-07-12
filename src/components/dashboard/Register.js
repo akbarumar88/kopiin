@@ -226,6 +226,7 @@ class Register extends React.Component {
                     this.setState({form: {...this.state.form, username: val}});
                   }}
                   value={form.username}
+                  autoCapitalize="none"
                 />
 
                 <FormControl.ErrorMessage
@@ -298,6 +299,7 @@ class Register extends React.Component {
                     this.ipass.focus();
                   }}
                   value={form.email}
+                  autoCapitalize={'none'}
                 />
                 <FormControl.ErrorMessage
                   _text={{fontSize: 'xs', color: 'error.500', fontWeight: 500}}>
