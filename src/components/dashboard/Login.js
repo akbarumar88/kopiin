@@ -55,7 +55,7 @@ export default class Login extends React.Component {
     return (
       <NativeBaseProvider>
         <ScrollView>
-          <Box flex={1} p={2} w="90%" mx="auto">
+          <Box flex={1} p={8} bg="white">
             <Heading size="lg" color={theme.primary}>
               Selamat Datang
             </Heading>
@@ -95,7 +95,6 @@ export default class Login extends React.Component {
                     this.setState({form: {...this.state.form, pass: val}});
                   }}
                   onSubmitEditing={() => {
-                    this.ikonfpass.focus();
                   }}
                   InputRightElement={
                     <IconButton

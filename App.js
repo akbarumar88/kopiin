@@ -61,14 +61,7 @@ class App extends Component {
     setTimeout(() => {
       this.setState({loading: false});
     }, 1000);
-    // Cek login
-    this.loginCek();
   }
-
-  loginCek = async () => {
-    let userToken = await AsyncStorage.getItem('userToken');
-    this.setState({userToken});
-  };
 
   render() {
     const {loading, userToken} = this.state;
