@@ -43,6 +43,8 @@ import Register from './src/components/dashboard/Register';
 import Dashboard from './src/components/dashboard/Index';
 import {theme} from './src/utilitas/Config';
 import AsyncStorage from '@react-native-community/async-storage';
+import Shop from './src/components/dashboard/Shop';
+import AddProduct from './src/components/dashboard/AddProduct';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -75,7 +77,9 @@ class App extends Component {
     return (
       <NativeBaseProvider>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="Splash" screenOptions={{headerShown:true}}>
+          <Stack.Navigator
+            initialRouteName="Splash"
+            screenOptions={{headerShown: true}}>
             <Stack.Screen
               name="Splash"
               component={Splash}
@@ -87,6 +91,8 @@ class App extends Component {
               options={{headerShown: false}}
             />
             <Stack.Screen name="Register" component={Register} />
+            <Stack.Screen name="AddProduct" component={AddProduct} />
+            <Stack.Screen name="Shop" component={Shop} />
           </Stack.Navigator>
         </NavigationContainer>
       </NativeBaseProvider>
