@@ -15,13 +15,15 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {theme} from '../../utilitas/Config';
 import {BASE_URL} from './../../utilitas/Config';
-
+import axios from 'axios';
+import QueryString from 'qs';
 import AsyncStorage from '@react-native-community/async-storage';
 export default class AddProduct extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
+      loggingIn: false,
       error: {},
       form: {},
       kategori: [],
@@ -66,9 +68,6 @@ export default class AddProduct extends React.Component {
       }
     });
 
-    let username = await AsyncStorage.getItem('username');
-    console.log(username);
-
     this.setState({error: error ?? {}});
     if (error) {
       return;
@@ -76,10 +75,40 @@ export default class AddProduct extends React.Component {
     this.simpan();
   };
 
-  simpan = () => {};
+  simpan = () => {
+    this.setState({loggingIn: true});
+    const {form, variasi} = this.state;
+
+    axios
+      .post(
+        `${BASE_URL()}/barang`,
+        JSON.stringify({
+          id_merchant: '3',
+          id_kategori: form.kategori,
+          nama: form.namaBarang,
+          deskripsi: form.deskripsi,
+          harga: form.harga,
+          berat: form.berat,
+          varian: variasi,
+        }),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+      .then(async ({data}) => {
+        this.setState({loggingIn: false});
+        if (!data.status) {
+          console.log('Salah');
+        } else {
+          console.log('Benar');
+        }
+      });
+  };
 
   render() {
-    const {error, form} = this.state;
+    const {error, form, loggingIn} = this.state;
     return (
       <NativeBaseProvider>
         <ScrollView>
@@ -244,12 +273,16 @@ export default class AddProduct extends React.Component {
                 onPress={() => {
                   this.setState({variasi: [...this.state.variasi, '']});
                 }}
+                isLoading={loggingIn}
+                isLoadingText="Proses penyimpanan"
                 _text={{color: 'white'}}>
                 Tambah Varian
               </Button>
 
               <VStack space={1}>
                 <Button
+                  isLoading={loggingIn}
+                  isLoadingText="Proses penyimpanan"
                   onPress={this.validate}
                   bgColor={theme.primary}
                   _text={{color: 'white'}}>
