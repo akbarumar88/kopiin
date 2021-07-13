@@ -24,7 +24,24 @@ import AlertYesNoV2 from '../universal/AlertYesNoV2';
 import AsyncStorage from '@react-native-community/async-storage';
 
 export default class Akun extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      jenistoko: null,
+    };
+  }
+
+  async cekToko() {
+    let jenis = await AsyncStorage.getItem('jenistoko');
+    this.setState({jenistoko: jenis});
+  }
+
+  componentDidMount() {
+    this.cekToko();
+  }
+
   render() {
+    const {jenistoko} = this.state;
     return (
       <NativeBaseProvider>
         <AlertYesNoV2 ref={ref => (this.alert = ref)} />
@@ -42,6 +59,24 @@ export default class Akun extends React.Component {
                 <Text bold>Profil</Text>
                 <Text fontSize="sm">Data diri, Alamat, dan Keamanan Akun</Text>
               </Pressable>
+              {!jenistoko ? (
+                <Pressable
+                  paddingY={2}
+                  onPress={() => this.makeShop()}
+                  borderBottomWidth={0.5}>
+                  <Text bold>Buat Toko</Text>
+                  <Text fontSize="sm">Buka Toko d Baru</Text>
+                </Pressable>
+              ) : (
+                <Pressable
+                  paddingY={2}
+                  onPress={() => this.myListProduk()}
+                  borderBottomWidth={0.5}>
+                  <Text bold>Daftar Produk</Text>
+                  <Text fontSize="sm">Produk di toko saya</Text>
+                </Pressable>
+              )}
+
               <Pressable
                 paddingY={2}
                 onPress={() => this.logout()}
@@ -56,10 +91,14 @@ export default class Akun extends React.Component {
     );
   }
 
-  profil=() => {
-    
-  }
+  profil = () => {};
 
+  makeShop = () => {
+    this.props.navigation.navigate('Shop');
+  };
+  myListProduk = () => {
+    this.props.navigation.navigate('MyProduk');
+  };
   logout = () => {
     this.alert.show({message: 'Anda yakin ingin keluar?'}, async () => {
       let sessionData = [
@@ -68,7 +107,7 @@ export default class Akun extends React.Component {
         ['email', ''],
         ['notelp', ''],
         ['token', ''],
-      ]
+      ];
       await AsyncStorage.multiSet(sessionData);
       this.props.navigation.reset({index: 0, routes: [{name: 'Dashboard'}]});
     });

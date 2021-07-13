@@ -80,12 +80,14 @@ export default class Login extends React.Component {
           'Login Berhasil, anda akan diarahkan ke halaman home.',
           ToastAndroid.SHORT,
         );
-        const {data: user} = data
+        const {data: user} = data;
+
         let sessionData = [
           ['nama', user.nama_lengkap],
           ['username', user.username],
           ['email', user.email],
           ['notelp', user.no_telp],
+          ['id', user.id.toString()],
           ['token', data.token],
         ];
         // console.warn(sessionData)

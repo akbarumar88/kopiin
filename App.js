@@ -45,6 +45,7 @@ import {theme} from './src/utilitas/Config';
 import AsyncStorage from '@react-native-community/async-storage';
 import Shop from './src/components/dashboard/Shop';
 import AddProduct from './src/components/dashboard/AddProduct';
+import MyProduk from './src/components/dashboard/MyProduk';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -90,6 +91,7 @@ class App extends Component {
               component={AddProduct}
             />
             <Stack.Screen name="Shop" component={Shop} />
+            <Stack.Screen name="MyProduk" component={MyProduk} />
           </Stack.Navigator>
         </NavigationContainer>
       </NativeBaseProvider>

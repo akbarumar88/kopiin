@@ -18,6 +18,8 @@ import {BASE_URL} from './../../utilitas/Config';
 import axios from 'axios';
 import QueryString from 'qs';
 import AsyncStorage from '@react-native-community/async-storage';
+import AlertOkV2 from './../universal/AlertOkV2';
+import {errMsg} from './../../utilitas/Function';
 export default class AddProduct extends React.Component {
   constructor(props) {
     super(props);
@@ -36,9 +38,10 @@ export default class AddProduct extends React.Component {
   }
 
   getKategori = () => {
+    this.setState({loggingIn: true});
     fetch(BASE_URL() + '/kategori').then(res => {
       res.json().then(e => {
-        this.setState({kategori: e.data});
+        this.setState({kategori: e.data, loggingIn: false});
         this.setState({form: {...this.state.form, kategori: e.data[0].id}});
       });
     });
@@ -75,15 +78,15 @@ export default class AddProduct extends React.Component {
     this.simpan();
   };
 
-  simpan = () => {
+  simpan = async () => {
     this.setState({loggingIn: true});
     const {form, variasi} = this.state;
-
+    let id = await AsyncStorage.getItem('id');
     axios
       .post(
         `${BASE_URL()}/barang`,
         JSON.stringify({
-          id_merchant: '3',
+          id_merchant: id,
           id_kategori: form.kategori,
           nama: form.namaBarang,
           deskripsi: form.deskripsi,
@@ -99,11 +102,15 @@ export default class AddProduct extends React.Component {
       )
       .then(async ({data}) => {
         this.setState({loggingIn: false});
-        if (!data.status) {
-          console.log('Salah');
-        } else {
-          console.log('Benar');
+        if (data.status) {
+          this.props.navigation.goBack();
         }
+      })
+      .catch(e => {
+        this.setState({loggingIn: false});
+        this.alert.show({
+          message: errMsg('Tambah Produk'),
+        });
       });
   };
 
@@ -112,6 +119,7 @@ export default class AddProduct extends React.Component {
     return (
       <NativeBaseProvider>
         <ScrollView>
+          <AlertOkV2 ref={ref => (this.alert = ref)} />
           <Box flex={1} p={2} w="90%" mx="auto" pb={8}>
             <Heading size="lg" color={theme.primary}>
               Buat Barang
@@ -286,7 +294,7 @@ export default class AddProduct extends React.Component {
                   onPress={this.validate}
                   bgColor={theme.primary}
                   _text={{color: 'white'}}>
-                  Lanjutkan
+                  Simpan
                 </Button>
               </VStack>
             </VStack>
