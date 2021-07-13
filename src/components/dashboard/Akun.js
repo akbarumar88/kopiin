@@ -91,7 +91,9 @@ export default class Akun extends React.Component {
     );
   }
 
-  profil = () => {};
+  profil = () => {
+    this.props.navigation.navigate('Profil')
+  };
 
   makeShop = () => {
     this.props.navigation.navigate('Shop');
