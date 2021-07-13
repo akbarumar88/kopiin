@@ -17,13 +17,20 @@ import {
   Divider,
   ScrollView,
 } from 'native-base';
-import {BASE_URL, theme} from '../../utilitas/Config';
+import {BASE_URL, OAUTH_CLIENT_ID, theme} from '../../utilitas/Config';
 import axios from 'axios';
-import {ToastAndroid} from 'react-native';
+import {ToastAndroid,ActivityIndicator} from 'react-native';
+import Modal from 'react-native-modal';
 import {errMsg} from '../../utilitas/Function';
 import AlertOkV2 from '../universal/AlertOkV2';
+import Loading from '../universal/Loading';
 import QueryString from 'qs';
 import AsyncStorage from '@react-native-community/async-storage';
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+  statusCodes,
+} from '@react-native-community/google-signin';
 
 export default class Login extends React.Component {
   constructor(props) {
@@ -34,8 +41,29 @@ export default class Login extends React.Component {
       error: {},
       form: {},
       showpass: false,
+      loadingEmail: false
     };
   }
+
+  componentDidMount() {
+    GoogleSignin.configure({
+      webClientId: OAUTH_CLIENT_ID, // client ID of type WEB for your server (needed to verify user ID and offline access)
+      offlineAccess: false, // if you want to access Google API on behalf of the user FROM YOUR SERVER
+    });
+  }
+
+  async componentWillUnmount() {
+    
+  }
+
+  signOutGoogle = async () => {
+    try {
+      await GoogleSignin.revokeAccess();
+      await GoogleSignin.signOut();
+    } catch (error) {
+      Alert.alert('Terjadi kesalahan saat logout... ', error.toString());
+    }
+  };
 
   validate = () => {
     const {form} = this.state;
@@ -55,6 +83,73 @@ export default class Login extends React.Component {
       return;
     }
     this.login();
+  };
+
+  googleSignIn = async () => {
+    try {
+      if (await GoogleSignin.isSignedIn()) {
+        // Logout Google Account, agar tidak auto signed-in
+        await this.signOutGoogle();
+      }
+      await GoogleSignin.hasPlayServices();
+      const {user} = await GoogleSignin.signIn();
+
+      // console.warn('1', user);
+      // Jika berhasil sign-in, cek ketersediaan e-mail
+      this.setState({loadingEmail:true})
+      try {
+        let {data} = await axios.post(
+          `${BASE_URL()}/auth/email`,
+          QueryString.stringify({username: user.email}),
+        );
+        this.setState({loadingEmail:false})
+        if (!data.status) {
+          this.alert.show({
+            message: errMsg('Cek E-mail'),
+          });
+          return;
+        }
+        // Berhasil
+        this.props.navigation.navigate('Register', {
+          email: user.email,
+          nama: user.name,
+          username: user.email.replace(/@.+/, ''),
+        });
+      } catch (e) {
+        this.setState({loadingEmail:false})
+        this.alert.show({
+          message: e.response?.data?.errorMessage ?? errMsg('Cek E-mail'),
+        });
+        console.warn(e.response?.data ?? e.message);
+      }
+      // this.setState(s => ({
+      //   form: {
+      //     ...s.form,
+      //     email: user.email,
+      //     nama: user.name,
+      //     username: user.email.replace(/@gmail.com/, ''),
+      //   },
+      // }));
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // user cancelled the login flow
+        Alert.alert('Cancel');
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        alert('Signin in progress');
+        // operation (f.e. sign in) is in progress already
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        alert('PLAY_SERVICES_NOT_AVAILABLE');
+        // play services not available or outdated
+      } else {
+        // some other error happened
+        console.warn(error.message);
+        Alert.alert(
+          'Terjadi kesalahan saat register dengan Google... ',
+          error.toString(),
+        );
+        setError(error);
+      }
+    }
   };
 
   login = () => {
@@ -104,9 +199,10 @@ export default class Login extends React.Component {
   };
 
   render() {
-    const {loggingIn, error, showpass} = this.state;
+    const {loggingIn, error, showpass, loadingEmail} = this.state;
     return (
       <NativeBaseProvider>
+        <Loading isVisible={loadingEmail} />
         <AlertOkV2 ref={ref => (this.alert = ref)} />
         <ScrollView>
           <Box flex={1} p={8} bg="white">
@@ -202,7 +298,8 @@ export default class Login extends React.Component {
                 </Text>
                 <Link
                   onPress={_ => {
-                    this.props.navigation.navigate('Register');
+                    // this.props.navigation.navigate('Register');
+                    this.googleSignIn();
                   }}
                   _text={{color: theme.primary, bold: true, fontSize: 'sm'}}>
                   Daftar

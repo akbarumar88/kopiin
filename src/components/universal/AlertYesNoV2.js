@@ -92,8 +92,8 @@ export default class AlertYesNoV2 extends Component {
   }
 
   static defaultProps = {
-    animationIn: "fadeIn",
-    animationOut: "fadeOut",
+    animationIn: "zoomIn",
+    animationOut: "zoomOut",
     refs: () => {}
   }
 
