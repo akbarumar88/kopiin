@@ -36,10 +36,15 @@ class Register extends React.Component {
   constructor(props) {
     super(props);
 
+    const {email,nama,username} = props.route.params
     this.state = {
       loggingIn: false,
       error: {},
-      form: {},
+      form: {
+        email,
+        nama,
+        username
+      },
       showpass: false,
       showkonfpass: false,
     };
@@ -272,7 +277,7 @@ class Register extends React.Component {
                     this.setState({form: {...this.state.form, notelp: val}});
                   }}
                   onSubmitEditing={() => {
-                    this.iemail.focus();
+                    this.ipass.focus();
                   }}
                   autoCapitalize="words"
                   value={form.notelp}
@@ -290,6 +295,7 @@ class Register extends React.Component {
                   E-mail
                 </FormControl.Label>
                 <Input
+                  isDisabled={true}
                   keyboardType="email-address"
                   ref={ref => (this.iemail = ref)}
                   onChangeText={val => {
@@ -391,7 +397,7 @@ class Register extends React.Component {
                   Daftar
                 </Button>
 
-                <Button
+                {/* <Button
                   mt={1}
                   onPress={this.googleSignIn}
                   disabled={loggingIn}
@@ -401,7 +407,7 @@ class Register extends React.Component {
                     <Icon as={MaterialCommunityIcons} name="google" size={5} />
                   }>
                   Gunakan Akun Google
-                </Button>
+                </Button> */}
 
                 {/* <HStack justifyContent="center" alignItem="center">
                   <IconButton
