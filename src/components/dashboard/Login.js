@@ -100,7 +100,7 @@ export default class Login extends React.Component {
       try {
         let {data} = await axios.post(
           `${BASE_URL()}/auth/email`,
-          QueryString.stringify({username: user.email}),
+          QueryString.stringify({email: user.email, id: 0}), // Pake id=0 agar kena semua
         );
         this.setState({loadingEmail:false})
         if (!data.status) {

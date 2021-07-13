@@ -40,6 +40,7 @@ import Keranjang from './src/components/dashboard/Keranjang';
 import Akun from './src/components/dashboard/Akun';
 import Login from './src/components/dashboard/Login';
 import Register from './src/components/dashboard/Register';
+import Profil from './src/components/akun/Profil';
 import Dashboard from './src/components/dashboard/Index';
 import {theme} from './src/utilitas/Config';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -85,6 +86,7 @@ class App extends Component {
               options={{headerShown: false}}
             />
             <Stack.Screen name="Register" component={Register} />
+            <Stack.Screen name="Profil" component={Profil} />
             <Stack.Screen
               name="AddProduct"
               options={{title: 'Tambah Produk'}}

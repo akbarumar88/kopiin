@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Alert,ToastAndroid} from 'react-native';
+import {Alert, ToastAndroid} from 'react-native';
 import {
   NativeBaseProvider,
   Box,
@@ -29,24 +29,23 @@ import auth from '@react-native-firebase/auth';
 import axios from 'axios';
 import QueryString from 'qs';
 import AlertOkV2 from '../universal/AlertOkV2';
-import { errMsg } from '../../utilitas/Function';
+import Loading from '../universal/Loading';
+import {errMsg} from '../../utilitas/Function';
 import AsyncStorage from '@react-native-community/async-storage';
 
-class Register extends React.Component {
+class Profil extends React.Component {
   constructor(props) {
     super(props);
 
-    const {email,nama,username} = props.route.params
     this.state = {
-      loggingIn: false,
+      updating: false,
       error: {},
-      form: {
-        email,
-        nama,
-        username
-      },
+      form: {},
       showpass: false,
       showkonfpass: false,
+      loadingEmail: false,
+      initialLoad: true,
+      userid:0
     };
   }
 
@@ -55,6 +54,7 @@ class Register extends React.Component {
       webClientId: OAUTH_CLIENT_ID, // client ID of type WEB for your server (needed to verify user ID and offline access)
       offlineAccess: false, // if you want to access Google API on behalf of the user FROM YOUR SERVER
     });
+    this.fillData();
   }
 
   async componentWillUnmount() {
@@ -63,6 +63,17 @@ class Register extends React.Component {
       this.signOutGoogle();
     }
   }
+
+  fillData = async () => {
+    let [[k0, userid],[k1, email], [k2, username], [k3, nama], [k4, notelp]] =
+      await AsyncStorage.multiGet(['id','email', 'username', 'nama', 'notelp']);
+    // console.warn({email,username,nama,notelp})
+    this.setState(s => ({
+      form: {...s.form, email, username, notelp, nama},
+      userid,
+      initialLoad: false,
+    }));
+  };
 
   signOutGoogle = async () => {
     try {
@@ -93,18 +104,6 @@ class Register extends React.Component {
       error = {...error, notelp: 'No. telepon tidak valid'};
     }
 
-    if (!form.pass) {
-      error = {...error, pass: 'Password harus diisi'};
-    } else if (form.pass.length < 8) {
-      error = {...error, pass: 'Password harus minimal 8 karakter'};
-    }
-
-    if (!form.konfpass) {
-      error = {...error, konfpass: 'Konfirmasi Password harus diisi'};
-    } else if (form.konfpass !== form.pass) {
-      error = {...error, konfpass: 'Konfirmasi Password tidak sama'};
-    }
-
     if (!form.email) {
       error = {...error, email: 'Email harus diisi'};
     } else if (
@@ -119,15 +118,15 @@ class Register extends React.Component {
     if (error) {
       return;
     }
-    this.register();
+    this.saveChange();
   };
 
-  register = () => {
-    const {form} = this.state
-    this.setState({loggingIn: true})
+  saveChange = () => {
+    const {form,userid} = this.state;
+    this.setState({updating: true});
     axios
-      .post(
-        `${BASE_URL()}/auth/register`,
+      .put(
+        `${BASE_URL()}/user/${userid}`,
         QueryString.stringify({
           username: form.username,
           nama_lengkap: form.nama,
@@ -137,41 +136,96 @@ class Register extends React.Component {
         }),
       )
       .then(async ({data}) => {
-        this.setState({loggingIn: false})
+        this.setState({updating: false});
         if (!data.status) {
           this.alert.show({
-            message:
-              'Terjadi kesalahan saat register. harap coba lagi beberapa saat.',
+            message: errMsg('Ubah Profil'),
           });
           return;
         }
-        ToastAndroid.show('Pendaftaran Berhasil, anda akan diarahkan ke halaman home.', ToastAndroid.SHORT);
         let sessionData = [
           ['nama', form.nama],
           ['username', form.username],
           ['email', form.email],
           ['notelp', form.notelp],
-          ['id', data.data.id.toString()],
-          ['token', data.token],
-        ]
-        console.warn(sessionData)
+        ];
+        // console.warn(sessionData)
         await AsyncStorage.multiSet(sessionData);
-        this.props.navigation.reset({index: 0, routes: [{name: 'Dashboard'}]});
+        ToastAndroid.show(
+          'Berhasil ubah profil. Data anda telah disimpan.',
+          ToastAndroid.SHORT,
+        );
       })
       .catch(e => {
-        this.setState({loggingIn: false})
+        this.setState({updating: false});
         this.alert.show({
-          message:
-            e.response?.data?.errorMessage ?? errMsg('Register'),
+          message: e.response?.data?.errorMessage ?? errMsg('Ubah Profil'),
         });
         console.warn(e.response?.data ?? e.message);
       });
   };
 
+  selectEmail = async () => {
+    const {userid} = this.state
+    try {
+      if (await GoogleSignin.isSignedIn()) {
+        // Logout Google Account, agar tidak auto signed-in
+        await this.signOutGoogle();
+      }
+      await GoogleSignin.hasPlayServices();
+      const {user} = await GoogleSignin.signIn();
+
+      // console.warn('1', user);
+      // Jika berhasil sign-in, cek ketersediaan e-mail
+      this.setState({loadingEmail:true})
+      try {
+        let {data} = await axios.post(
+          `${BASE_URL()}/auth/email`,
+          QueryString.stringify({email: user.email, id: userid}),
+        );
+        this.setState({loadingEmail:false})
+        if (!data.status) {
+          this.alert.show({
+            message: errMsg('Cek E-mail'),
+          });
+          return;
+        }
+        // Berhasil
+        this.setState(s => ({form: {...s.form, email: user.email}}));
+      } catch (e) {
+        this.setState({loadingEmail:false})
+        this.alert.show({
+          message: e.response?.data?.errorMessage ?? errMsg('Cek E-mail'),
+        });
+        console.warn(e.response?.data ?? e.message);
+      }
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // user cancelled the login flow
+        // Alert.alert('Cancel');
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        alert('Signin in progress');
+        // operation (f.e. sign in) is in progress already
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        alert('PLAY_SERVICES_NOT_AVAILABLE');
+        // play services not available or outdated
+      } else {
+        // some other error happened
+        console.warn(error.message);
+        Alert.alert(
+          'Terjadi kesalahan saat register dengan Google... ',
+          error.toString(),
+        );
+        setError(error);
+      }
+    }
+  };
+
   render() {
-    const {loggingIn, error, showpass, showkonfpass, form} = this.state;
+    const {updating, error, showpass, showkonfpass, form,loadingEmail,initialLoad} = this.state;
     return (
       <NativeBaseProvider>
+        <Loading isVisible={loadingEmail || initialLoad} />
         <AlertOkV2 ref={ref => (this.alert = ref)} />
         <ScrollView>
           <Box flex={1} paddingX={8} pb={8} bg="white">
@@ -271,6 +325,23 @@ class Register extends React.Component {
                   }}
                   value={form.email}
                   autoCapitalize={'none'}
+                  InputRightElement={
+                    <IconButton
+                      onPress={_ => this.selectEmail()}
+                      variant="unstyled"
+                      startIcon={
+                        <Icon
+                          as={
+                            <MaterialCommunityIcons
+                              name={'email-edit-outline'}
+                            />
+                          }
+                          color="muted.700"
+                          size="sm"
+                        />
+                      }
+                    />
+                  }
                 />
                 <FormControl.ErrorMessage
                   _text={{fontSize: 'xs', color: 'error.500', fontWeight: 500}}>
@@ -278,94 +349,19 @@ class Register extends React.Component {
                 </FormControl.ErrorMessage>
               </FormControl>
 
-              <FormControl isRequired isInvalid={'pass' in error}>
-                <FormControl.Label
-                  _text={{color: 'muted.700', fontSize: 'sm', fontWeight: 600}}>
-                  Password
-                </FormControl.Label>
-                <Input
-                  ref={ref => (this.ipass = ref)}
-                  onChangeText={val => {
-                    this.setState({form: {...this.state.form, pass: val}});
-                  }}
-                  onSubmitEditing={() => {
-                    this.ikonfpass.focus();
-                  }}
-                  InputRightElement={
-                    <IconButton
-                      onPress={_ => this.setState({showpass: !showpass})}
-                      variant="unstyled"
-                      startIcon={
-                        <Icon
-                          as={
-                            <MaterialCommunityIcons
-                              name={showpass ? 'eye-off' : 'eye'}
-                            />
-                          }
-                          color="muted.700"
-                          size="sm"
-                        />
-                      }
-                    />
-                  }
-                  type={showpass ? 'text' : 'password'}
-                />
-                <FormControl.ErrorMessage
-                  _text={{fontSize: 'xs', color: 'error.500', fontWeight: 500}}>
-                  {error.pass}
-                </FormControl.ErrorMessage>
-              </FormControl>
-
-              <FormControl mb={5} isRequired isInvalid={'konfpass' in error}>
-                <FormControl.Label
-                  _text={{color: 'muted.700', fontSize: 'sm', fontWeight: 600}}>
-                  Konfirmasi Password
-                </FormControl.Label>
-                <Input
-                  ref={ref => (this.ikonfpass = ref)}
-                  onChangeText={val => {
-                    this.setState({form: {...this.state.form, konfpass: val}});
-                  }}
-                  InputRightElement={
-                    <IconButton
-                      onPress={_ =>
-                        this.setState({showkonfpass: !showkonfpass})
-                      }
-                      variant="unstyled"
-                      startIcon={
-                        <Icon
-                          as={
-                            <MaterialCommunityIcons
-                              name={showkonfpass ? 'eye-off' : 'eye'}
-                            />
-                          }
-                          color="muted.700"
-                          size="sm"
-                        />
-                      }
-                    />
-                  }
-                  type={showkonfpass ? 'text' : 'password'}
-                />
-                <FormControl.ErrorMessage
-                  _text={{fontSize: 'xs', color: 'error.500', fontWeight: 500}}>
-                  {error.konfpass}
-                </FormControl.ErrorMessage>
-              </FormControl>
-
-              <VStack space={2}>
+              <VStack space={2} mt={4}>
                 <Button
                   onPress={this.validate}
-                  isLoading={loggingIn}
+                  isLoading={updating}
                   bgColor={theme.primary}
                   _text={{color: 'white'}}>
-                  Daftar
+                  Ubah
                 </Button>
 
                 {/* <Button
                   mt={1}
-                  onPress={this.googleSignIn}
-                  disabled={loggingIn}
+                  onPress={this.selectEmail}
+                  disabled={updating}
                   bgColor={'red.600'}
                   _text={{color: 'white'}}
                   startIcon={
@@ -413,4 +409,4 @@ function withHook(Component) {
   };
 }
 
-export default (Register);
+export default Profil;
