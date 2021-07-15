@@ -1,8 +1,9 @@
-import React, { Component } from "react"
-import { View, Text, TouchableNativeFeedback } from "react-native"
-import Modal from "react-native-modal"
-import PropTypes from "prop-types"
-import { theme } from "../../utilitas/Config"
+import React, {Component} from 'react';
+import {View, Text, TouchableNativeFeedback} from 'react-native';
+import Modal from 'react-native-modal';
+import PropTypes from 'prop-types';
+import {theme} from '../../utilitas/Config';
+import {AlertDialog, Button, NativeBaseProvider, Center} from 'native-base';
 
 /**
  * Alert Ok Component
@@ -12,7 +13,7 @@ import { theme } from "../../utilitas/Config"
  * @author [React Native Community](https://github.com/react-native-community)
  */
 
-export default class AlertOkV2 extends Component {
+class AlertOkV2 extends Component {
   static propTypes = {
     /**
      * Title modal nya.
@@ -88,37 +89,37 @@ export default class AlertOkV2 extends Component {
      * Button tambahan di bawah 'ok'
      * @since Version 1.0.0
      */
-    additionalButton: PropTypes.any
-  }
+    additionalButton: PropTypes.any,
+  };
 
   static defaultProps = {
-    animationIn: "zoomIn",
-    animationOut: "zoomOut",
-    refs: () => {}
-  }
+    animationIn: 'zoomIn',
+    animationOut: 'zoomOut',
+    refs: () => {},
+  };
 
   constructor(props) {
-    super(props)
+    super(props);
 
     this.state = {
       isVisible: false,
-      title: "",
-      message: "",
+      title: '',
+      message: '',
       setCanceledOnTouchOutside: true,
       onConfirm: () => {},
       onCancel: () => {},
       onModalHide: () => {},
-      customMessageComponent: null
-    }
+      customMessageComponent: null,
+    };
   }
 
   componentDidMount() {
     // console.warn(this.props)
-    this.props.refs(this)
+    this.props.refs(this);
   }
 
-  render() {
-    const { props } = this
+  renderv2() {
+    const {props} = this;
     const {
       isVisible,
       title,
@@ -126,8 +127,50 @@ export default class AlertOkV2 extends Component {
       setCanceledOnTouchOutside,
       onConfirm,
       onCancel,
-      customMessageComponent
-    } = this.state
+      customMessageComponent,
+    } = this.state;
+    return (
+      <AlertDialog
+        motionPreset="fade"
+        leastDestructiveRef={this.cancelRef}
+        onClose={() => {}}
+        isOpen={isVisible}
+        closeOnOverlayClick={true}
+        isCentered>
+        <AlertDialog.Content>
+          {/* <AlertDialog.CloseButton onPress={() => {
+            this.close()
+            onCancel()
+          }} /> */}
+          <AlertDialog.Header>{title}</AlertDialog.Header>
+          <AlertDialog.Body>{message}</AlertDialog.Body>
+          <AlertDialog.Footer>
+            <Button
+              bgColor={theme.primary}
+              ml={3}
+              onPress={() => {
+                this.close();
+                onConfirm();
+              }}>
+              Ya
+            </Button>
+          </AlertDialog.Footer>
+        </AlertDialog.Content>
+      </AlertDialog>
+    );
+  }
+
+  render() {
+    const {props} = this;
+    const {
+      isVisible,
+      title,
+      message,
+      setCanceledOnTouchOutside,
+      onConfirm,
+      onCancel,
+      customMessageComponent,
+    } = this.state;
     return (
       <Modal
         animationInTiming={100}
@@ -141,80 +184,73 @@ export default class AlertOkV2 extends Component {
         }
         animationIn={props.animationIn}
         animationOut={props.animationOut}
-        onModalHide={this.state.onModalHide}
-      >
+        onModalHide={this.state.onModalHide}>
         <View
           style={{
-            backgroundColor: "white",
+            backgroundColor: 'white',
             // alignItems: "center",
             paddingHorizontal: 16,
             paddingTop: 24,
             paddingBottom: 16,
-            borderRadius: 8
-          }}
-        >
+            borderRadius: 8,
+          }}>
           <Text
             style={{
-              fontWeight: "bold",
-              color: "#333",
+              fontWeight: 'bold',
+              color: '#333',
               fontSize: 20,
-              textAlign: "center"
-            }}
-          >
+              textAlign: 'center',
+            }}>
             {title}
           </Text>
 
           {customMessageComponent ?? (
             <Text
               style={{
-                color: "#777",
+                color: '#777',
                 marginTop: 16,
-                textAlign: "center",
-                fontSize: 14
-              }}
-            >
+                textAlign: 'center',
+                fontSize: 14,
+              }}>
               {message}
             </Text>
           )}
 
           <TouchableNativeFeedback
             onPress={_ => this.close(onConfirm)}
-            style={{}}
-          >
+            style={{}}>
             <View
               style={{
                 paddingVertical: 12,
                 backgroundColor: theme.primary,
                 borderRadius: 8,
-                marginTop: 24
-              }}
-            >
+                marginTop: 24,
+              }}>
               <Text
                 style={{
-                  textAlign: "center",
-                  color: "white",
+                  textAlign: 'center',
+                  color: 'white',
                   fontSize: 14,
-                  fontWeight: "bold"
-                }}
-              >
+                  fontWeight: 'bold',
+                }}>
                 OK
               </Text>
             </View>
           </TouchableNativeFeedback>
         </View>
       </Modal>
-    )
+    );
   }
 
   show = (
     {
-      title = "Peringatan",
+      title = 'Peringatan',
       message,
       setCanceledOnTouchOutside = true,
-      customMessageComponent = null
+      customMessageComponent = null,
     },
     onConfirm = () => {},
-    onCancel = () => {}
+    onCancel = () => {},
   ) => {
     this.setState({
       title,
@@ -223,22 +259,22 @@ export default class AlertOkV2 extends Component {
       onCancel,
       onConfirm,
       isVisible: true,
-      customMessageComponent
-    })
-  }
+      customMessageComponent,
+    });
+  };
 
   close = action => {
     this.setState({
-      title: "",
-      message: "",
+      title: '',
+      message: '',
       setCanceledOnTouchOutside: true,
       onCancel: _ => {},
       onConfirm: _ => {},
       onModalHide: action,
       isVisible: false,
-      customMessageComponent: null
-    })
-  }
+      customMessageComponent: null,
+    });
+  };
 }
 
 /**
@@ -249,3 +285,4 @@ export default class AlertOkV2 extends Component {
         positiveText="OK"
     />
  */
+export default AlertOkV2;
