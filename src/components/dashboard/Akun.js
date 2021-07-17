@@ -17,6 +17,8 @@ import {
   HStack,
   Divider,
   ScrollView,
+  Tabs,
+  extendTheme,
 } from 'native-base';
 import {theme} from '../../utilitas/Config';
 import {Alert} from 'react-native';
@@ -52,51 +54,90 @@ export default class Akun extends React.Component {
             </Heading>
 
             <VStack>
-              <Pressable
-                paddingY={2}
-                onPress={() => this.profil()}
-                borderBottomWidth={0.5}>
-                <Text bold>Profil</Text>
-                <Text fontSize="sm">Data diri, Alamat, dan Keamanan Akun</Text>
-              </Pressable>
-              <Pressable
-                paddingY={2}
-                onPress={() => this.ubahPasssword()}
-                borderBottomWidth={0.5}>
-                <Text bold>Ubah Password</Text>
-                <Text fontSize="sm">Ubah Password dari akun anda</Text>
-              </Pressable>
-              {!id_merchant ? (
-                <Pressable
-                  paddingY={2}
-                  onPress={() => this.makeShop()}
-                  borderBottomWidth={0.5}>
-                  <Text bold>Buat Toko</Text>
-                  <Text fontSize="sm">Buka Toko Baru</Text>
-                </Pressable>
-              ) : (
-                <Pressable
-                  paddingY={2}
-                  onPress={() => this.myListProduk()}
-                  borderBottomWidth={0.5}>
-                  <Text bold>Daftar Produk</Text>
-                  <Text fontSize="sm">Produk di toko saya</Text>
-                </Pressable>
-              )}
+              <Tabs colorScheme="amber" isFitted>
+                {/* Tab Heading */}
+                <Tabs.Bar>
+                  <Tabs.Tab>User</Tabs.Tab>
+                  <Tabs.Tab>Toko</Tabs.Tab>
+                </Tabs.Bar>
 
-              <Pressable
-                paddingY={2}
-                onPress={() => this.logout()}
-                borderBottomWidth={0.5}>
-                <Text bold>Keluar</Text>
-                <Text fontSize="sm">Keluar dari akun anda.</Text>
-              </Pressable>
+                {/* Tab View */}
+                <Tabs.Views>
+                  <Tabs.View>{this.userView()}</Tabs.View>
+                  <Tabs.View>
+                    {id_merchant ? this.merchantView() : this.registerView()}
+                  </Tabs.View>
+                </Tabs.Views>
+              </Tabs>
             </VStack>
           </Box>
         </ScrollView>
       </NativeBaseProvider>
     );
   }
+
+  userView = () => {
+    const {id_merchant} = this.state;
+    return (
+      <Box>
+        <Pressable
+          paddingY={2}
+          onPress={() => this.profil()}
+          borderBottomWidth={0.5}>
+          <Text bold>Profil</Text>
+          <Text fontSize="sm">Data diri, Alamat, dan Keamanan Akun</Text>
+        </Pressable>
+        <Pressable
+          paddingY={2}
+          onPress={() => this.ubahPasssword()}
+          borderBottomWidth={0.5}>
+          <Text bold>Ubah Password</Text>
+          <Text fontSize="sm">Ubah Password dari akun anda</Text>
+        </Pressable>
+
+        <Pressable
+          paddingY={2}
+          onPress={() => this.logout()}
+          borderBottomWidth={0.5}>
+          <Text bold>Keluar</Text>
+          <Text fontSize="sm">Keluar dari akun anda.</Text>
+        </Pressable>
+      </Box>
+    );
+  };
+
+  merchantView = () => {
+    return (
+      <Box>
+        <Pressable paddingY={2} onPress={() => {}} borderBottomWidth={0.5}>
+          <Text bold>Profil Toko</Text>
+          <Text fontSize="sm">Jenis Toko, Alamat, dan Foto Profil</Text>
+        </Pressable>
+
+        <Pressable
+          paddingY={2}
+          onPress={() => this.myListProduk()}
+          borderBottomWidth={0.5}>
+          <Text bold>Daftar Produk</Text>
+          <Text fontSize="sm">Produk di toko saya</Text>
+        </Pressable>
+      </Box>
+    );
+  };
+
+  registerView = () => {
+    return (
+      <Box>
+        <Pressable
+          paddingY={2}
+          onPress={() => this.bukaToko()}
+          borderBottomWidth={0.5}>
+          <Text bold>Buka Toko</Text>
+          <Text fontSize="sm">Buka Toko Gratis!</Text>
+        </Pressable>
+      </Box>
+    );
+  };
 
   profil = () => {
     this.props.navigation.navigate('Profil');
@@ -105,12 +146,15 @@ export default class Akun extends React.Component {
   ubahPasssword = () => {
     this.props.navigation.navigate('UbahPassword');
   };
-  makeShop = () => {
+
+  bukaToko = () => {
     this.props.navigation.navigate('Shop');
   };
+
   myListProduk = () => {
     this.props.navigation.navigate('MyProduk');
   };
+
   logout = () => {
     this.alert.show({message: 'Anda yakin ingin keluar?'}, async () => {
       let sessionData = [
@@ -119,6 +163,8 @@ export default class Akun extends React.Component {
         ['email', ''],
         ['notelp', ''],
         ['token', ''],
+        ['id', ''],
+        ['id_merchant', ''],
       ];
       await AsyncStorage.multiSet(sessionData);
       this.props.navigation.reset({index: 0, routes: [{name: 'Dashboard'}]});
