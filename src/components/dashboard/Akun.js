@@ -109,7 +109,10 @@ export default class Akun extends React.Component {
   merchantView = () => {
     return (
       <Box>
-        <Pressable paddingY={2} onPress={() => {}} borderBottomWidth={0.5}>
+        <Pressable
+          paddingY={2}
+          onPress={() => this.bukaToko()}
+          borderBottomWidth={0.5}>
           <Text bold>Profil Toko</Text>
           <Text fontSize="sm">Jenis Toko, Alamat, dan Foto Profil</Text>
         </Pressable>

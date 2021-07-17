@@ -95,7 +95,11 @@ class App extends Component {
               component={AddProduct}
             />
 
-            <Stack.Screen name="Shop" component={Shop} />
+            <Stack.Screen
+              options={{title: 'Profil Toko'}}
+              name="Shop"
+              component={Shop}
+            />
             <Stack.Screen name="MyProduk" component={MyProduk} />
           </Stack.Navigator>
         </NavigationContainer>
