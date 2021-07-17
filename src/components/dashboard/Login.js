@@ -19,7 +19,7 @@ import {
 } from 'native-base';
 import {BASE_URL, OAUTH_CLIENT_ID, theme} from '../../utilitas/Config';
 import axios from 'axios';
-import {ToastAndroid,ActivityIndicator} from 'react-native';
+import {ToastAndroid, ActivityIndicator} from 'react-native';
 import Modal from 'react-native-modal';
 import {errMsg} from '../../utilitas/Function';
 import AlertOkV2 from '../universal/AlertOkV2';
@@ -41,7 +41,7 @@ export default class Login extends React.Component {
       error: {},
       form: {},
       showpass: false,
-      loadingEmail: false
+      loadingEmail: false,
     };
   }
 
@@ -52,9 +52,7 @@ export default class Login extends React.Component {
     });
   }
 
-  async componentWillUnmount() {
-    
-  }
+  async componentWillUnmount() {}
 
   signOutGoogle = async () => {
     try {
@@ -96,13 +94,13 @@ export default class Login extends React.Component {
 
       // console.warn('1', user);
       // Jika berhasil sign-in, cek ketersediaan e-mail
-      this.setState({loadingEmail:true})
+      this.setState({loadingEmail: true});
       try {
         let {data} = await axios.post(
           `${BASE_URL()}/auth/email`,
           QueryString.stringify({email: user.email, id: 0}), // Pake id=0 agar kena semua
         );
-        this.setState({loadingEmail:false})
+        this.setState({loadingEmail: false});
         if (!data.status) {
           this.alert.show({
             message: errMsg('Cek E-mail'),
@@ -116,7 +114,7 @@ export default class Login extends React.Component {
           username: user.email.replace(/@.+/, ''),
         });
       } catch (e) {
-        this.setState({loadingEmail:false})
+        this.setState({loadingEmail: false});
         this.alert.show({
           message: e.response?.data?.errorMessage ?? errMsg('Cek E-mail'),
         });
@@ -183,6 +181,7 @@ export default class Login extends React.Component {
           ['email', user.email],
           ['notelp', user.no_telp],
           ['id', user.id.toString()],
+          ['id_merchant', user.id_merchant?.toString() ?? ''],
           ['token', data.token],
         ];
         // console.warn(sessionData)

@@ -27,13 +27,13 @@ export default class Akun extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      jenistoko: null,
+      id_merchant: null,
     };
   }
 
   async cekToko() {
-    let jenis = await AsyncStorage.getItem('jenistoko');
-    this.setState({jenistoko: jenis});
+    let id_merchant = await AsyncStorage.getItem('id_merchant');
+    this.setState({id_merchant: id_merchant});
   }
 
   componentDidMount() {
@@ -41,7 +41,7 @@ export default class Akun extends React.Component {
   }
 
   render() {
-    const {jenistoko} = this.state;
+    const {id_merchant} = this.state;
     return (
       <NativeBaseProvider>
         <AlertYesNoV2 ref={ref => (this.alert = ref)} />
@@ -66,13 +66,13 @@ export default class Akun extends React.Component {
                 <Text bold>Ubah Password</Text>
                 <Text fontSize="sm">Ubah Password dari akun anda</Text>
               </Pressable>
-              {!jenistoko ? (
+              {!id_merchant ? (
                 <Pressable
                   paddingY={2}
                   onPress={() => this.makeShop()}
                   borderBottomWidth={0.5}>
                   <Text bold>Buat Toko</Text>
-                  <Text fontSize="sm">Buka Toko d Baru</Text>
+                  <Text fontSize="sm">Buka Toko Baru</Text>
                 </Pressable>
               ) : (
                 <Pressable
