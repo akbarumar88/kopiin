@@ -47,6 +47,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import Shop from './src/components/dashboard/Shop';
 import AddProduct from './src/components/dashboard/AddProduct';
 import MyProduk from './src/components/dashboard/MyProduk';
+import UbahPasssword from './src/components/akun/UbahPassword';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -87,11 +88,13 @@ class App extends Component {
             />
             <Stack.Screen name="Register" component={Register} />
             <Stack.Screen name="Profil" component={Profil} />
+            <Stack.Screen name="UbahPassword" component={UbahPasssword} />
             <Stack.Screen
               name="AddProduct"
               options={{title: 'Tambah Produk'}}
               component={AddProduct}
             />
+
             <Stack.Screen name="Shop" component={Shop} />
             <Stack.Screen name="MyProduk" component={MyProduk} />
           </Stack.Navigator>

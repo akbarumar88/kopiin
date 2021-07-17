@@ -59,6 +59,13 @@ export default class Akun extends React.Component {
                 <Text bold>Profil</Text>
                 <Text fontSize="sm">Data diri, Alamat, dan Keamanan Akun</Text>
               </Pressable>
+              <Pressable
+                paddingY={2}
+                onPress={() => this.ubahPasssword()}
+                borderBottomWidth={0.5}>
+                <Text bold>Ubah Password</Text>
+                <Text fontSize="sm">Ubah Password dari akun anda</Text>
+              </Pressable>
               {!jenistoko ? (
                 <Pressable
                   paddingY={2}
@@ -92,9 +99,12 @@ export default class Akun extends React.Component {
   }
 
   profil = () => {
-    this.props.navigation.navigate('Profil')
+    this.props.navigation.navigate('Profil');
   };
 
+  ubahPasssword = () => {
+    this.props.navigation.navigate('UbahPassword');
+  };
   makeShop = () => {
     this.props.navigation.navigate('Shop');
   };
