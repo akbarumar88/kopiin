@@ -80,7 +80,7 @@ export default class Home extends Component {
             <Box>
               <Text bold>Toko / Kedai Terdekat</Text>
               {this.listToko()}
-              <Text bold>Mungkin anda butuh barang ini</Text>
+              <Text bold>Mungkin anda suka</Text>
               {this.listBarang()}
             </Box>
           </ScrollView>
