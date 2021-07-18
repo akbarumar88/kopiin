@@ -137,10 +137,11 @@ export default class FormAlamat extends React.Component {
           const {data: value} = data;
 
           ToastAndroid.show(
-            'Berhasil ubah profil. Data anda telah disimpan.',
+            'Berhasil menambah alamat. Data anda telah disimpan.',
             ToastAndroid.SHORT,
           );
-          // this.props.navigation.goBack();
+
+          this.props.navigation.goBack();
         }
       })
       .catch(e => {
@@ -180,10 +181,10 @@ export default class FormAlamat extends React.Component {
           const {data: value} = data;
 
           ToastAndroid.show(
-            'Berhasil ubah profil. Data anda telah disimpan.',
+            'Berhasil mengubah alamat. Data anda telah disimpan.',
             ToastAndroid.SHORT,
           );
-          // this.props.navigation.goBack();
+          this.props.navigation.goBack();
         }
       })
       .catch(e => {
