@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {ToastAndroid} from 'react-native';
 import {
   NativeBaseProvider,
   Box,
@@ -41,7 +42,6 @@ export default class Shop extends React.Component {
   }
   handleChoosePhoto() {
     launchImageLibrary({noData: true}, response => {
-      // console.log(response);
       if (response.assets) {
         this.setState({foto_merchant: response.assets[0]});
       }
@@ -100,9 +100,13 @@ export default class Shop extends React.Component {
     let error;
     if (!form.namaToko) {
       error = {...error, namaToko: 'Nama Toko harus diisi'};
+    } else if (form.namaToko.length < 5) {
+      error = {...error, namaToko: 'Nama Toko harus lebih dari 5 huruf'};
     }
     if (!form.alamatToko) {
       error = {...error, alamatToko: 'Alamat Toko harus diisi'};
+    } else if (form.alamatToko.length < 5) {
+      error = {...error, alamatToko: 'Alamat Toko harus lebih dari 5 huruf'};
     }
     if (!form.kodepos) {
       error = {...error, kodepos: 'Kode Pos Toko harus diisi'};
@@ -153,19 +157,23 @@ export default class Shop extends React.Component {
 
           if (value.id_merchant) {
             this.setState({id_mechant: value.id_merchant.toString()});
-            AsyncStorage.setItem('id_merchant', value.id_merchant.toString());
+            await AsyncStorage.setItem(
+              'id_merchant',
+              value.id_merchant.toString(),
+            );
           }
           if (this.state.foto_merchant.uri) {
-            this.uploadFoto();
+            await this.uploadFoto();
           }
 
-          this.props.navigation.reset({
-            index: 0,
-            routes: [{name: 'Dashboard'}],
-          });
+          ToastAndroid.show(
+            'Berhasil ubah profil. Data anda telah disimpan.',
+            ToastAndroid.SHORT,
+          );
         }
       })
       .catch(e => {
+        console.warn(e);
         this.setState({loading: false});
         this.alert.show({
           message: errMsg('Buat Toko'),
@@ -181,14 +189,14 @@ export default class Shop extends React.Component {
       type: photo.type,
       uri: Platform.OS === 'ios' ? photo.uri.replace('file://', '') : photo.uri,
     });
-    console.log(`${BASE_URL()}/fotomerchant/${this.state.id_mechant}`);
+
     axios
       .post(`${BASE_URL()}/user/fotomerchant/${this.state.id_mechant}`, data)
-      .then(async ({data}) => {
-        console.log(data);
-      })
+      .then(async ({data}) => {})
       .catch(e => {
-        console.warn(e);
+        this.alert.show({
+          message: 'Terjadi Kesalahan saat Upload Foto',
+        });
       });
     return data;
   };
@@ -199,6 +207,7 @@ export default class Shop extends React.Component {
         {({loading, error, payload: data, refetch}) => {
           return (
             <FormControl
+              isRequired
               isInvalid={'provinsi' in this.state.error}
               isDisabled={loading || error}>
               <FormControl.Label
@@ -249,6 +258,7 @@ export default class Shop extends React.Component {
         {({loading, error, payload: data, refetch}) => {
           return (
             <FormControl
+              isRequired
               isInvalid={'kota' in this.state.error}
               isDisabled={loading || this.state.kota == '' || error}>
               <FormControl.Label
@@ -296,6 +306,7 @@ export default class Shop extends React.Component {
         {({loading, error, payload: data, refetch}) => {
           return (
             <FormControl
+              isRequired
               isInvalid={'kecamatan' in this.state.error}
               isDisabled={loading || error || this.state.kecamatan == ''}>
               <FormControl.Label
@@ -335,6 +346,7 @@ export default class Shop extends React.Component {
         {({loading, error, payload: data, refetch}) => {
           return (
             <FormControl
+              isRequired
               isInvalid={'jenis_toko' in this.state.error}
               isDisabled={loading || error}>
               <FormControl.Label
@@ -433,6 +445,7 @@ export default class Shop extends React.Component {
                   Kode Pos Toko
                 </FormControl.Label>
                 <Input
+                  keyboardType="number-pad"
                   onChangeText={val => {
                     this.setState({
                       form: {...this.state.form, kodepos: val},

@@ -18,6 +18,8 @@ import {
   Divider,
   ScrollView,
   useToast,
+  Avatar,
+  Pressable,
 } from 'native-base';
 import {BASE_URL, OAUTH_CLIENT_ID, theme} from '../../utilitas/Config';
 import {
@@ -32,6 +34,7 @@ import AlertOkV2 from '../universal/AlertOkV2';
 import Loading from '../universal/Loading';
 import {errMsg} from '../../utilitas/Function';
 import AsyncStorage from '@react-native-community/async-storage';
+import {launchImageLibrary} from 'react-native-image-picker';
 
 class Profil extends React.Component {
   constructor(props) {
@@ -45,7 +48,8 @@ class Profil extends React.Component {
       showkonfpass: false,
       loadingEmail: false,
       initialLoad: true,
-      userid:0
+      foto_user: 'https://puprpkpp.riau.go.id/asset/img/default-image.png',
+      userid: 0,
     };
   }
 
@@ -64,15 +68,65 @@ class Profil extends React.Component {
     }
   }
 
+  getDataAccount = id => {
+    axios
+      .get(`${BASE_URL()}/user/${id}`)
+      .then(async ({data}) => {
+        this.setState({
+          foto_user:
+            `${BASE_URL()}/image/user/` +
+            data.data.foto_user +
+            '?tgl=' +
+            new Date(),
+        });
+      })
+      .catch(e => {});
+  };
+
   fillData = async () => {
-    let [[k0, userid],[k1, email], [k2, username], [k3, nama], [k4, notelp]] =
-      await AsyncStorage.multiGet(['id','email', 'username', 'nama', 'notelp']);
+    let [[k0, userid], [k1, email], [k2, username], [k3, nama], [k4, notelp]] =
+      await AsyncStorage.multiGet([
+        'id',
+        'email',
+        'username',
+        'nama',
+        'notelp',
+      ]);
+    await this.getDataAccount(userid);
     // console.warn({email,username,nama,notelp})
     this.setState(s => ({
       form: {...s.form, email, username, notelp, nama},
       userid,
       initialLoad: false,
     }));
+  };
+
+  handleChoosePhoto() {
+    launchImageLibrary({noData: true}, response => {
+      if (response.assets) {
+        this.setState({foto_user: response.assets[0]});
+      }
+    });
+  }
+
+  uploadFoto = () => {
+    let data = new FormData();
+    let photo = this.state.foto_user;
+    data.append('foto_user', {
+      name: photo.fileName,
+      type: photo.type,
+      uri: Platform.OS === 'ios' ? photo.uri.replace('file://', '') : photo.uri,
+    });
+
+    axios
+      .post(`${BASE_URL()}/user/fotoprofil/${this.state.userid}`, data)
+      .then(async ({data}) => {})
+      .catch(e => {
+        this.alert.show({
+          message: 'Terjadi Kesalahan saat Upload Foto',
+        });
+      });
+    return data;
   };
 
   signOutGoogle = async () => {
@@ -122,7 +176,7 @@ class Profil extends React.Component {
   };
 
   saveChange = () => {
-    const {form,userid} = this.state;
+    const {form, userid, foto_user} = this.state;
     this.setState({updating: true});
     axios
       .put(
@@ -142,6 +196,9 @@ class Profil extends React.Component {
             message: errMsg('Ubah Profil'),
           });
           return;
+        }
+        if (foto_user.uri) {
+          await this.uploadFoto();
         }
         let sessionData = [
           ['nama', form.nama],
@@ -166,7 +223,7 @@ class Profil extends React.Component {
   };
 
   selectEmail = async () => {
-    const {userid} = this.state
+    const {userid} = this.state;
     try {
       if (await GoogleSignin.isSignedIn()) {
         // Logout Google Account, agar tidak auto signed-in
@@ -177,13 +234,13 @@ class Profil extends React.Component {
 
       // console.warn('1', user);
       // Jika berhasil sign-in, cek ketersediaan e-mail
-      this.setState({loadingEmail:true})
+      this.setState({loadingEmail: true});
       try {
         let {data} = await axios.post(
           `${BASE_URL()}/auth/email`,
           QueryString.stringify({email: user.email, id: userid}),
         );
-        this.setState({loadingEmail:false})
+        this.setState({loadingEmail: false});
         if (!data.status) {
           this.alert.show({
             message: errMsg('Cek E-mail'),
@@ -193,7 +250,7 @@ class Profil extends React.Component {
         // Berhasil
         this.setState(s => ({form: {...s.form, email: user.email}}));
       } catch (e) {
-        this.setState({loadingEmail:false})
+        this.setState({loadingEmail: false});
         this.alert.show({
           message: e.response?.data?.errorMessage ?? errMsg('Cek E-mail'),
         });
@@ -222,21 +279,40 @@ class Profil extends React.Component {
   };
 
   render() {
-    const {updating, error, showpass, showkonfpass, form,loadingEmail,initialLoad} = this.state;
+    const {
+      updating,
+      error,
+      showpass,
+      showkonfpass,
+      form,
+      loadingEmail,
+      initialLoad,
+      foto_user,
+    } = this.state;
     return (
       <NativeBaseProvider>
         <Loading isVisible={loadingEmail || initialLoad} />
         <AlertOkV2 ref={ref => (this.alert = ref)} />
         <ScrollView>
           <Box flex={1} paddingX={8} pb={8} bg="white">
-            <Heading size="lg" color={theme.primary}>
-              Daftar
+            <Heading size="lg" mt={3} color={theme.primary}>
+              Akunku
             </Heading>
             {/* <Heading color="muted.400" size="xs">
               Daftar untuk melanjutkan!
             </Heading> */}
 
             <VStack space={3} mt={5}>
+              <Pressable onPress={() => this.handleChoosePhoto()}>
+                <Avatar
+                  source={{
+                    uri: foto_user.uri ? foto_user.uri : foto_user,
+                  }}
+                  alignSelf={{base: 'center'}}
+                  size="xl">
+                  Upload
+                </Avatar>
+              </Pressable>
               <FormControl isRequired isInvalid={'username' in error}>
                 <FormControl.Label
                   _text={{color: 'muted.700', fontSize: 'sm', fontWeight: 600}}>
