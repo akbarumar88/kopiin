@@ -75,12 +75,13 @@ export default class Shop extends React.Component {
 
           this.setState({
             form: dataToko,
-            foto_merchant:
-              BASE_URL() +
-              '/image/merchant/' +
-              value.foto_merchant +
-              '?' +
-              new Date(),
+            foto_merchant: value.foto_merchant
+              ? BASE_URL() +
+                '/image/merchant/' +
+                value.foto_merchant +
+                '?' +
+                new Date()
+              : 'https://puprpkpp.riau.go.id/asset/img/default-image.png',
             kota: value.idprovinsi,
             kecamatan: value.idkota,
             daerah: value.kecamatan,
@@ -154,13 +155,14 @@ export default class Shop extends React.Component {
         this.setState({loading: false});
         if (data.status) {
           const {data: value} = data;
-
+          let reset = false;
           if (value.id_merchant) {
             this.setState({id_mechant: value.id_merchant.toString()});
             await AsyncStorage.setItem(
               'id_merchant',
               value.id_merchant.toString(),
             );
+            reset = true;
           }
           if (this.state.foto_merchant.uri) {
             await this.uploadFoto();
@@ -170,6 +172,12 @@ export default class Shop extends React.Component {
             'Berhasil ubah profil. Data anda telah disimpan.',
             ToastAndroid.SHORT,
           );
+          if (reset) {
+            this.props.navigation.reset({
+              index: 0,
+              routes: [{name: 'Dashboard'}],
+            });
+          }
         }
       })
       .catch(e => {
@@ -387,9 +395,9 @@ export default class Shop extends React.Component {
         <AlertOkV2 ref={ref => (this.alert = ref)} />
         <Loading isVisible={loadingData} />
         <ScrollView>
-          <Box flex={1} p={2} w="90%" mx="auto" pb={8}>
+          <Box flex={1} paddingX={8} pt={5} pb={8} bg="white">
             <Heading size="lg" color={theme.primary}>
-              {id_merchant != '' ? 'Ubah Profil Toko' : 'Buat Toko'}
+              {this.state.id_mechant ? 'Ubah Profil Toko' : 'Buat Toko'}
             </Heading>
 
             <VStack space={4} mt={5}>

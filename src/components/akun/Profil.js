@@ -73,11 +73,12 @@ class Profil extends React.Component {
       .get(`${BASE_URL()}/user/${id}`)
       .then(async ({data}) => {
         this.setState({
-          foto_user:
-            `${BASE_URL()}/image/user/` +
-            data.data.foto_user +
-            '?tgl=' +
-            new Date(),
+          foto_user: data.data.foto_user
+            ? `${BASE_URL()}/image/user/` +
+              data.data.foto_user +
+              '?tgl=' +
+              new Date()
+            : 'https://puprpkpp.riau.go.id/asset/img/default-image.png',
         });
       })
       .catch(e => {});
