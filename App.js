@@ -49,6 +49,8 @@ import AddProduct from './src/components/dashboard/AddProduct';
 import MyProduk from './src/components/dashboard/MyProduk';
 import UbahPasssword from './src/components/akun/UbahPassword';
 
+import FormAlamat from './src/components/akun/FormAlamat';
+
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
 
@@ -74,7 +76,7 @@ class App extends Component {
       <NativeBaseProvider>
         <NavigationContainer>
           <Stack.Navigator
-            initialRouteName="Splash"
+            initialRouteName="FormAlamat"
             screenOptions={{headerShown: true}}>
             <Stack.Screen
               name="Splash"
@@ -101,6 +103,11 @@ class App extends Component {
               component={Shop}
             />
             <Stack.Screen name="MyProduk" component={MyProduk} />
+            <Stack.Screen
+              name="FormAlamat"
+              options={{title: 'Alamat'}}
+              component={FormAlamat}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </NativeBaseProvider>
