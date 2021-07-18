@@ -9,9 +9,10 @@ import {
   Input,
   Button,
   ScrollView,
-  Select,
+  HStack,
   Avatar,
-  Pressable,
+  Text,
+  FlatList,
 } from 'native-base';
 import {BASE_URL, theme} from '../../utilitas/Config';
 import axios from 'axios';
@@ -21,39 +22,124 @@ import AsyncStorage from '@react-native-community/async-storage';
 import AlertOkV2 from './../universal/AlertOkV2';
 import Resource from './../universal/Resource';
 import Loading from './../universal/Loading';
+import AlertYesNoV2 from './../universal/AlertYesNoV2';
 
 export default class Alamat extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      iduser: '-',
+      cari: '',
+      refresh: new Date(),
+    };
   }
 
+  async componentDidMount() {
+    this.props.navigation.setOptions({
+      headerRight: () => (
+        <Button
+          variant="ghost"
+          colorScheme="success"
+          onPress={() => this.tambahAlamat()}>
+          Tambah Alamat
+        </Button>
+      ),
+    });
+
+    let iduser = await AsyncStorage.getItem('id');
+    this.setState({iduser: iduser});
+  }
+
+  hapusAlamat = id => {
+    this.alert.show(
+      {message: 'Anda yakin ingin menghapus data ini ?'},
+      async () => {
+        await axios.delete(`${BASE_URL()}/alamat/${id}`).then(e => {
+          this.setState({refresh: new Date()});
+        });
+      },
+    );
+  };
+
+  editAlamat = id => {
+    this.props.navigation.navigate('FormAlamat', {idalamat: id});
+  };
   tambahAlamat = () => {
     this.props.navigation.navigate('FormAlamat');
   };
 
+  daftarAlamat = () => (
+    <Resource
+      url={`${BASE_URL()}/alamat/user/${this.state.iduser}?cari=${encodeURI(
+        this.state.cari,
+      )}`}
+      params={{refresh: this.state.refresh}}>
+      {({loading, error, payload: data, refetch}) => {
+        const {cari} = this.state;
+        return (
+          <>
+            <Loading isVisible={loading} />
+            <FormControl>
+              <Input
+                mt={3}
+                onSubmitEditing={e => {
+                  this.setState({cari: e.nativeEvent.text});
+                }}
+                placeholder="Cari Alamat"
+                bg="lightgrey"
+              />
+            </FormControl>
+
+            <FlatList
+              data={data.data}
+              renderItem={({item}) => (
+                <Box shadow={4} rounded={5} py={4} bg="white" px={4} mb={2}>
+                  <Text bold={true}>{item.nama}</Text>
+                  <Text fontSize="sm" color="grey" mt={1}>
+                    {item.no_telp}
+                  </Text>
+                  <Text fontSize="sm" color="grey" mt={1}>
+                    {item.detail}
+                  </Text>
+
+                  <HStack space="2">
+                    <Button
+                      size="sm"
+                      onPress={() => this.editAlamat(item.id)}
+                      flex={1}
+                      mt={3}
+                      variant="outline">
+                      Ubah Alamat
+                    </Button>
+                    <Button
+                      size="sm"
+                      mt={3}
+                      onPress={() => this.hapusAlamat(item.id)}
+                      colorScheme="danger"
+                      variant="outline">
+                      Hapus Alamat
+                    </Button>
+                  </HStack>
+                </Box>
+              )}
+            />
+          </>
+        );
+      }}
+    </Resource>
+  );
+
   render() {
+    const {iduser} = this.state;
     return (
       <NativeBaseProvider>
-        <AlertOkV2 ref={ref => (this.alert = ref)} />
+        <AlertYesNoV2 ref={ref => (this.alert = ref)} />
 
-        <ScrollView>
-          <Box flex={1} paddingX={8} pt={5} pb={8} bg="white">
-            <Heading size="lg" color={theme.primary}>
-              Daftar Alamat
-            </Heading>
-
-            <VStack space={4} mt={5}>
-              <VStack space={1}>
-                <Button
-                  onPress={this.tambahAlamat}
-                  bgColor={theme.primary}
-                  _text={{color: 'white', fontWeight: 'bold'}}>
-                  Tambah Alamat
-                </Button>
-              </VStack>
-            </VStack>
-          </Box>
-        </ScrollView>
+        <Box flex={1} paddingX={4} bg="white" pb={8}>
+          <VStack space={1} mt={2}>
+            {iduser != '-' && this.daftarAlamat()}
+          </VStack>
+        </Box>
       </NativeBaseProvider>
     );
   }

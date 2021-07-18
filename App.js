@@ -29,7 +29,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 
 import Splash from './src/components/universal/Splash';
-import {NativeBaseProvider} from 'native-base';
+import {NativeBaseProvider, Button} from 'native-base';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -50,6 +50,7 @@ import MyProduk from './src/components/dashboard/MyProduk';
 import UbahPasssword from './src/components/akun/UbahPassword';
 
 import FormAlamat from './src/components/akun/FormAlamat';
+import Alamat from './src/components/akun/Alamat';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -108,6 +109,7 @@ class App extends Component {
               options={{title: 'Alamat'}}
               component={FormAlamat}
             />
+            <Stack.Screen name="Alamat" component={Alamat} />
           </Stack.Navigator>
         </NavigationContainer>
       </NativeBaseProvider>
