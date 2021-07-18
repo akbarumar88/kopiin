@@ -9,6 +9,8 @@ import {
   Button,
   ScrollView,
   Select,
+  Avatar,
+  Pressable,
 } from 'native-base';
 import {BASE_URL, theme} from '../../utilitas/Config';
 import axios from 'axios';
@@ -18,6 +20,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import AlertOkV2 from './../universal/AlertOkV2';
 import Resource from './../universal/Resource';
 import Loading from './../universal/Loading';
+import {launchImageLibrary} from 'react-native-image-picker';
 
 export default class Shop extends React.Component {
   constructor(props) {
@@ -33,7 +36,16 @@ export default class Shop extends React.Component {
       id_mechant: '',
       loading: false,
       loadingData: false,
+      foto_merchant: 'https://puprpkpp.riau.go.id/asset/img/default-image.png',
     };
+  }
+  handleChoosePhoto() {
+    launchImageLibrary({noData: true}, response => {
+      // console.log(response);
+      if (response.assets) {
+        this.setState({foto_merchant: response.assets[0]});
+      }
+    });
   }
 
   componentDidMount() {
@@ -60,8 +72,15 @@ export default class Shop extends React.Component {
             kecamatan: value.kecamatan,
             kodepos: value.kodepos,
           };
+
           this.setState({
             form: dataToko,
+            foto_merchant:
+              BASE_URL() +
+              '/image/merchant/' +
+              value.foto_merchant +
+              '?' +
+              new Date(),
             kota: value.idprovinsi,
             kecamatan: value.idkota,
             daerah: value.kecamatan,
@@ -133,8 +152,13 @@ export default class Shop extends React.Component {
           const {data: value} = data;
 
           if (value.id_merchant) {
+            this.setState({id_mechant: value.id_merchant.toString()});
             AsyncStorage.setItem('id_merchant', value.id_merchant.toString());
           }
+          if (this.state.foto_merchant.uri) {
+            this.uploadFoto();
+          }
+
           this.props.navigation.reset({
             index: 0,
             routes: [{name: 'Dashboard'}],
@@ -147,6 +171,26 @@ export default class Shop extends React.Component {
           message: errMsg('Buat Toko'),
         });
       });
+  };
+
+  uploadFoto = () => {
+    let data = new FormData();
+    let photo = this.state.foto_merchant;
+    data.append('foto_merchant', {
+      name: photo.fileName,
+      type: photo.type,
+      uri: Platform.OS === 'ios' ? photo.uri.replace('file://', '') : photo.uri,
+    });
+    console.log(`${BASE_URL()}/fotomerchant/${this.state.id_mechant}`);
+    axios
+      .post(`${BASE_URL()}/user/fotomerchant/${this.state.id_mechant}`, data)
+      .then(async ({data}) => {
+        console.log(data);
+      })
+      .catch(e => {
+        console.warn(e);
+      });
+    return data;
   };
 
   optionProvince() {
@@ -172,10 +216,12 @@ export default class Shop extends React.Component {
                     return e.nama == val;
                   });
 
+                  if (this.state.kota != idprovinsi.id.toString()) {
+                    this.setState({kecamatan: ''});
+                  }
                   this.setState({
                     form: {...this.state.form, provinsi: val},
                     kota: idprovinsi.id.toString(),
-                    kecamatan: '',
                   });
                 }}>
                 {!loading && !error ? (
@@ -217,10 +263,12 @@ export default class Shop extends React.Component {
                 selectedValue={this.state.form.kota}
                 onValueChange={val => {
                   let idcity = data.kota_kabupaten.find(e => e.nama == val);
+                  if (this.state.kecamatan != idcity.id) {
+                    this.setState({daerah: ''});
+                  }
                   this.setState({
                     form: {...this.state.form, kota: val},
                     kecamatan: idcity.id,
-                    daerah: '',
                   });
                 }}>
                 {!loading && !error && this.state.kota != '' ? (
@@ -320,7 +368,8 @@ export default class Shop extends React.Component {
   }
 
   render() {
-    const {error, form, loading, loadingData, id_merchant} = this.state;
+    const {error, form, loading, loadingData, id_merchant, foto_merchant} =
+      this.state;
     return (
       <NativeBaseProvider>
         <AlertOkV2 ref={ref => (this.alert = ref)} />
@@ -332,6 +381,16 @@ export default class Shop extends React.Component {
             </Heading>
 
             <VStack space={4} mt={5}>
+              <Pressable onPress={() => this.handleChoosePhoto()}>
+                <Avatar
+                  source={{
+                    uri: foto_merchant.uri ? foto_merchant.uri : foto_merchant,
+                  }}
+                  alignSelf={{base: 'center'}}
+                  size="xl">
+                  Upload
+                </Avatar>
+              </Pressable>
               <FormControl isRequired isInvalid={'namaToko' in error}>
                 <FormControl.Label
                   _text={{color: 'muted.700', fontSize: 'sm', fontWeight: 600}}>
