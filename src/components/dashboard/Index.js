@@ -44,7 +44,8 @@ export default class Index extends Component {
         activeColor={theme.primary}
         inactiveColor={'#444'}
         shifting={true}
-        barStyle={{backgroundColor: '#fff'}}>
+        barStyle={{backgroundColor: '#fff'}}
+        initialRouteName="Akun">
         <Tab.Screen
           name="Home"
           component={Home}

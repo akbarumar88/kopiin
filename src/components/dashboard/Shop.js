@@ -12,6 +12,8 @@ import {
   Select,
   Avatar,
   Pressable,
+  Icon,
+  Text,
 } from 'native-base';
 import {BASE_URL, theme} from '../../utilitas/Config';
 import axios from 'axios';
@@ -22,6 +24,8 @@ import AlertOkV2 from './../universal/AlertOkV2';
 import Resource from './../universal/Resource';
 import Loading from './../universal/Loading';
 import {launchImageLibrary} from 'react-native-image-picker';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default class Shop extends React.Component {
   constructor(props) {
@@ -38,10 +42,22 @@ export default class Shop extends React.Component {
       loading: false,
       loadingData: false,
       foto_merchant: 'https://puprpkpp.riau.go.id/asset/img/default-image.png',
+      alamatPick: {
+        detail: '',
+        lat: '',
+        long: '',
+      },
     };
   }
+
   handleChoosePhoto() {
-    launchImageLibrary({noData: true}, response => {
+    const options = {
+      maxWidth: 500,
+      maxHeight: 500,
+      quality: 0.7,
+      noData: true,
+    };
+    launchImageLibrary(options, response => {
       if (response.assets) {
         this.setState({foto_merchant: response.assets[0]});
       }
@@ -388,8 +404,15 @@ export default class Shop extends React.Component {
   }
 
   render() {
-    const {error, form, loading, loadingData, id_merchant, foto_merchant} =
-      this.state;
+    const {
+      error,
+      form,
+      loading,
+      loadingData,
+      id_merchant,
+      foto_merchant,
+      alamatPick,
+    } = this.state;
     return (
       <NativeBaseProvider>
         <AlertOkV2 ref={ref => (this.alert = ref)} />
@@ -411,12 +434,17 @@ export default class Shop extends React.Component {
                   Upload
                 </Avatar>
               </Pressable>
+
               <FormControl isRequired isInvalid={'namaToko' in error}>
                 <FormControl.Label
                   _text={{color: 'muted.700', fontSize: 'sm', fontWeight: 600}}>
                   Nama Toko
                 </FormControl.Label>
                 <Input
+                  ref={ref => (this.inama = ref)}
+                  onSubmitEditing={() => {
+                    this.ialamat.focus();
+                  }}
                   onChangeText={val => {
                     this.setState({form: {...this.state.form, namaToko: val}});
                   }}
@@ -428,12 +456,17 @@ export default class Shop extends React.Component {
                   {error.namaToko}
                 </FormControl.ErrorMessage>
               </FormControl>
+
               <FormControl isRequired isInvalid={'alamatToko' in error}>
                 <FormControl.Label
                   _text={{color: 'muted.700', fontSize: 'sm', fontWeight: 600}}>
                   Alamat Toko
                 </FormControl.Label>
                 <Input
+                  ref={ref => (this.ialamat = ref)}
+                  onSubmitEditing={() => {
+                    this.ikodepos.focus();
+                  }}
                   onChangeText={val => {
                     this.setState({
                       form: {...this.state.form, alamatToko: val},
@@ -447,12 +480,15 @@ export default class Shop extends React.Component {
                   {error.alamatToko}
                 </FormControl.ErrorMessage>
               </FormControl>
+
               <FormControl isRequired isInvalid={'kodepos' in error}>
                 <FormControl.Label
                   _text={{color: 'muted.700', fontSize: 'sm', fontWeight: 600}}>
                   Kode Pos Toko
                 </FormControl.Label>
                 <Input
+                  ref={ref => (this.ikodepos = ref)}
+                  onSubmitEditing={() => {}}
                   keyboardType="number-pad"
                   onChangeText={val => {
                     this.setState({
@@ -467,17 +503,48 @@ export default class Shop extends React.Component {
                   {error.kodepos}
                 </FormControl.ErrorMessage>
               </FormControl>
+
               {this.optionJenisToko()}
               {this.optionProvince()}
               {this.optionCity()}
               {this.optionSubCity()}
+
+              <FormControl isRequired isInvalid={'alamatpick' in error}>
+                <FormControl.Label
+                  _text={{color: 'muted.700', fontSize: 'sm', fontWeight: 600}}>
+                  Titik Lokasi
+                </FormControl.Label>
+                <Input
+                  isDisabled
+                  ref={ref => (this.ikodepos = ref)}
+                  onSubmitEditing={() => {}}
+                  value={alamatPick.detail}
+                />
+
+                <FormControl.ErrorMessage
+                  _text={{fontSize: 'xs', color: 'error.500', fontWeight: 500}}>
+                  {error.alamatpick}
+                </FormControl.ErrorMessage>
+              </FormControl>
+
+              <Button
+                colorScheme="amber"
+                startIcon={<Icon as={Ionicons} name="location" size={5} />}
+                _text={{color: 'white', fontWeight: 'bold'}}
+                onPress={() => {
+                  this.props.navigation.navigate('PilihLokasi', {
+                    BackRoute: 'Shop',
+                  });
+                }}>
+                Pilih Titik Alamat
+              </Button>
               <VStack space={1}>
                 <Button
                   isLoading={loading}
                   isLoadingText="Proses"
                   onPress={this.validate}
                   bgColor={theme.primary}
-                  _text={{color: 'white'}}>
+                  _text={{color: 'white', fontWeight: 'bold'}}>
                   Simpan
                 </Button>
               </VStack>

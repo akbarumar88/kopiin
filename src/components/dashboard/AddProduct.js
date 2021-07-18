@@ -118,7 +118,7 @@ export default class AddProduct extends React.Component {
     const {error, form, loggingIn} = this.state;
     return (
       <NativeBaseProvider>
-        <ScrollView>
+        <ScrollView bg="#fff">
           <AlertOkV2 ref={ref => (this.alert = ref)} />
           <Box flex={1} p={2} w="90%" mx="auto" pb={8}>
             <Heading size="lg" color={theme.primary}>

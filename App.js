@@ -44,6 +44,8 @@ import Profil from './src/components/akun/Profil';
 import Dashboard from './src/components/dashboard/Index';
 import {theme} from './src/utilitas/Config';
 import AsyncStorage from '@react-native-community/async-storage';
+
+import PilihLokasi from './src/components/akun/PilihLokasi';
 import Shop from './src/components/dashboard/Shop';
 import AddProduct from './src/components/dashboard/AddProduct';
 import MyProduk from './src/components/dashboard/MyProduk';
@@ -74,7 +76,7 @@ class App extends Component {
       <NativeBaseProvider>
         <NavigationContainer>
           <Stack.Navigator
-            initialRouteName="Splash"
+            initialRouteName="Shop"
             screenOptions={{headerShown: true}}>
             <Stack.Screen
               name="Splash"
@@ -88,7 +90,11 @@ class App extends Component {
             />
             <Stack.Screen name="Register" component={Register} />
             <Stack.Screen name="Profil" component={Profil} />
-            <Stack.Screen name="UbahPassword" component={UbahPasssword} />
+            <Stack.Screen
+              name="UbahPassword"
+              component={UbahPasssword}
+              options={{title: 'Ubah Password'}}
+            />
             <Stack.Screen
               name="AddProduct"
               options={{title: 'Tambah Produk'}}
@@ -99,6 +105,11 @@ class App extends Component {
               options={{title: 'Profil Toko'}}
               name="Shop"
               component={Shop}
+            />
+            <Stack.Screen
+              options={{title: 'Pilih Lokasi',headerShown:false}}
+              name="PilihLokasi"
+              component={PilihLokasi}
             />
             <Stack.Screen name="MyProduk" component={MyProduk} />
           </Stack.Navigator>

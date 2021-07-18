@@ -25,7 +25,7 @@ export default class MyProduk extends React.Component {
   render() {
     return (
       <NativeBaseProvider>
-        <ScrollView>
+        <ScrollView bg="#fff">
           <Box flex={1} p={2} w="90%" mx="auto" pb={8}>
             <VStack space={2}>
               <VStack space={1}>

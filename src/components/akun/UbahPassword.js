@@ -98,7 +98,7 @@ export default class UbahPasssword extends React.Component {
         }
         ToastAndroid.show('Password berhasil diubah', ToastAndroid.SHORT);
 
-        this.props.navigation.reset({index: 0, routes: [{name: 'Dashboard'}]});
+        this.props.navigation.goBack();
       })
       .catch(e => {
         this.setState({loggingIn: false});
@@ -135,7 +135,9 @@ export default class UbahPasssword extends React.Component {
                   onChangeText={val => {
                     this.setState({form: {...this.state.form, old_pass: val}});
                   }}
-                  onSubmitEditing={() => {}}
+                  onSubmitEditing={() => {
+                    this.ipass.focus()
+                  }}
                   InputRightElement={
                     <IconButton
                       onPress={_ => this.setState({showoldpass: !showoldpass})}
@@ -171,7 +173,9 @@ export default class UbahPasssword extends React.Component {
                   onChangeText={val => {
                     this.setState({form: {...this.state.form, pass: val}});
                   }}
-                  onSubmitEditing={() => {}}
+                  onSubmitEditing={() => {
+                    this.ipass2.focus()
+                  }}
                   InputRightElement={
                     <IconButton
                       onPress={_ => this.setState({showpass: !showpass})}
