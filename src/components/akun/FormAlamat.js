@@ -40,7 +40,7 @@ export default class FormAlamat extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.route.params) {
+    if (this.props.route.params.idalamat) {
       this.setDataAlamat();
     }
   }
@@ -101,7 +101,7 @@ export default class FormAlamat extends React.Component {
     if (error) {
       return;
     }
-    if (this.props.route.params) {
+    if (this.props.route.params.idalamat) {
       this.updateData();
     } else {
       this.simpanData();
@@ -140,7 +140,7 @@ export default class FormAlamat extends React.Component {
             'Berhasil menambah alamat. Data anda telah disimpan.',
             ToastAndroid.SHORT,
           );
-
+          this.props.route.params.refreshData();
           this.props.navigation.goBack();
         }
       })
@@ -184,6 +184,8 @@ export default class FormAlamat extends React.Component {
             'Berhasil mengubah alamat. Data anda telah disimpan.',
             ToastAndroid.SHORT,
           );
+          console.log(this.props.navigation.params);
+          this.props.route.params.refreshData();
           this.props.navigation.goBack();
         }
       })
@@ -349,7 +351,9 @@ export default class FormAlamat extends React.Component {
         <ScrollView>
           <Box flex={1} paddingX={8} pt={5} pb={8} bg="white">
             <Heading size="lg" color={theme.primary}>
-              {this.props.route.params ? 'Edit Alamat' : 'Tambah Alamat'}
+              {this.props.route.params.idalamat
+                ? 'Edit Alamat'
+                : 'Tambah Alamat'}
             </Heading>
 
             <VStack space={4} mt={5}>

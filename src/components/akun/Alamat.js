@@ -55,17 +55,26 @@ export default class Alamat extends React.Component {
       {message: 'Anda yakin ingin menghapus data ini ?'},
       async () => {
         await axios.delete(`${BASE_URL()}/alamat/${id}`).then(e => {
-          this.setState({refresh: new Date()});
+          this.refreshData();
         });
       },
     );
   };
 
+  refreshData = () => {
+    this.setState({refresh: new Date()});
+  };
+
   editAlamat = id => {
-    this.props.navigation.navigate('FormAlamat', {idalamat: id});
+    this.props.navigation.navigate('FormAlamat', {
+      idalamat: id,
+      refreshData: this.refreshData,
+    });
   };
   tambahAlamat = () => {
-    this.props.navigation.navigate('FormAlamat');
+    this.props.navigation.navigate('FormAlamat', {
+      refreshData: this.refreshData,
+    });
   };
 
   daftarAlamat = () => (
@@ -81,19 +90,34 @@ export default class Alamat extends React.Component {
             <Loading isVisible={loading} />
             <FormControl>
               <Input
+                keyboardType="web-search"
                 mt={3}
+                mb={2}
+                tyoe
                 onSubmitEditing={e => {
                   this.setState({cari: e.nativeEvent.text});
                 }}
                 placeholder="Cari Alamat"
-                bg="lightgrey"
+                bg="whitesmoke"
               />
             </FormControl>
-
+            {data.data?.length == 0 && !loading && (
+              <Text mt={10} color="grey" alignSelf={{base: 'center'}}>
+                Tidak ada Data
+              </Text>
+            )}
             <FlatList
+              mt={2}
               data={data.data}
-              renderItem={({item}) => (
-                <Box shadow={4} rounded={5} py={4} bg="white" px={4} mb={2}>
+              renderItem={({item, index}) => (
+                <Box
+                  my={1}
+                  mx={1}
+                  shadow={4}
+                  rounded={5}
+                  py={4}
+                  bg="white"
+                  px={4}>
                   <Text bold={true}>{item.nama}</Text>
                   <Text fontSize="sm" color="grey" mt={1}>
                     {item.no_telp}
