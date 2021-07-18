@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {ToastAndroid} from 'react-native';
+import {ToastAndroid, Dimensions} from 'react-native';
 import {
   NativeBaseProvider,
   Box,
@@ -10,7 +10,7 @@ import {
   Button,
   ScrollView,
   HStack,
-  Avatar,
+  Image,
   Text,
   FlatList,
 } from 'native-base';
@@ -24,11 +24,11 @@ import Resource from './../universal/Resource';
 import Loading from './../universal/Loading';
 import AlertYesNoV2 from './../universal/AlertYesNoV2';
 
-export default class Alamat extends React.Component {
+export default class MyProduk extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      iduser: '-',
+      idmerchant: '-',
       cari: '',
       refresh: new Date(),
     };
@@ -36,28 +36,38 @@ export default class Alamat extends React.Component {
 
   async componentDidMount() {
     this.props.navigation.setOptions({
+      title: 'Barang ku',
       headerRight: () => (
         <Button
           variant="ghost"
           colorScheme="success"
           size="sm"
-          onPress={() => this.tambahAlamat()}>
-          Tambah Alamat
+          onPress={() => this.tambahBarang()}>
+          Tambah
         </Button>
       ),
     });
 
-    let iduser = await AsyncStorage.getItem('id');
-    this.setState({iduser: iduser});
+    let idmerchant = await AsyncStorage.getItem('id_merchant');
+    this.setState({idmerchant: idmerchant});
   }
 
-  hapusAlamat = id => {
-    this.alert.show(
+  hapusBarang = id => {
+    this.dialog.show(
       {message: 'Anda yakin ingin menghapus data ini ?'},
       async () => {
-        await axios.delete(`${BASE_URL()}/alamat/${id}`).then(e => {
-          this.refreshData();
-        });
+        await axios
+          .delete(`${BASE_URL()}/barang/${id}`)
+          .then(({data}) => {
+            if (data.status) {
+              this.refreshData();
+            } else {
+              this.alert.show({message: 'Produk sedang dipakai'});
+            }
+          })
+          .catch(e => {
+            this.alert.show({message: 'Produk sedang dipakai'});
+          });
       },
     );
   };
@@ -66,21 +76,21 @@ export default class Alamat extends React.Component {
     this.setState({refresh: new Date()});
   };
 
-  editAlamat = id => {
-    this.props.navigation.navigate('FormAlamat', {
-      idalamat: id,
+  editBarang = id => {
+    this.props.navigation.navigate('FormProduk', {
+      idproduk: id,
       refreshData: this.refreshData,
     });
   };
-  tambahAlamat = () => {
-    this.props.navigation.navigate('FormAlamat', {
+  tambahBarang = () => {
+    this.props.navigation.navigate('FormProduk', {
       refreshData: this.refreshData,
     });
   };
 
-  daftarAlamat = () => (
+  daftarBarang = () => (
     <Resource
-      url={`${BASE_URL()}/alamat/user/${this.state.iduser}?cari=${encodeURI(
+      url={`${BASE_URL()}/barang/shop/${this.state.idmerchant}?cari=${encodeURI(
         this.state.cari,
       )}`}
       params={{refresh: this.state.refresh}}>
@@ -98,7 +108,7 @@ export default class Alamat extends React.Component {
                 onSubmitEditing={e => {
                   this.setState({cari: e.nativeEvent.text});
                 }}
-                placeholder="Cari Alamat"
+                placeholder="Cari Barang"
                 bg="whitesmoke"
               />
             </FormControl>
@@ -109,40 +119,56 @@ export default class Alamat extends React.Component {
             )}
             <FlatList
               mt={2}
+              mb={4}
+              py={1}
               data={data.data}
               renderItem={({item, index}) => (
                 <Box
                   my={1}
+                  mb={3}
                   mx={1}
                   shadow={4}
                   rounded={5}
                   py={4}
                   bg="white"
                   px={4}>
+                  <Image
+                    my={1}
+                    alt="gambar"
+                    alignSelf={{base: 'center'}}
+                    source={{
+                      uri: item.foto_barang
+                        ? `${BASE_URL()}/image/barang/${
+                            item.foto_barang
+                          }?time=${new Date()}`
+                        : 'https://www.pixsy.com/wp-content/uploads/2021/04/ben-sweet-2LowviVHZ-E-unsplash-1.jpeg',
+                    }}
+                    size={Dimensions.get('screen').width * 0.18}
+                  />
                   <Text bold={true}>{item.nama}</Text>
                   <Text fontSize="sm" color="grey" mt={1}>
-                    {item.no_telp}
+                    {'Harga : ' + item.harga}
                   </Text>
                   <Text fontSize="sm" color="grey" mt={1}>
-                    {item.detail}
+                    {'Stok : ' + item.stok}
                   </Text>
 
                   <HStack space="2">
                     <Button
                       size="sm"
-                      onPress={() => this.editAlamat(item.id)}
+                      onPress={() => this.editBarang(item.id)}
                       flex={1}
                       mt={3}
                       variant="outline">
-                      Ubah Alamat
+                      Ubah Barang
                     </Button>
                     <Button
                       size="sm"
                       mt={3}
-                      onPress={() => this.hapusAlamat(item.id)}
+                      onPress={() => this.hapusBarang(item.id)}
                       colorScheme="danger"
                       variant="outline">
-                      Hapus Alamat
+                      Hapus Barang
                     </Button>
                   </HStack>
                 </Box>
@@ -155,14 +181,14 @@ export default class Alamat extends React.Component {
   );
 
   render() {
-    const {iduser} = this.state;
+    const {idmerchant} = this.state;
     return (
       <NativeBaseProvider>
-        <AlertYesNoV2 ref={ref => (this.alert = ref)} />
-
+        <AlertYesNoV2 ref={ref => (this.dialog = ref)} />
+        <AlertOkV2 ref={ref => (this.alert = ref)} />
         <Box flex={1} paddingX={4} bg="white" pb={8}>
-          <VStack space={1} mt={2}>
-            {iduser != '-' && this.daftarAlamat()}
+          <VStack space={1} mt={2} mb={5}>
+            {idmerchant != '-' && this.daftarBarang()}
           </VStack>
         </Box>
       </NativeBaseProvider>

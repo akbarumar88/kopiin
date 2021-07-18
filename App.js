@@ -45,8 +45,8 @@ import Dashboard from './src/components/dashboard/Index';
 import {theme} from './src/utilitas/Config';
 import AsyncStorage from '@react-native-community/async-storage';
 import Shop from './src/components/dashboard/Shop';
-import AddProduct from './src/components/dashboard/AddProduct';
-import MyProduk from './src/components/dashboard/MyProduk';
+import FormProduk from './src/components/akun/FormProduk';
+import MyProduk from './src/components/akun/MyProduk';
 import UbahPasssword from './src/components/akun/UbahPassword';
 
 import FormAlamat from './src/components/akun/FormAlamat';
@@ -93,9 +93,9 @@ class App extends Component {
             <Stack.Screen name="Profil" component={Profil} />
             <Stack.Screen name="UbahPassword" component={UbahPasssword} />
             <Stack.Screen
-              name="AddProduct"
+              name="FormProduk"
               options={{title: 'Tambah Produk'}}
-              component={AddProduct}
+              component={FormProduk}
             />
 
             <Stack.Screen
