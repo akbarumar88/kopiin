@@ -90,6 +90,7 @@ export default class Home extends Component {
             }>
             {!initialLoading ? (
               <Box>
+                {this.searchBox()}
                 <Text bold>Toko / Kedai Terdekat</Text>
                 {this.listToko()}
                 <Text bold>Mungkin anda suka</Text>
