@@ -29,7 +29,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 
 import Splash from './src/components/universal/Splash';
-import {NativeBaseProvider} from 'native-base';
+import {NativeBaseProvider, Button} from 'native-base';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -47,9 +47,12 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 import PilihLokasi from './src/components/akun/PilihLokasi';
 import Shop from './src/components/dashboard/Shop';
-import AddProduct from './src/components/dashboard/AddProduct';
-import MyProduk from './src/components/dashboard/MyProduk';
+import FormProduk from './src/components/akun/FormProduk';
+import MyProduk from './src/components/akun/MyProduk';
 import UbahPasssword from './src/components/akun/UbahPassword';
+
+import FormAlamat from './src/components/akun/FormAlamat';
+import Alamat from './src/components/akun/Alamat';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -96,9 +99,9 @@ class App extends Component {
               options={{title: 'Ubah Password'}}
             />
             <Stack.Screen
-              name="AddProduct"
+              name="FormProduk"
               options={{title: 'Tambah Produk'}}
-              component={AddProduct}
+              component={FormProduk}
             />
 
             <Stack.Screen
@@ -112,6 +115,12 @@ class App extends Component {
               component={PilihLokasi}
             />
             <Stack.Screen name="MyProduk" component={MyProduk} />
+            <Stack.Screen
+              name="FormAlamat"
+              options={{title: 'Alamat'}}
+              component={FormAlamat}
+            />
+            <Stack.Screen name="Alamat" component={Alamat} />
           </Stack.Navigator>
         </NavigationContainer>
       </NativeBaseProvider>
