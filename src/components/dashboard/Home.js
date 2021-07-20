@@ -39,7 +39,7 @@ import axios from 'axios';
 import QueryString from 'qs';
 import AlertOkV2 from '../universal/AlertOkV2';
 import Loading from '../universal/Loading';
-import {errMsg} from '../../utilitas/Function';
+import {errMsg,toCurrency} from '../../utilitas/Function';
 import AsyncStorage from '@react-native-community/async-storage';
 import Resource from '../universal/Resource';
 import {MerchantShimmer, BarangShimmer} from '../universal/Placeholder';
@@ -55,10 +55,20 @@ export default class Home extends Component {
 
     this.state = {
       refresh: 1,
+      lat: 0,
+      long: 0,
+      initialLoading: true,
     };
   }
 
+  async componentDidMount() {
+    let lat = await AsyncStorage.getItem('lat');
+    let long = await AsyncStorage.getItem('long');
+    this.setState({lat, long, initialLoading: false});
+  }
+
   render() {
+    const {initialLoading} = this.state;
     return (
       <NativeBaseProvider>
         <Box bgColor={'#ff0000'} flex={1}>
@@ -78,13 +88,14 @@ export default class Home extends Component {
                 }}
               />
             }>
-            <Box>
-              {this.searchBox()}
-              <Text bold>Toko / Kedai Terdekat</Text>
-              {this.listToko()}
-              <Text bold>Mungkin anda suka</Text>
-              {this.listBarang()}
-            </Box>
+            {!initialLoading ? (
+              <Box>
+                <Text bold>Toko / Kedai Terdekat</Text>
+                {this.listToko()}
+                <Text bold>Mungkin anda suka</Text>
+                {this.listBarang()}
+              </Box>
+            ) : null}
           </ScrollView>
         </Box>
       </NativeBaseProvider>
@@ -109,10 +120,12 @@ export default class Home extends Component {
   );
 
   listToko = () => {
+    const {lat, long} = this.state;
+    // console.warn(lat,long)
     return (
       <Resource
         url={`${BASE_URL()}/dashboard/shop`}
-        params={{refresh: this.state.refresh}}>
+        params={{refresh: this.state.refresh, lat, long}}>
         {({loading, error, payload: data, refetch}) => {
           if (loading) {
             return <MerchantShimmer />;
@@ -133,38 +146,43 @@ export default class Home extends Component {
                       nama_toko,
                       alamat_toko,
                       jenis,
-                      foto = this.defaultStoreAvatar,
-                      jarak = 0,
-                      foto_merchant
+                      foto_merchant,
+                      distance = 0,
+                      kota,
                     },
                     index,
                   ) => {
-                    let imgWidth = Dimensions.get('window').width / 7;
+                    kota = kota.split(/\s/)[1];
+                    let imgWidth = Dimensions.get('window').width / 4;
                     let itemWidth = Dimensions.get('window').width / 3.5;
                     return (
                       <Pressable
+                        shadow={4}
                         alignItems="flex-start"
                         bgColor="coolGray.100"
                         _pressed={{backgroundColor: 'coolGray.300'}}
                         p={2}
-                        mr={2}
+                        mr={3}
                         key={index}
                         w={itemWidth}
                         borderRadius={8}
                         onPress={() => {}}>
                         {/* <View style={[{width}, style.wCardApotek, marginLeft]}> */}
                         <Image
+                          mb={2}
                           alignSelf="center"
-                          resizeMode="contain"
+                          resizeMode="cover"
                           style={[
                             {width: imgWidth, height: imgWidth},
                             {
-                              borderTopLeftRadius: 10,
-                              borderTopRightRadius: 10,
+                              borderTopLeftRadius: 8,
+                              borderTopRightRadius: 8,
                             },
                           ]}
                           source={{
-                            uri: `${BASE_URL()}/image/merchant/${foto_merchant}?${new Date()}`,
+                            uri: foto_merchant
+                              ? `${BASE_URL()}/image/merchant/${foto_merchant}?${new Date()}`
+                              : this.defaultStoreAvatar,
                           }}
                           alt={nama_toko}
                         />
@@ -174,10 +192,10 @@ export default class Home extends Component {
                             {nama_toko}
                           </Text>
                           <Text fontSize="xs" bold color="grey">
-                            {alamat_toko}
+                            {kota}
                           </Text>
                           <Text fontSize="xs" color="grey">
-                            {jarak} KM dari lokasi anda.
+                            {distance.toFixed(1)} KM dari lokasi anda.
                           </Text>
                         </Box>
                         {/* </View> */}
@@ -220,9 +238,13 @@ export default class Home extends Component {
                     jenis,
                     foto = this.defaultProductAvatar,
                     jarak,
+                    kota,
+                    rating = 0, 
+                    terjual = 0
                   },
                   index,
                 ) => {
+                  kota = kota.split(/\s/)[1]
                   let imgWidth = Dimensions.get('window').width / 7;
                   let itemWidth = Dimensions.get('window').width / 3.5;
                   return (
@@ -231,11 +253,12 @@ export default class Home extends Component {
                       bgColor="coolGray.100"
                       _pressed={{backgroundColor: 'coolGray.300'}}
                       p={2}
-                      mr={2}
+                      mr={3}
                       mb={2}
                       key={index}
                       w={itemWidth}
                       borderRadius={8}
+                      shadow={4}
                       onPress={() => {}}>
                       {/* <View style={[{width}, style.wCardApotek, marginLeft]}> */}
                       <Image
@@ -252,6 +275,7 @@ export default class Home extends Component {
                           uri: foto,
                         }}
                         alt={nama}
+                        mb={2}
                       />
 
                       <Box px={0}>
@@ -259,11 +283,19 @@ export default class Home extends Component {
                           {nama}
                         </Text>
                         <Text fontSize="xs" bold color="grey">
-                          {deskripsi}
+                          {kota}
                         </Text>
                         <Text fontSize="xs" color="grey">
-                          {harga}
+                          Rp {toCurrency(harga)}
                         </Text>
+                        <HStack alignItems="center" mt={1}>
+                          <Icon as={Ionicons} name="star" size={"xs"} color="orange" mr={1} />
+                          <Text fontSize="xs" color="grey">
+                            {rating} | Terjual {terjual}
+                          </Text>
+
+                        </HStack>
+                        
                       </Box>
                       {/* </View> */}
                     </Pressable>

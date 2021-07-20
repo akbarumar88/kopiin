@@ -34,7 +34,16 @@ export default class Resource extends Component {
 
     this.setState({loading: true});
     try {
-      let {data} = await Axios[method](url, params);
+      let body
+      if (method == 'get') {
+        body = {
+          params
+        }
+      } else {
+        body = params
+      }
+      // console.warn(body)
+      let {data} = await Axios[method](url, body);
 
       this.setState({payload: data, loading: false, error: false});
     } catch (error) {

@@ -88,7 +88,7 @@ class App extends Component {
       <NativeBaseProvider>
         <NavigationContainer>
           <Stack.Navigator
-            initialRouteName="Dashboard"
+            initialRouteName="Splash"
             screenOptions={{headerShown: true}}>
             <Stack.Screen
               name="Splash"
