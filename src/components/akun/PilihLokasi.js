@@ -171,11 +171,14 @@ export default class PilihLokasi extends Component {
   }
 
   simpan() {
-    this.props.navigation.state.params.setMaps(
-      this.state.Region.latitude,
-      this.state.Region.longitude,
-    );
-    this.props.navigation.goBack();
+    const {BackRoute} = this.props.route.params;
+    // this.props.navigation.state.params.setMaps(
+    //   this.state.Region.latitude,
+    //   this.state.Region.longitude,
+    // );
+    this.props.navigation.navigate(BackRoute, {
+      Region: {...this.state.Region, namaalamat:this.state.namaalamat},
+    });
   }
 
   getAlamat(Region) {
@@ -250,7 +253,7 @@ const style = StyleSheet.create({
     justifyContent: 'center',
     flex: 1,
     paddingBottom: 85,
-    paddingHorizontal: 16
+    paddingHorizontal: 16,
     // backgroundColor: 'red'
   },
   button: {

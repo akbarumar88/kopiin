@@ -42,10 +42,10 @@ export default class Shop extends React.Component {
       loading: false,
       loadingData: false,
       foto_merchant: 'https://puprpkpp.riau.go.id/asset/img/default-image.png',
-      alamatPick: {
-        detail: '',
-        lat: '',
-        long: '',
+      Region: {
+        namaalamat: '',
+        latitude: '',
+        longitude: '',
       },
     };
   }
@@ -59,6 +59,7 @@ export default class Shop extends React.Component {
     };
     launchImageLibrary(options, response => {
       if (response.assets) {
+        // console.warn(response.assets)
         this.setState({foto_merchant: response.assets[0]});
       }
     });
@@ -66,6 +67,17 @@ export default class Shop extends React.Component {
 
   componentDidMount() {
     this.loadDataShop();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    // Cek perubahan props
+    if (
+      JSON.stringify(prevProps.route.params) !=
+      JSON.stringify(this.props.route.params)
+    ) {
+      // Update lokasi gan
+      this.setState({Region: this.props.route.params.Region});
+    }
   }
 
   async loadDataShop() {
@@ -92,11 +104,9 @@ export default class Shop extends React.Component {
           this.setState({
             form: dataToko,
             foto_merchant: value.foto_merchant
-              ? BASE_URL() +
-                '/image/merchant/' +
-                value.foto_merchant +
-                '?' +
-                new Date()
+              ? `${BASE_URL()}/image/merchant/${
+                  value.foto_merchant
+                }?${new Date()}`
               : 'https://puprpkpp.riau.go.id/asset/img/default-image.png',
             kota: value.idprovinsi,
             kecamatan: value.idkota,
@@ -113,7 +123,7 @@ export default class Shop extends React.Component {
   }
 
   validate = () => {
-    const {form, kota, kecamatan, daerah} = this.state;
+    const {form, kota, kecamatan, daerah, Region} = this.state;
     let error;
     if (!form.namaToko) {
       error = {...error, namaToko: 'Nama Toko harus diisi'};
@@ -138,6 +148,10 @@ export default class Shop extends React.Component {
     } else if (daerah == '') {
       error = {...error, kecamatan: 'Kecamatan harus diisi'};
     }
+
+    if (!Region.latitude) {
+      error = {...error, region: 'Harap pilih titik lokasi'};
+    }
     this.setState({error: error ?? {}});
     if (error) {
       return;
@@ -146,7 +160,7 @@ export default class Shop extends React.Component {
   };
 
   simpan = async () => {
-    const {form, kota, kecamatan} = this.state;
+    const {form, kota, kecamatan, Region} = this.state;
     this.setState({loading: true});
     let id = await AsyncStorage.getItem('id');
 
@@ -157,8 +171,8 @@ export default class Shop extends React.Component {
           nama_toko: form.namaToko,
           jenis_toko: form.jenis_toko,
           alamat_toko: form.alamatToko,
-          lat_toko: '0',
-          long_toko: '0',
+          lat_toko: Region.latitude,
+          long_toko: Region.longitude,
           provinsi: form.provinsi,
           kota: form.kota,
           kecamatan: form.kecamatan,
@@ -411,7 +425,7 @@ export default class Shop extends React.Component {
       loadingData,
       id_merchant,
       foto_merchant,
-      alamatPick,
+      Region,
     } = this.state;
     return (
       <NativeBaseProvider>
@@ -427,7 +441,7 @@ export default class Shop extends React.Component {
               <Pressable onPress={() => this.handleChoosePhoto()}>
                 <Avatar
                   source={{
-                    uri: foto_merchant.uri ? foto_merchant.uri : foto_merchant,
+                    uri: foto_merchant.uri ?? foto_merchant,
                   }}
                   alignSelf={{base: 'center'}}
                   size="xl">
@@ -509,7 +523,7 @@ export default class Shop extends React.Component {
               {this.optionCity()}
               {this.optionSubCity()}
 
-              <FormControl isRequired isInvalid={'alamatpick' in error}>
+              <FormControl isRequired isInvalid={'region' in error}>
                 <FormControl.Label
                   _text={{color: 'muted.700', fontSize: 'sm', fontWeight: 600}}>
                   Titik Lokasi
@@ -518,12 +532,12 @@ export default class Shop extends React.Component {
                   isDisabled
                   ref={ref => (this.ikodepos = ref)}
                   onSubmitEditing={() => {}}
-                  value={alamatPick.detail}
+                  value={Region.namaalamat}
                 />
 
                 <FormControl.ErrorMessage
                   _text={{fontSize: 'xs', color: 'error.500', fontWeight: 500}}>
-                  {error.alamatpick}
+                  {error.region}
                 </FormControl.ErrorMessage>
               </FormControl>
 
