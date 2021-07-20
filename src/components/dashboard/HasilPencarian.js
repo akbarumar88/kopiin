@@ -15,6 +15,7 @@ import {
   FlatList,
   Image,
 } from 'native-base';
+import {toCurrency} from '../../utilitas/Function';
 import Resource from './../universal/Resource';
 import {BASE_URL, theme} from './../../utilitas/Config';
 import {TabView, TabBar, SceneMap} from 'react-native-tab-view';
@@ -110,7 +111,9 @@ export default class HasilPencarian extends Component {
               keyExtractor={(item, index) => item.id}
               showsVerticalScrollIndicator={false}
               renderItem={({item, index}) => (
-                <Pressable flex={0.5}>
+                <Pressable
+                  onPress={() => this.showDetailProduk(item.id)}
+                  flex={0.5}>
                   <Box
                     bgColor="coolGray.100"
                     mx={1}
@@ -145,7 +148,7 @@ export default class HasilPencarian extends Component {
                       {item.deskripsi}
                     </Text>
                     <Text fontSize="xs" color="grey">
-                      {item.harga}
+                      Rp.{toCurrency(item.harga)}
                     </Text>
                   </Box>
                 </Pressable>
@@ -155,6 +158,10 @@ export default class HasilPencarian extends Component {
         }}
       </Resource>
     );
+  };
+
+  showDetailProduk = id => {
+    this.props.navigation.navigate('DetailProduk', {idproduk: id});
   };
 
   listToko = () => {
