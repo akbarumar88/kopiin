@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Dimensions} from 'react-native';
+import {Dimensions, View, StatusBar} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   ScrollView,
@@ -16,7 +16,9 @@ import {
   Image,
 } from 'native-base';
 import Resource from './../universal/Resource';
-import {BASE_URL} from './../../utilitas/Config';
+import {BASE_URL, theme} from './../../utilitas/Config';
+import {TabView, TabBar, SceneMap} from 'react-native-tab-view';
+
 export default class HasilPencarian extends Component {
   defaultStoreAvatar =
     'https://cdn.icon-icons.com/icons2/1706/PNG/512/3986701-online-shop-store-store-icon_112278.png';
@@ -29,27 +31,56 @@ export default class HasilPencarian extends Component {
     this.state = {
       cari: this.props.route.params.cari,
       pencarian: this.props.route.params.cari,
+      tabIndex: 0,
+      tabRoutes: [
+        {key: 'barang', title: 'Barang'},
+        {key: 'toko', title: 'Toko'},
+      ],
     };
   }
 
   render() {
+    const {tabIndex, tabRoutes} = this.state;
     return (
       <NativeBaseProvider>
         <Box flex={1} pt={3} bg="white">
           {this.searchBox()}
-          <Tabs flex={1} mt={4} colorScheme="amber" isFitted>
-            {/* Tab Heading */}
-            <Tabs.Bar>
+          {/* <Tabs flex={1} mt={4} colorScheme="amber" isFitted> */}
+          {/* Tab Heading */}
+          {/* <Tabs.Bar>
               <Tabs.Tab>Barang</Tabs.Tab>
               <Tabs.Tab>Toko</Tabs.Tab>
-            </Tabs.Bar>
+            </Tabs.Bar> */}
 
-            {/* Tab View */}
-            <Tabs.Views flex={1}>
+          {/* Tab View */}
+          {/* <Tabs.Views flex={1}>
               <Tabs.View flex={1}>{this.listProduct()}</Tabs.View>
               <Tabs.View flex={1}>{this.listToko()}</Tabs.View>
             </Tabs.Views>
-          </Tabs>
+          </Tabs> */}
+          <TabView
+            lazy
+            navigationState={{index: tabIndex, routes: tabRoutes}}
+            renderScene={SceneMap({
+              barang: this.listProduct,
+              toko: this.listToko,
+            })}
+            renderTabBar={props => (
+              <TabBar
+                {...props}
+                indicatorStyle={{backgroundColor: theme.primary}}
+                style={{backgroundColor: '#fff'}}
+                labelStyle={{fontWeight: 'bold'}}
+                activeColor={theme.primary}
+                inactiveColor={'gray'}
+              />
+            )}
+            onIndexChange={i => {
+              this.setState({tabIndex: i});
+            }}
+            initialLayout={{width: Dimensions.get('window').width}}
+            style={{marginTop: 0}}
+          />
         </Box>
       </NativeBaseProvider>
     );
