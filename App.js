@@ -62,6 +62,7 @@ import Alamat from './src/components/akun/Alamat';
 
 import HasilPencarian from './src/components/dashboard/HasilPencarian';
 import Pencarian from './src/components/dashboard/Pencarian';
+import DetailProduk from './src/components/dashboard/DetailProduk';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -119,6 +120,8 @@ class App extends Component {
               name="Search"
               component={Pencarian}
             />
+            <Stack.Screen name="DetailProduk" component={DetailProduk} />
+
             <Stack.Screen
               options={{
                 title: 'Hasil Pencarian',
@@ -133,7 +136,7 @@ class App extends Component {
               component={Shop}
             />
             <Stack.Screen
-              options={{title: 'Pilih Lokasi',headerShown:false}}
+              options={{title: 'Pilih Lokasi', headerShown: false}}
               name="PilihLokasi"
               component={PilihLokasi}
             />
