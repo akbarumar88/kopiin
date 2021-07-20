@@ -29,7 +29,13 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 
 import Splash from './src/components/universal/Splash';
-import {NativeBaseProvider, Button} from 'native-base';
+import {
+  NativeBaseProvider,
+  Button,
+  Input,
+  FormControl,
+  Icon,
+} from 'native-base';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -51,6 +57,9 @@ import UbahPasssword from './src/components/akun/UbahPassword';
 
 import FormAlamat from './src/components/akun/FormAlamat';
 import Alamat from './src/components/akun/Alamat';
+
+import HasilPencarian from './src/components/dashboard/HasilPencarian';
+import Pencarian from './src/components/dashboard/Pencarian';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -97,7 +106,21 @@ class App extends Component {
               options={{title: 'Tambah Produk'}}
               component={FormProduk}
             />
-
+            <Stack.Screen
+              options={{
+                title: 'Pencarian',
+              }}
+              name="Search"
+              component={Pencarian}
+            />
+            <Stack.Screen
+              options={{
+                title: 'Hasil Pencarian',
+              }}
+              initialParams={{cari: ''}}
+              name="SearchResult"
+              component={HasilPencarian}
+            />
             <Stack.Screen
               options={{title: 'Profil Toko'}}
               name="Shop"

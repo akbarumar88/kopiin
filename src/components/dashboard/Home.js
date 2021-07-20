@@ -47,7 +47,8 @@ import {MerchantShimmer, BarangShimmer} from '../universal/Placeholder';
 export default class Home extends Component {
   defaultStoreAvatar =
     'https://cdn.icon-icons.com/icons2/1706/PNG/512/3986701-online-shop-store-store-icon_112278.png';
-  defaultProductAvatar = "https://cdn.iconscout.com/icon/free/png-512/box-with-stuff-2349406-1955397.png"
+  defaultProductAvatar =
+    'https://cdn.iconscout.com/icon/free/png-512/box-with-stuff-2349406-1955397.png';
 
   constructor(props) {
     super(props);
@@ -78,6 +79,7 @@ export default class Home extends Component {
               />
             }>
             <Box>
+              {this.searchBox()}
               <Text bold>Toko / Kedai Terdekat</Text>
               {this.listToko()}
               <Text bold>Mungkin anda suka</Text>
@@ -89,13 +91,30 @@ export default class Home extends Component {
     );
   }
 
+  searchBox = () => (
+    <Pressable onPress={() => this.bukaPencarian()}>
+      <FormControl isReadOnly={true} mt={5} mb={10}>
+        <Input
+          placeholder="Cari"
+          InputRightElement={
+            <Icon
+              size="md"
+              mr={2}
+              as={<MaterialCommunityIcons name="magnify" />}
+            />
+          }
+        />
+      </FormControl>
+    </Pressable>
+  );
+
   listToko = () => {
     return (
       <Resource
         url={`${BASE_URL()}/dashboard/shop`}
         params={{refresh: this.state.refresh}}>
         {({loading, error, payload: data, refetch}) => {
-          if (loading ) {
+          if (loading) {
             return <MerchantShimmer />;
           } else if (error) {
             return <Text>{errMsg('Load Merchant')}</Text>;
@@ -255,5 +274,9 @@ export default class Home extends Component {
         }}
       </Resource>
     );
+  };
+
+  bukaPencarian = () => {
+    this.props.navigation.navigate('Search');
   };
 }
