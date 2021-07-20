@@ -103,6 +103,11 @@ export default class Shop extends React.Component {
 
           this.setState({
             form: dataToko,
+            Region: {
+              latitude: value.lat_toko,
+              longitude: value.long_toko,
+              namaalamat: value.alamat_map
+            },
             foto_merchant: value.foto_merchant
               ? `${BASE_URL()}/image/merchant/${
                   value.foto_merchant
@@ -171,14 +176,15 @@ export default class Shop extends React.Component {
           nama_toko: form.namaToko,
           jenis_toko: form.jenis_toko,
           alamat_toko: form.alamatToko,
-          lat_toko: Region.latitude,
-          long_toko: Region.longitude,
           provinsi: form.provinsi,
           kota: form.kota,
           kecamatan: form.kecamatan,
           kodepos: form.kodepos,
           idprovinsi: kota,
           idkota: kecamatan,
+          lat_toko: Region.latitude,
+          long_toko: Region.longitude,
+          alamat_map: Region.namaalamat
         }),
       )
       .then(async ({data}) => {
