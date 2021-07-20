@@ -17,6 +17,7 @@ import {
 import {Dimensions} from 'react-native';
 import Resource from './../universal/Resource';
 import {BASE_URL} from './../../utilitas/Config';
+import {toCurrency} from '../../utilitas/Function';
 
 export default class DetailProduk extends Component {
   constructor(props) {
@@ -65,7 +66,7 @@ export default class DetailProduk extends Component {
                     </Box>
                     <Box bg="white" mt={2} py={4} px={3}>
                       <Text bold fontSize={20}>
-                        {data.data.harga}
+                        Rp.{toCurrency(data.data.harga)}
                       </Text>
                       <Text fontSize={14}>{data.data.nama}</Text>
                     </Box>
@@ -122,10 +123,19 @@ export default class DetailProduk extends Component {
                       <Text bold={true}>Detail Produk</Text>
                       <HStack space={1} mt={4} mb={2}>
                         <Text fontSize={14} flex={1}>
-                          Berat
+                          Berat :
                         </Text>
                         <Text fontSize={14} flex={1}>
                           {data.data.berat} gram
+                        </Text>
+                      </HStack>
+                      <Divider />
+                      <HStack space={1} mt={4} mb={2}>
+                        <Text fontSize={14} flex={1}>
+                          Tersedia :
+                        </Text>
+                        <Text fontSize={14} flex={1}>
+                          {data.data.stok}
                         </Text>
                       </HStack>
                       <Divider />

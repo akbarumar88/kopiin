@@ -231,6 +231,7 @@ export default class Home extends Component {
               {data.data.map(
                 (
                   {
+                    id,
                     nama,
                     deskripsi,
                     harga,
@@ -260,7 +261,9 @@ export default class Home extends Component {
                       w={itemWidth}
                       borderRadius={8}
                       shadow={4}
-                      onPress={() => {}}>
+                      onPress={() => {
+                        this.props.navigation.navigate('DetailProduk', {idproduk: id});
+                      }}>
                       {/* <View style={[{width}, style.wCardApotek, marginLeft]}> */}
                       <Image
                         alignSelf="center"

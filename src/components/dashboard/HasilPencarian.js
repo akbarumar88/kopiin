@@ -15,6 +15,7 @@ import {
   FlatList,
   Image,
 } from 'native-base';
+import {toCurrency} from '../../utilitas/Function';
 import Resource from './../universal/Resource';
 import {BASE_URL} from './../../utilitas/Config';
 export default class HasilPencarian extends Component {
@@ -116,7 +117,7 @@ export default class HasilPencarian extends Component {
                       {item.deskripsi}
                     </Text>
                     <Text fontSize="xs" color="grey">
-                      {item.harga}
+                      Rp.{toCurrency(item.harga)}
                     </Text>
                   </Box>
                 </Pressable>
