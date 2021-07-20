@@ -92,6 +92,13 @@ export default class Pencarian extends Component {
   );
 
   bukaPencarian = () => {
-    this.props.navigation.navigate('SearchResult', {cari: this.state.cari});
+    this.props.navigation.reset({
+      index: 1,
+      routes: [
+        {name: 'Dashboard'},
+        {name: 'SearchResult', params: {cari: this.state.cari}},
+      ],
+    });
+    // this.props.navigation.navigate('SearchResult', {cari: this.state.cari});
   };
 }

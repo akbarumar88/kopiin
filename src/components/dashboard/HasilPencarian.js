@@ -107,7 +107,7 @@ export default class HasilPencarian extends Component {
               numColumns={2}
               horizontal={false}
               flex={1}
-              data={data.data}
+              data={[...data.data]}
               keyExtractor={(item, index) => item.id}
               showsVerticalScrollIndicator={false}
               renderItem={({item, index}) => (
@@ -140,6 +140,7 @@ export default class HasilPencarian extends Component {
                           ? urlGambar + item.foto_barang
                           : this.defaultProductAvatar,
                       }}
+                      alt={item.nama}
                     />
                     <Text fontSize="sm" isTruncated>
                       {item.nama}
@@ -184,7 +185,7 @@ export default class HasilPencarian extends Component {
               numColumns={2}
               horizontal={false}
               flex={1}
-              data={data.data}
+              data={[...data.data]}
               keyExtractor={(item, index) => item.id}
               showsVerticalScrollIndicator={false}
               renderItem={({item, index}) => (
@@ -215,6 +216,7 @@ export default class HasilPencarian extends Component {
                           ? urlGambar + item.foto_merchant
                           : this.defaultStoreAvatar,
                       }}
+                      alt={item.nama_toko}
                     />
                     <Text fontSize="sm" isTruncated>
                       {item.nama_toko}
