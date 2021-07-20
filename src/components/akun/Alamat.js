@@ -147,6 +147,10 @@ export default class Alamat extends React.Component {
                   </HStack>
                 </Box>
               )}
+              refreshing={false}
+              onRefresh={() => {
+                refetch()
+              }}
             />
           </>
         );

@@ -103,7 +103,12 @@ class Profil extends React.Component {
   };
 
   handleChoosePhoto() {
-    launchImageLibrary({noData: true}, response => {
+    const options = {
+      maxWidth: 500,
+      maxHeight: 500,
+      quality: 0.7,
+    };
+    launchImageLibrary(options, response => {
       if (response.assets) {
         this.setState({foto_user: response.assets[0]});
       }
