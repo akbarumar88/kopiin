@@ -28,6 +28,74 @@ export default class DetailProduk extends Component {
     };
   }
 
+  listProdukTerkait = dataProduk => {
+    const urlGambar = `${BASE_URL()}/image/barang/`;
+
+    const imgWidth = (Dimensions.get('screen').width * 0.9) / 2;
+    return (
+      <Box py={3} mt={2} px={3} bg="white">
+        <Text mt={2} bold={true}>
+          Produk Terkait
+        </Text>
+        <FlatList
+          flex={1}
+          mt={5}
+          numColumns={2}
+          horizontal={false}
+          data={dataProduk}
+          keyExtractor={(item, index) => item.id}
+          showsVerticalScrollIndicator={false}
+          renderItem={({item, index}) => (
+            <Pressable
+              onPress={() => {
+                this.props.navigation.navigate('DetailProduk', {
+                  idproduk: item.id,
+                });
+              }}>
+              <Box
+                bgColor="coolGray.100"
+                mx={1}
+                key={index}
+                borderRadius={20}
+                pb={4}
+                mb={1}
+                alignItems="center">
+                <Image
+                  alignSelf="center"
+                  resizeMode="contain"
+                  mt={2}
+                  mb={2}
+                  onError={() => {}}
+                  style={[
+                    {width: imgWidth, height: imgWidth},
+                    {
+                      borderTopLeftRadius: 10,
+                      borderTopRightRadius: 10,
+                    },
+                  ]}
+                  source={{
+                    uri: item.foto_barang
+                      ? urlGambar + item.foto_barang
+                      : this.defaultProductAvatar,
+                  }}
+                />
+                <Text fontSize="sm" isTruncated>
+                  {item.nama}
+                </Text>
+                <Text fontSize="xs" bold color="grey">
+                  {item.deskripsi}
+                </Text>
+                <Text fontSize="xs" color="grey">
+                  Rp.{toCurrency(item.harga)}
+                </Text>
+              </Box>
+            </Pressable>
+          )}
+        />
+      </Box>
+    );
+  };
+
   render() {
     const urlGambar = `${BASE_URL()}/image/barang/`;
     const urlToko = `${BASE_URL()}/image/merchant/`;
@@ -130,7 +198,7 @@ export default class DetailProduk extends Component {
                         </Text>
                       </HStack>
                       <Divider />
-                      <HStack space={1} mt={4} mb={2}>
+                      <HStack space={1} mt={2} mb={2}>
                         <Text fontSize={14} flex={1}>
                           Tersedia :
                         </Text>
@@ -141,6 +209,9 @@ export default class DetailProduk extends Component {
                       <Divider />
                       <Text mt={4}>{data.data.deskripsi}</Text>
                     </Box>
+
+                    {data.data?.terkait?.length > 0 &&
+                      this.listProdukTerkait(data.data?.terkait)}
                   </>
                 );
               }}
