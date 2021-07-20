@@ -116,6 +116,7 @@ export default class Home extends Component {
                       jenis,
                       foto = this.defaultStoreAvatar,
                       jarak = 0,
+                      foto_merchant
                     },
                     index,
                   ) => {
@@ -144,7 +145,7 @@ export default class Home extends Component {
                             },
                           ]}
                           source={{
-                            uri: foto,
+                            uri: `${BASE_URL()}/image/merchant/${foto_merchant}?${new Date()}`,
                           }}
                           alt={nama_toko}
                         />

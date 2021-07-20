@@ -12,6 +12,7 @@ import {
   Select,
   Avatar,
   Pressable,
+  Icon
 } from 'native-base';
 import {BASE_URL, theme} from '../../utilitas/Config';
 import axios from 'axios';
@@ -21,6 +22,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import AlertOkV2 from './../universal/AlertOkV2';
 import Resource from './../universal/Resource';
 import Loading from './../universal/Loading';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default class FormAlamat extends React.Component {
   constructor(props) {
@@ -36,12 +38,28 @@ export default class FormAlamat extends React.Component {
 
       loading: false,
       loadingData: false,
+      Region: {
+        namaalamat: '',
+        latitude: '',
+        longitude: '',
+      },
     };
   }
 
   componentDidMount() {
     if (this.props.route.params.idalamat) {
       this.setDataAlamat();
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    // Cek perubahan props params
+    if (
+      JSON.stringify(prevProps.route.params) !=
+      JSON.stringify(this.props.route.params)
+    ) {
+      // Update lokasi gan
+      this.setState({Region: this.props.route.params.Region});
     }
   }
 
@@ -56,6 +74,11 @@ export default class FormAlamat extends React.Component {
           kota: data.data.idprovinsi,
           kecamatan: data.data.idkota,
           daerah: data.data.kecamatan,
+          Region: {
+            latitude: data.data.latitude,
+            longitude: data.data.longitude,
+            namaalamat: data.data.alamat_map,
+          }
         });
       })
       .catch(e => {
@@ -69,7 +92,7 @@ export default class FormAlamat extends React.Component {
   };
 
   validate = () => {
-    const {form, kota, kecamatan, daerah} = this.state;
+    const {form, kota, kecamatan, daerah,Region} = this.state;
     let error;
     if (!form.nama) {
       error = {...error, nama: 'Nama harus diisi'};
@@ -97,6 +120,10 @@ export default class FormAlamat extends React.Component {
     } else if (daerah == '') {
       error = {...error, kecamatan: 'Kecamatan harus diisi'};
     }
+
+    if (!Region.latitude) {
+      error = {...error, region: 'Harap pilih titik lokasi'};
+    }
     this.setState({error: error ?? {}});
     if (error) {
       return;
@@ -109,7 +136,7 @@ export default class FormAlamat extends React.Component {
   };
 
   simpanData = async () => {
-    const {form, kota, kecamatan} = this.state;
+    const {form, kota, kecamatan,Region} = this.state;
     this.setState({loading: true});
     let id = await AsyncStorage.getItem('id');
 
@@ -125,10 +152,11 @@ export default class FormAlamat extends React.Component {
           kecamatan: form.kecamatan,
           kodepos: form.kodepos,
           no_telp: form.no_telp,
-          latitude: 0.0,
-          longitude: 0.0,
           idprovinsi: kota,
           idkota: kecamatan,
+          latitude: Region.latitude,
+          longitude: Region.longitude,
+          alamat_map: Region.namaalamat
         }),
       )
       .then(async ({data}) => {
@@ -152,8 +180,9 @@ export default class FormAlamat extends React.Component {
         });
       });
   };
+
   updateData = async () => {
-    const {form, kota, kecamatan} = this.state;
+    const {form, kota, kecamatan,Region} = this.state;
     this.setState({loading: true});
     let id = await AsyncStorage.getItem('id');
 
@@ -169,10 +198,11 @@ export default class FormAlamat extends React.Component {
           kecamatan: form.kecamatan,
           kodepos: form.kodepos,
           no_telp: form.no_telp,
-          latitude: 0.0,
-          longitude: 0.0,
           idprovinsi: kota,
           idkota: kecamatan,
+          latitude: Region.latitude,
+          longitude: Region.longitude,
+          alamat_map: Region.namaalamat
         }),
       )
       .then(async ({data}) => {
@@ -343,7 +373,7 @@ export default class FormAlamat extends React.Component {
   }
 
   render() {
-    const {error, form, loading, loadingData} = this.state;
+    const {error, form, loading, loadingData, Region} = this.state;
     return (
       <NativeBaseProvider>
         <AlertOkV2 ref={ref => (this.alert = ref)} />
@@ -360,7 +390,7 @@ export default class FormAlamat extends React.Component {
               <FormControl isRequired isInvalid={'nama' in error}>
                 <FormControl.Label
                   _text={{color: 'muted.700', fontSize: 'sm', fontWeight: 600}}>
-                  Nama
+                  Nama Alamat
                 </FormControl.Label>
                 <Input
                   onSubmitEditing={() => {
@@ -399,6 +429,7 @@ export default class FormAlamat extends React.Component {
                   {error.no_telp}
                 </FormControl.ErrorMessage>
               </FormControl>
+              
               <FormControl isRequired isInvalid={'detail' in error}>
                 <FormControl.Label
                   _text={{color: 'muted.700', fontSize: 'sm', fontWeight: 600}}>
@@ -422,6 +453,7 @@ export default class FormAlamat extends React.Component {
                   {error.detail}
                 </FormControl.ErrorMessage>
               </FormControl>
+
               <FormControl isRequired isInvalid={'kodepos' in error}>
                 <FormControl.Label
                   _text={{color: 'muted.700', fontSize: 'sm', fontWeight: 600}}>
@@ -448,6 +480,37 @@ export default class FormAlamat extends React.Component {
               {this.optionProvince()}
               {this.optionCity()}
               {this.optionSubCity()}
+
+              <FormControl isRequired isInvalid={'region' in error}>
+                <FormControl.Label
+                  _text={{color: 'muted.700', fontSize: 'sm', fontWeight: 600}}>
+                  Titik Lokasi
+                </FormControl.Label>
+                <Input
+                  isDisabled
+                  ref={ref => (this.ikodepos = ref)}
+                  onSubmitEditing={() => {}}
+                  value={Region.namaalamat}
+                />
+
+                <FormControl.ErrorMessage
+                  _text={{fontSize: 'xs', color: 'error.500', fontWeight: 500}}>
+                  {error.region}
+                </FormControl.ErrorMessage>
+              </FormControl>
+
+              <Button
+                colorScheme="amber"
+                startIcon={<Icon as={Ionicons} name="location" size={5} />}
+                _text={{color: 'white', fontWeight: 'bold'}}
+                onPress={() => {
+                  this.props.navigation.navigate('PilihLokasi', {
+                    BackRoute: 'FormAlamat',
+                  });
+                }}>
+                Pilih Titik Alamat
+              </Button>
+
               <VStack space={1}>
                 <Button
                   isLoading={loading}
