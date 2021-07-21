@@ -1,45 +1,21 @@
 import React, {Component} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {
-  Alert,
-  ToastAndroid,
-  Dimensions,
-  RefreshControl,
-  NativeAppEventEmitter,
-} from 'react-native';
+import {Dimensions, RefreshControl} from 'react-native';
 import {
   NativeBaseProvider,
   Box,
   Text,
-  Heading,
-  VStack,
   FormControl,
   Input,
-  Link,
-  Button,
   Icon,
-  IconButton,
   HStack,
-  Divider,
   ScrollView,
-  useToast,
   Pressable,
   Image,
-  Center,
 } from 'native-base';
-import {BASE_URL, OAUTH_CLIENT_ID, theme} from '../../utilitas/Config';
-import {
-  GoogleSignin,
-  GoogleSigninButton,
-  statusCodes,
-} from '@react-native-community/google-signin';
-import auth from '@react-native-firebase/auth';
-import axios from 'axios';
-import QueryString from 'qs';
-import AlertOkV2 from '../universal/AlertOkV2';
-import Loading from '../universal/Loading';
-import {errMsg,toCurrency} from '../../utilitas/Function';
+import {BASE_URL} from '../../utilitas/Config';
+import {errMsg, toCurrency} from '../../utilitas/Function';
 import AsyncStorage from '@react-native-community/async-storage';
 import Resource from '../universal/Resource';
 import {MerchantShimmer, BarangShimmer} from '../universal/Placeholder';
@@ -150,6 +126,7 @@ export default class Home extends Component {
                       foto_merchant,
                       distance = 0,
                       kota,
+                      id,
                     },
                     index,
                   ) => {
@@ -167,7 +144,11 @@ export default class Home extends Component {
                         key={index}
                         w={itemWidth}
                         borderRadius={8}
-                        onPress={() => {}}>
+                        onPress={() => {
+                          this.props.navigation.navigate('DetailToko', {
+                            idtoko: id,
+                          });
+                        }}>
                         {/* <View style={[{width}, style.wCardApotek, marginLeft]}> */}
                         <Image
                           mb={2}
@@ -241,12 +222,12 @@ export default class Home extends Component {
                     foto = this.defaultProductAvatar,
                     jarak,
                     kota,
-                    rating = 0, 
-                    terjual = 0
+                    rating = 0,
+                    terjual = 0,
                   },
                   index,
                 ) => {
-                  kota = kota.split(/\s/)[1]
+                  kota = kota.split(/\s/)[1];
                   let imgWidth = Dimensions.get('window').width / 7;
                   let itemWidth = Dimensions.get('window').width / 3.5;
                   return (
@@ -262,7 +243,9 @@ export default class Home extends Component {
                       borderRadius={8}
                       shadow={4}
                       onPress={() => {
-                        this.props.navigation.navigate('DetailProduk', {idproduk: id});
+                        this.props.navigation.navigate('DetailProduk', {
+                          idproduk: id,
+                        });
                       }}>
                       {/* <View style={[{width}, style.wCardApotek, marginLeft]}> */}
                       <Image
@@ -293,13 +276,17 @@ export default class Home extends Component {
                           Rp {toCurrency(harga)}
                         </Text>
                         <HStack alignItems="center" mt={1}>
-                          <Icon as={Ionicons} name="star" size={"xs"} color="orange" mr={1} />
+                          <Icon
+                            as={Ionicons}
+                            name="star"
+                            size={'xs'}
+                            color="orange"
+                            mr={1}
+                          />
                           <Text fontSize="xs" color="grey">
                             {rating} | Terjual {terjual}
                           </Text>
-
                         </HStack>
-                        
                       </Box>
                       {/* </View> */}
                     </Pressable>

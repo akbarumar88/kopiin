@@ -189,7 +189,13 @@ export default class HasilPencarian extends Component {
               keyExtractor={(item, index) => item.id}
               showsVerticalScrollIndicator={false}
               renderItem={({item, index}) => (
-                <Pressable flex={0.5}>
+                <Pressable
+                  onPress={() => {
+                    this.props.navigation.navigate('DetailToko', {
+                      idtoko: item.id,
+                    });
+                  }}
+                  flex={0.5}>
                   <Box
                     bgColor="coolGray.100"
                     mx={1}

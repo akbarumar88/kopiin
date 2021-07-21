@@ -14,24 +14,65 @@ import {
   Avatar,
   Button,
 } from 'native-base';
-import {Dimensions} from 'react-native';
+import {Dimensions, ToastAndroid} from 'react-native';
 import Resource from './../universal/Resource';
 import {BASE_URL} from './../../utilitas/Config';
 import {toCurrency} from '../../utilitas/Function';
-
+import AsyncStorage from '@react-native-community/async-storage';
+import QueryString from 'qs';
+import axios from 'axios';
+import AlertOkV2 from './../universal/AlertOkV2';
 export default class DetailProduk extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      varian: 0,
+      varian: undefined,
+      dataProduk: [],
+      loading: false,
     };
   }
+
+  tambahKeranjang = async () => {
+    if (!this.state.varian && this.state.dataProduk.varian.length > 0) {
+      ToastAndroid.show('Pilih variasi terlebih dahulu', ToastAndroid.SHORT);
+    } else {
+      this.setState({loading: true});
+      let id = await AsyncStorage.getItem('id');
+
+      let body = QueryString.stringify({
+        id_user: id,
+        id_merchant: this.state.dataProduk.id_merchant,
+        id_varian: this.state.varian,
+        id_barang: this.state.dataProduk.id,
+        harga: this.state.dataProduk.harga,
+        jumlah: 1,
+      });
+      axios
+        .post(`${BASE_URL()}/orderdetail`, body)
+        .then(async ({data}) => {
+          this.setState({loading: false});
+          if (data.status) {
+            ToastAndroid.show(
+              'Berhasil dimasukkan keranjang',
+              ToastAndroid.SHORT,
+            );
+          }
+        })
+        .catch(e => {
+          this.setState({loading: false});
+          console.warn(e);
+          this.alert.show({
+            message: errMsg('Buat Toko'),
+          });
+        });
+    }
+  };
 
   listProdukTerkait = dataProduk => {
     const urlGambar = `${BASE_URL()}/image/barang/`;
 
-    const imgWidth = (Dimensions.get('screen').width * 0.9) / 2;
+    const imgWidth = (Dimensions.get('screen').width * 0.85) / 2;
     return (
       <Box py={3} mt={2} px={3} bg="white">
         <Text mt={2} bold={true}>
@@ -101,6 +142,7 @@ export default class DetailProduk extends Component {
     const urlToko = `${BASE_URL()}/image/merchant/`;
     return (
       <NativeBaseProvider>
+        <AlertOkV2 ref={ref => (this.alert = ref)} />
         <Box flex={1}>
           {/* <Box>
             <Text>Ini Header Gan</Text>
@@ -117,6 +159,9 @@ export default class DetailProduk extends Component {
                   );
                 }
 
+                if (this.state.dataProduk.length == 0) {
+                  this.setState({dataProduk: data.data});
+                }
                 return (
                   <>
                     <Box
@@ -138,18 +183,25 @@ export default class DetailProduk extends Component {
                       </Text>
                       <Text fontSize={14}>{data.data.nama}</Text>
                     </Box>
-                    <Box bg="white" mt={2} py={4} px={3}>
-                      <HStack alignItems="center">
-                        <Avatar
-                          mr={4}
-                          source={{
-                            uri: urlToko + data.data.foto_merchant,
-                          }}
-                          alt={data.data.nama_toko}
-                        />
-                        <Text bold={true}>{data.data.nama_toko}</Text>
-                      </HStack>
-                    </Box>
+                    <Pressable
+                      onPress={() => {
+                        this.props.navigation.navigate('DetailToko', {
+                          idtoko: data.data.id_merchant,
+                        });
+                      }}>
+                      <Box bg="white" mt={2} py={4} px={3}>
+                        <HStack alignItems="center">
+                          <Avatar
+                            mr={4}
+                            source={{
+                              uri: urlToko + data.data.foto_merchant,
+                            }}
+                            alt={data.data.nama_toko}
+                          />
+                          <Text bold={true}>{data.data.nama_toko}</Text>
+                        </HStack>
+                      </Box>
+                    </Pressable>
 
                     {data.data.varian?.length > 0 && (
                       <Box bg="white" mt={2} py={4} px={3}>
@@ -218,7 +270,13 @@ export default class DetailProduk extends Component {
             </Resource>
           </ScrollView>
           <Box px={3} pb={2}>
-            <Button colorScheme="success">Masukkan Keranjang</Button>
+            <Button
+              isLoading={this.state.loading}
+              isLoadingText="Proses"
+              onPress={() => this.tambahKeranjang()}
+              colorScheme="success">
+              Masukkan Keranjang
+            </Button>
           </Box>
         </Box>
       </NativeBaseProvider>

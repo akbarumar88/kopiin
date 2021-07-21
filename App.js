@@ -63,6 +63,7 @@ import Alamat from './src/components/akun/Alamat';
 import HasilPencarian from './src/components/dashboard/HasilPencarian';
 import Pencarian from './src/components/dashboard/Pencarian';
 import DetailProduk from './src/components/dashboard/DetailProduk';
+import DetailToko from './src/components/dashboard/DetailToko';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -121,7 +122,7 @@ class App extends Component {
               component={Pencarian}
             />
             <Stack.Screen name="DetailProduk" component={DetailProduk} />
-
+            <Stack.Screen name="DetailToko" component={DetailToko} />
             <Stack.Screen
               options={{
                 title: 'Hasil Pencarian',
