@@ -14,14 +14,15 @@ import {
   Avatar,
   Button,
 } from 'native-base';
-import {Dimensions, ToastAndroid} from 'react-native';
+import {Dimensions, ToastAndroid, Alert} from 'react-native';
 import Resource from './../universal/Resource';
 import {BASE_URL} from './../../utilitas/Config';
-import {toCurrency} from '../../utilitas/Function';
+import {toCurrency, errMsg} from '../../utilitas/Function';
 import AsyncStorage from '@react-native-community/async-storage';
 import QueryString from 'qs';
 import axios from 'axios';
 import AlertOkV2 from './../universal/AlertOkV2';
+import ImageLoad from './../universal/ImageLoad';
 export default class DetailProduk extends Component {
   constructor(props) {
     super(props);
@@ -30,8 +31,30 @@ export default class DetailProduk extends Component {
       varian: undefined,
       dataProduk: [],
       loading: false,
+      refresh: new Date(),
     };
   }
+
+  showAlert = () =>
+    Alert.alert(
+      'Berhasil',
+      'Berhasil dimasukkan keranjang',
+      [
+        {
+          text: 'Lanjutkan Belanja',
+
+          style: 'default',
+        },
+        {
+          text: 'Bayar',
+          onPress: () => {},
+          style: 'default',
+        },
+      ],
+      {
+        cancelable: true,
+      },
+    );
 
   tambahKeranjang = async () => {
     if (!this.state.varian && this.state.dataProduk.varian.length > 0) {
@@ -53,17 +76,19 @@ export default class DetailProduk extends Component {
         .then(async ({data}) => {
           this.setState({loading: false});
           if (data.status) {
-            ToastAndroid.show(
-              'Berhasil dimasukkan keranjang',
-              ToastAndroid.SHORT,
-            );
+            this.showAlert();
+            // ToastAndroid.show(
+            //   'Berhasil dimasukkan keranjang',
+            //   ToastAndroid.SHORT,
+            // );
           }
         })
         .catch(e => {
           this.setState({loading: false});
-          console.warn(e);
+
           this.alert.show({
-            message: errMsg('Buat Toko'),
+            message:
+              e.response?.data?.errorMessage ?? errMsg('Tambah Keranjang'),
           });
         });
     }
@@ -114,9 +139,13 @@ export default class DetailProduk extends Component {
                       borderTopRightRadius: 10,
                     },
                   ]}
+                  alt={item.nama}
                   source={{
                     uri: item.foto_barang
-                      ? urlGambar + item.foto_barang
+                      ? urlGambar +
+                        item.foto_barang +
+                        '?url=' +
+                        this.state.refresh
                       : this.defaultProductAvatar,
                   }}
                 />
@@ -167,14 +196,18 @@ export default class DetailProduk extends Component {
                     <Box
                       bg="white"
                       height={Dimensions.get('screen').height * 0.25}>
-                      <Image
+                      <ImageLoad
                         flex={1}
                         style={{
                           resizeMode: 'contain',
                         }}
-                        source={{
-                          uri: urlGambar + data.data.foto_barang,
-                        }}
+                        url={
+                          urlGambar +
+                          data.data.foto_barang +
+                          '?date=' +
+                          this.state.refresh
+                        }
+                        alt={data.data.nama}
                       />
                     </Box>
                     <Box bg="white" mt={2} py={4} px={3}>
@@ -216,7 +249,6 @@ export default class DetailProduk extends Component {
                               <Pressable
                                 onPress={() => {
                                   this.setState({varian: item.id});
-                                  console.log(this.state.varian);
                                 }}>
                                 <Box
                                   py={3}

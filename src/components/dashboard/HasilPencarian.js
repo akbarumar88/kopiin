@@ -20,6 +20,7 @@ import Resource from './../universal/Resource';
 import {BASE_URL, theme} from './../../utilitas/Config';
 import {TabView, TabBar, SceneMap} from 'react-native-tab-view';
 import FooterLoading from '../universal/FooterLoading';
+import ImageLoad from './../universal/ImageLoad';
 
 export default class HasilPencarian extends Component {
   defaultStoreAvatar =
@@ -38,7 +39,7 @@ export default class HasilPencarian extends Component {
         {key: 'barang', title: 'Barang'},
         {key: 'toko', title: 'Toko'},
       ],
-      limit: 3,
+      limit: 4,
       hasMoreProduct: true,
       hasMoreShop: true,
     };
@@ -68,7 +69,7 @@ export default class HasilPencarian extends Component {
             navigationState={{index: tabIndex, routes: tabRoutes}}
             renderScene={SceneMap({
               barang: this.listProduct,
-              toko: this.listToko,
+              toko: this.listShop,
             })}
             renderTabBar={props => (
               <TabBar
@@ -133,7 +134,7 @@ export default class HasilPencarian extends Component {
                     pb={4}
                     mb={1}
                     alignItems="center">
-                    <Image
+                    <ImageLoad
                       alignSelf="center"
                       resizeMode="contain"
                       mt={2}
@@ -146,11 +147,7 @@ export default class HasilPencarian extends Component {
                           borderTopRightRadius: 10,
                         },
                       ]}
-                      source={{
-                        uri: item.foto_barang
-                          ? urlGambar + item.foto_barang
-                          : this.defaultProductAvatar,
-                      }}
+                      url={urlGambar + item.foto_barang + '?' + new Date()}
                       alt={item.nama}
                     />
                     <Text fontSize="sm" isTruncated>
@@ -167,8 +164,8 @@ export default class HasilPencarian extends Component {
               )}
               refreshing={false}
               onRefresh={() => {
-                this.setState({hasMoreProduct:true})
-                refetch()
+                this.setState({hasMoreProduct: true});
+                refetch();
               }}
               onEndReached={() => {
                 fetchMore({offset: nextOffset}, (newPayload, oldPayload) => {
@@ -192,21 +189,19 @@ export default class HasilPencarian extends Component {
     );
   };
 
-  showDetailProduk = id => {
-    this.props.navigation.navigate('DetailProduk', {idproduk: id});
-  };
-
-  listToko = () => {
-    const {pencarian,limit} = this.state;
+  listShop = () => {
+    const {pencarian, limit} = this.state;
     const urlGambar = `${BASE_URL()}/image/merchant/`;
 
     const imgWidth = (Dimensions.get('screen').width * 0.5) / 2;
     return (
-      <Resource url={`${BASE_URL()}/shop`} params={{
-        cari:pencarian,
-        limit
-      }}>
-        {({loading, error, payload: data, refetch}) => {
+      <Resource
+        url={`${BASE_URL()}/shop`}
+        params={{
+          cari: pencarian,
+          limit,
+        }}>
+        {({loading, error, payload: data, refetch, fetchMore}) => {
           if (loading) {
             return (
               <Box flex={1} justifyContent="center">
@@ -214,7 +209,8 @@ export default class HasilPencarian extends Component {
               </Box>
             );
           }
-          console.warn(data)
+          let nextOffset = data.data.length;
+
           return (
             <FlatList
               numColumns={2}
@@ -239,7 +235,7 @@ export default class HasilPencarian extends Component {
                     pb={4}
                     mb={1}
                     alignItems="center">
-                    <Image
+                    <ImageLoad
                       alignSelf="center"
                       resizeMode="contain"
                       mt={2}
@@ -252,11 +248,7 @@ export default class HasilPencarian extends Component {
                         },
                       ]}
                       onError={() => {}}
-                      source={{
-                        uri: item.foto_merchant
-                          ? urlGambar + item.foto_merchant
-                          : this.defaultStoreAvatar,
-                      }}
+                      url={urlGambar + item.foto_merchant + '?' + new Date()}
                       alt={item.nama_toko}
                     />
                     <Text fontSize="sm" isTruncated>
@@ -268,11 +260,34 @@ export default class HasilPencarian extends Component {
                   </Box>
                 </Pressable>
               )}
+              refreshing={false}
+              onRefresh={() => {
+                this.setState({hasMoreShop: true});
+                refetch();
+              }}
+              onEndReached={() => {
+                fetchMore({offset: nextOffset}, (newPayload, oldPayload) => {
+                  if (newPayload.data.length < limit) {
+                    this.setState({hasMoreShop: false});
+                  }
+                  return {
+                    ...oldPayload,
+                    data: [...oldPayload.data, ...newPayload.data],
+                  };
+                });
+              }}
+              ListFooterComponent={
+                this.state.hasMoreShop ? <FooterLoading /> : null
+              }
             />
           );
         }}
       </Resource>
     );
+  };
+
+  showDetailProduk = id => {
+    this.props.navigation.navigate('DetailProduk', {idproduk: id});
   };
 
   searchBox = () => (

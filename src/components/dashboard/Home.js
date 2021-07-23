@@ -19,6 +19,7 @@ import {errMsg, toCurrency} from '../../utilitas/Function';
 import AsyncStorage from '@react-native-community/async-storage';
 import Resource from '../universal/Resource';
 import {MerchantShimmer, BarangShimmer} from '../universal/Placeholder';
+import ImageLoad from './../universal/ImageLoad';
 
 export default class Home extends Component {
   defaultStoreAvatar =
@@ -150,7 +151,7 @@ export default class Home extends Component {
                           });
                         }}>
                         {/* <View style={[{width}, style.wCardApotek, marginLeft]}> */}
-                        <Image
+                        <ImageLoad
                           mb={2}
                           alignSelf="center"
                           resizeMode="cover"
@@ -161,11 +162,7 @@ export default class Home extends Component {
                               borderTopRightRadius: 8,
                             },
                           ]}
-                          source={{
-                            uri: foto_merchant
-                              ? `${BASE_URL()}/image/merchant/${foto_merchant}?${new Date()}`
-                              : this.defaultStoreAvatar,
-                          }}
+                          url={`${BASE_URL()}/image/merchant/${foto_merchant}?${new Date()}`}
                           alt={nama_toko}
                         />
 
