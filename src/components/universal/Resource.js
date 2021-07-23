@@ -23,7 +23,7 @@ export default class Resource extends Component {
       prevProps.url != this.props.url ||
       JSON.stringify(prevProps.params) != JSON.stringify(this.props.params)
     ) {
-        // Jika terjadi perubahan url / parameter, refetch ulang
+      // Jika terjadi perubahan url / parameter, refetch ulang
       this.fetchData();
     }
   }
@@ -34,13 +34,13 @@ export default class Resource extends Component {
 
     this.setState({loading: true});
     try {
-      let body
+      let body;
       if (method == 'get') {
         body = {
-          params
-        }
+          params,
+        };
       } else {
-        body = params
+        body = params;
       }
       // console.warn(body)
       let {data} = await Axios[method](url, body);
@@ -51,7 +51,28 @@ export default class Resource extends Component {
     }
   };
 
+  fetchMore = async (newParams, callback) => {
+    let {url, params, method} = this.props;
+    method = method.toLowerCase();
+    let body;
+    if (method == 'get') {
+      body = {
+        params: {...params, ...newParams},
+      };
+    } else {
+      body = {...params, ...newParams};
+    }
+    // console.warn(body)
+    let {data} = await Axios[method](url, body);
+    let newPayload = await callback(data, this.state.payload);
+    this.setState({payload: newPayload});
+  };
+
   render() {
-    return this.props.children({...this.state, refetch: this.fetchData});
+    return this.props.children({
+      ...this.state,
+      refetch: this.fetchData,
+      fetchMore: this.fetchMore,
+    });
   }
 }

@@ -19,6 +19,7 @@ import {toCurrency} from '../../utilitas/Function';
 import Resource from './../universal/Resource';
 import {BASE_URL, theme} from './../../utilitas/Config';
 import {TabView, TabBar, SceneMap} from 'react-native-tab-view';
+import FooterLoading from '../universal/FooterLoading';
 
 export default class HasilPencarian extends Component {
   defaultStoreAvatar =
@@ -37,6 +38,9 @@ export default class HasilPencarian extends Component {
         {key: 'barang', title: 'Barang'},
         {key: 'toko', title: 'Toko'},
       ],
+      limit: 3,
+      hasMoreProduct: true,
+      hasMoreShop: true,
     };
   }
 
@@ -81,6 +85,7 @@ export default class HasilPencarian extends Component {
             }}
             initialLayout={{width: Dimensions.get('window').width}}
             style={{marginTop: 0}}
+            swipeEnabled
           />
         </Box>
       </NativeBaseProvider>
@@ -88,20 +93,26 @@ export default class HasilPencarian extends Component {
   }
 
   listProduct = () => {
-    const {pencarian} = this.state;
+    const {pencarian, limit} = this.state;
     const urlGambar = `${BASE_URL()}/image/barang/`;
 
     const imgWidth = (Dimensions.get('screen').width * 0.5) / 2;
     return (
-      <Resource url={`${BASE_URL()}/barang?cari=` + encodeURI(pencarian)}>
-        {({loading, error, payload: data, refetch}) => {
+      <Resource
+        url={`${BASE_URL()}/barang`}
+        params={{
+          cari: pencarian,
+          limit,
+        }}>
+        {({loading, error, payload: data, refetch, fetchMore}) => {
           if (loading) {
             return (
               <Box flex={1} justifyContent="center">
-                <Spinner size="lg" color="green" />
+                <FooterLoading full />
               </Box>
             );
           }
+          let nextOffset = data.data.length;
           return (
             <FlatList
               numColumns={2}
@@ -154,6 +165,26 @@ export default class HasilPencarian extends Component {
                   </Box>
                 </Pressable>
               )}
+              refreshing={false}
+              onRefresh={() => {
+                this.setState({hasMoreProduct:true})
+                refetch()
+              }}
+              onEndReached={() => {
+                fetchMore({offset: nextOffset}, (newPayload, oldPayload) => {
+                  // console.warn(newPayload);
+                  if (newPayload.data < limit) {
+                    this.setState({hasMoreProduct: false});
+                  }
+                  return {
+                    ...oldPayload,
+                    data: [...oldPayload.data, ...newPayload.data],
+                  };
+                });
+              }}
+              ListFooterComponent={
+                this.state.hasMoreProduct ? <FooterLoading /> : null
+              }
             />
           );
         }}
@@ -166,20 +197,24 @@ export default class HasilPencarian extends Component {
   };
 
   listToko = () => {
-    const {pencarian} = this.state;
+    const {pencarian,limit} = this.state;
     const urlGambar = `${BASE_URL()}/image/merchant/`;
 
     const imgWidth = (Dimensions.get('screen').width * 0.5) / 2;
     return (
-      <Resource url={`${BASE_URL()}/shop?cari=` + encodeURI(pencarian)}>
+      <Resource url={`${BASE_URL()}/shop`} params={{
+        cari:pencarian,
+        limit
+      }}>
         {({loading, error, payload: data, refetch}) => {
           if (loading) {
             return (
               <Box flex={1} justifyContent="center">
-                <Spinner size="lg" color="green" />
+                <FooterLoading full />
               </Box>
             );
           }
+          console.warn(data)
           return (
             <FlatList
               numColumns={2}
