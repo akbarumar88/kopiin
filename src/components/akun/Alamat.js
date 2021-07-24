@@ -51,6 +51,21 @@ export default class Alamat extends React.Component {
     this.setState({iduser: iduser});
   }
 
+  pilihAlamat = id => {
+    console.log(
+      `${BASE_URL()}/order/alamat/${this.props.route.params.idorder}`,
+    );
+    axios
+      .put(
+        `${BASE_URL()}/order/alamat/${this.props.route.params.idorder}`,
+        QueryString.stringify({id_alamat: id}),
+      )
+      .then(() => {
+        AsyncStorage.setItem('refreshKeranjang', 'Iya');
+        this.props.navigation.goBack();
+      });
+  };
+
   hapusAlamat = id => {
     this.alert.show(
       {message: 'Anda yakin ingin menghapus data ini ?'},
@@ -109,6 +124,7 @@ export default class Alamat extends React.Component {
             )}
             <FlatList
               mt={2}
+              flex={1}
               data={data.data}
               renderItem={({item, index}) => (
                 <Box
@@ -126,30 +142,51 @@ export default class Alamat extends React.Component {
                   <Text fontSize="sm" color="grey" mt={1}>
                     {item.detail}
                   </Text>
-
-                  <HStack space="2">
+                  {this.props.route.params && (
                     <Button
                       size="sm"
-                      onPress={() => this.editAlamat(item.id)}
-                      flex={1}
+                      onPress={() => {
+                        if (this.props.route.params.selected != item.id) {
+                          this.pilihAlamat(item.id);
+                        }
+                      }}
                       mt={3}
-                      variant="outline">
-                      Ubah Alamat
+                      colorScheme="success"
+                      variant={
+                        this.props.route.params.selected == item.id
+                          ? 'solid'
+                          : 'outline'
+                      }>
+                      {this.props.route.params.selected == item.id
+                        ? 'Alamat dipilih'
+                        : 'Pilih Alamat'}
                     </Button>
-                    <Button
-                      size="sm"
-                      mt={3}
-                      onPress={() => this.hapusAlamat(item.id)}
-                      colorScheme="danger"
-                      variant="outline">
-                      Hapus Alamat
-                    </Button>
-                  </HStack>
+                  )}
+                  {!this.props.route.params && (
+                    <HStack space="2">
+                      <Button
+                        size="sm"
+                        onPress={() => this.editAlamat(item.id)}
+                        flex={1}
+                        mt={3}
+                        variant="outline">
+                        Ubah Alamat
+                      </Button>
+                      <Button
+                        size="sm"
+                        mt={3}
+                        onPress={() => this.hapusAlamat(item.id)}
+                        colorScheme="danger"
+                        variant="outline">
+                        Hapus Alamat
+                      </Button>
+                    </HStack>
+                  )}
                 </Box>
               )}
               refreshing={false}
               onRefresh={() => {
-                refetch()
+                refetch();
               }}
             />
           </>
@@ -165,9 +202,7 @@ export default class Alamat extends React.Component {
         <AlertYesNoV2 ref={ref => (this.alert = ref)} />
 
         <Box flex={1} paddingX={4} bg="white" pb={8}>
-          <VStack space={1} mt={2}>
-            {iduser != '-' && this.daftarAlamat()}
-          </VStack>
+          {iduser != '-' && this.daftarAlamat()}
         </Box>
       </NativeBaseProvider>
     );

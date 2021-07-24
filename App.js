@@ -64,6 +64,7 @@ import HasilPencarian from './src/components/dashboard/HasilPencarian';
 import Pencarian from './src/components/dashboard/Pencarian';
 import DetailProduk from './src/components/dashboard/DetailProduk';
 import DetailToko from './src/components/dashboard/DetailToko';
+import UbahKeranjang from './src/components/dashboard/UbahKeranjang';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -104,6 +105,7 @@ class App extends Component {
             />
             <Stack.Screen name="Register" component={Register} />
             <Stack.Screen name="Profil" component={Profil} />
+            <Stack.Screen name="UbahKeranjang" component={UbahKeranjang} />
             <Stack.Screen
               name="UbahPassword"
               component={UbahPasssword}

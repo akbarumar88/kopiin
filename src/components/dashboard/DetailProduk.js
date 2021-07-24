@@ -101,7 +101,7 @@ export default class DetailProduk extends Component {
   listProdukTerkait = dataProduk => {
     const urlGambar = `${BASE_URL()}/image/barang/`;
 
-    const imgWidth = (Dimensions.get('screen').width * 0.88) / 2;
+    const imgWidth = (Dimensions.get('screen').width * 0.85) / 2;
     return (
       <Box py={3} mt={2} px={3} bg="white">
         <Text mt={2} bold={true}>
@@ -110,10 +110,9 @@ export default class DetailProduk extends Component {
         <FlatList
           flex={1}
           mt={5}
-          numColumns={2}
-          horizontal={false}
+          horizontal={true}
           data={dataProduk}
-          keyExtractor={(item, index) => item.id}
+          keyExtractor={(item, index) => item.id + 'idproduk'}
           showsVerticalScrollIndicator={false}
           renderItem={({item, index}) => (
             <Pressable
@@ -182,7 +181,7 @@ export default class DetailProduk extends Component {
           </Box> */}
           <FlatList
             flex={1}
-            keyExtractor={item => item}
+            keyExtractor={item => item + 'parent'}
             data={[1]}
             renderItem={() => (
               <Resource
@@ -253,7 +252,7 @@ export default class DetailProduk extends Component {
                             mt={2}
                             data={data.data.varian}
                             numColumns={4}
-                            keyExtractor={(item, index) => index}
+                            keyExtractor={(item, index) => item.id + 'varian'}
                             renderItem={({item}) => {
                               return (
                                 <Pressable

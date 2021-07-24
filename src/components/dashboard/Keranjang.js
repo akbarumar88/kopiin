@@ -11,8 +11,11 @@ import {
   HStack,
   VStack,
   Button,
+  HamburgerIcon,
   IconButton,
   Icon,
+  Pressable,
+  Menu,
 } from 'native-base';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Resource from './../universal/Resource';
@@ -34,28 +37,27 @@ export default class Keranjang extends Component {
     };
   }
 
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('blur', () => {
-      if (this.state.changedData) {
-        this.updateCart();
-      }
+  async getUser() {
+    let iduser = await AsyncStorage.getItem('id');
+
+    this.setState({
+      iduser: iduser,
     });
+  }
+
+  componentDidMount() {
+    this.getUser();
     this._focus = this.props.navigation.addListener('focus', async () => {
-      let iduser = await AsyncStorage.getItem('id');
       let loadAgain = await AsyncStorage.getItem('refreshKeranjang');
+
       if (loadAgain) {
         AsyncStorage.removeItem('refreshKeranjang');
         this.setState({paramrefresh: new Date()});
       }
-      this.setState({
-        iduser: iduser,
-        changedData: false,
-      });
     });
   }
 
   componentWillUnmount() {
-    this._unsubscribe();
     this._focus();
   }
 
@@ -69,19 +71,14 @@ export default class Keranjang extends Component {
     );
   };
 
-  updateCart = () => {
-    let data = this.state.cartData.reduce((result, item) => {
-      item.orderdetail.reduce((subresult, item) => {
-        result.push(item);
-      }, result);
-      return result;
-    }, []);
-
-    return axios.post(BASE_URL() + '/orderdetail/v2', JSON.stringify(data), {
-      headers: {
-        'Content-Type': 'application/json',
+  deleteOrder = id => {
+    this.alert.show(
+      {message: 'Apakah Anda yakin ingin menghapus data ini ?'},
+      async () => {
+        await axios.delete(`${BASE_URL()}/order/${id}`).then(e => {});
+        this.setState({paramrefresh: new Date()});
       },
-    });
+    );
   };
 
   getCountOrder = () =>
@@ -112,8 +109,9 @@ export default class Keranjang extends Component {
       0,
     );
 
+  //Header Checkbox
   header = () => {
-    const {cartData, checkedAll} = this.state;
+    const {cartData} = this.state;
     return (
       <Checkbox
         mt={2}
@@ -131,16 +129,12 @@ export default class Keranjang extends Component {
         }
         colorScheme="success"
         onChange={checked => {
-          try {
-            this.setState({
-              cartData: cartData.map(item => {
-                item.selected = checked;
-                return item;
-              }),
-            });
-          } catch (error) {
-            console.error(error);
-          }
+          this.setState({
+            cartData: cartData.map(item => {
+              item.selected = checked;
+              return item;
+            }),
+          });
         }}>
         Pilih Semua
       </Checkbox>
@@ -183,84 +177,12 @@ export default class Keranjang extends Component {
           {item.varian != '-' && (
             <Text fontSize="xs">Varian : {item.varian}</Text>
           )}
-          <Text bold color="green">
+          <Text color="grey" bold>
             {toCurrency(item.harga)}
           </Text>
-
-          <HStack mt={1}>
-            <Button
-              colorScheme="danger"
-              _text={{color: 'white'}}
-              roundedRight={0}
-              onPress={() => {
-                cartData[orderIndex].orderdetail[index].jumlah--;
-                if (cartData[orderIndex].orderdetail[index].jumlah <= 0) {
-                  this.deleteItem(item.id);
-                } else {
-                  this.setState({cartData: cartData, changedData: true});
-                }
-              }}
-              size="sm">
-              -
-            </Button>
-            <TextInput
-              autoCorrect={false}
-              value={cartData[orderIndex]?.orderdetail[
-                index
-              ]?.jumlah.toString()}
-              onChangeText={e => {
-                if (cartData[orderIndex]) {
-                  if (isNaN(parseInt(e))) {
-                    this.setState({
-                      savedNumber:
-                        cartData[orderIndex].orderdetail[index].jumlah,
-                    });
-                  }
-                  cartData[orderIndex].orderdetail[index].jumlah = isNaN(
-                    parseInt(e),
-                  )
-                    ? ''
-                    : parseInt(e);
-                  this.setState({cartData: cartData, changedData: true});
-                }
-              }}
-              onBlur={e => {
-                if (isNaN(cartData[orderIndex].orderdetail[index].jumlah)) {
-                  this.alert.show({message: 'Isi Dengan benar'});
-                  cartData[orderIndex].orderdetail[index].jumlah =
-                    this.state.savedNumber;
-                  this.setState({cartData: cartData});
-                } else if (
-                  cartData[orderIndex].orderdetail[index].jumlah <= 0
-                ) {
-                  this.deleteItem(item.id);
-                  cartData[orderIndex].orderdetail[index].jumlah =
-                    this.state.savedNumber;
-                  this.setState({cartData: cartData});
-                }
-              }}
-              keyboardType="numeric"
-              style={{
-                textAlign: 'center',
-                paddingVertical: 0,
-                paddingHorizontal: 10,
-                borderColor: 'grey',
-                borderWidth: 0.5,
-              }}
-            />
-            <Button
-              onPress={() => {
-                // this.setState({
-                //   testInput: this.state.testInput + 1,
-                // });
-                cartData[orderIndex].orderdetail[index].jumlah++;
-                this.setState({cartData: cartData, changedData: true});
-              }}
-              roundedLeft={0}
-              size="sm">
-              +
-            </Button>
-          </HStack>
+          <Text color="grey" fontSize="sm">
+            x {item.jumlah}
+          </Text>
         </VStack>
       </HStack>
     );
@@ -289,6 +211,31 @@ export default class Keranjang extends Component {
               }}>
               {item.nama_toko}
             </Checkbox>
+            <Box flex={1}></Box>
+            <Menu
+              mr={2}
+              trigger={triggerProps => {
+                return (
+                  <Pressable
+                    accessibilityLabel="More options menu"
+                    {...triggerProps}>
+                    <HamburgerIcon size="sm" fontSize="sm" />
+                  </Pressable>
+                );
+              }}>
+              <Menu.Item
+                _text={{padding: 0}}
+                onPress={() =>
+                  this.props.navigation.navigate('UbahKeranjang', {
+                    idorder: item.id,
+                  })
+                }>
+                Edit
+              </Menu.Item>
+              <Menu.Item onPress={() => this.deleteOrder(item.id)}>
+                Hapus
+              </Menu.Item>
+            </Menu>
           </HStack>
 
           {/* Item Keranjang */}
@@ -313,7 +260,16 @@ export default class Keranjang extends Component {
               </Text>
             </VStack>
             <VStack>
-              <Button size="sm">Ubah</Button>
+              <Button
+                size="sm"
+                onPress={() => {
+                  this.props.navigation.navigate('Alamat', {
+                    idorder: item.id,
+                    selected: item.id_alamat,
+                  });
+                }}>
+                Ubah
+              </Button>
             </VStack>
           </HStack>
           <Divider />
@@ -375,13 +331,6 @@ export default class Keranjang extends Component {
                         <RefreshControl
                           refreshing={loading || refresh}
                           onRefresh={async () => {
-                            if (this.state.changedData) {
-                              this.setState({
-                                refresh: true,
-                                changedData: false,
-                              });
-                              await this.updateCart();
-                            }
                             this.setState({
                               refresh: false,
                             });
