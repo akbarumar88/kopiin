@@ -159,31 +159,39 @@ export default class Keranjang extends Component {
             />
           }
         />
+        <Pressable
+          onPress={() =>
+            this.props.navigation.navigate('DetailProduk', {
+              idproduk: item.id_barang,
+            })
+          }>
+          <HStack mb={2} space={3}>
+            <ImageLoad
+              style={{
+                resizeMode: 'contain',
+                alignSelf: 'center',
+              }}
+              w={imgWidth}
+              h={imgWidth}
+              url={urlGambar + item.foto_barang}
+            />
 
-        <ImageLoad
-          style={{
-            resizeMode: 'contain',
-            alignSelf: 'center',
-          }}
-          w={imgWidth}
-          h={imgWidth}
-          url={urlGambar + item.foto_barang}
-        />
-
-        <VStack>
-          <Text fontSize="sm" bold>
-            {item.nama}
-          </Text>
-          {item.varian != '-' && (
-            <Text fontSize="xs">Varian : {item.varian}</Text>
-          )}
-          <Text color="grey" bold>
-            {toCurrency(item.harga)}
-          </Text>
-          <Text color="grey" fontSize="sm">
-            x {item.jumlah}
-          </Text>
-        </VStack>
+            <VStack>
+              <Text fontSize="sm" bold>
+                {item.nama}
+              </Text>
+              {item.varian != '-' && (
+                <Text fontSize="xs">Varian : {item.varian}</Text>
+              )}
+              <Text color="grey" bold>
+                {toCurrency(item.harga)}
+              </Text>
+              <Text color="grey" fontSize="sm">
+                x {item.jumlah}
+              </Text>
+            </VStack>
+          </HStack>
+        </Pressable>
       </HStack>
     );
   };
