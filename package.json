@@ -59,5 +59,8 @@
   },
   "jest": {
     "preset": "react-native"
+  },
+  "prettier":{
+    "semi": false
   }
 }

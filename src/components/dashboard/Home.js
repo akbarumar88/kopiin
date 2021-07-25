@@ -227,7 +227,7 @@ export default class Home extends Component {
                   kota = kota.split(/\s/)[1];
                   let imgWidth = Dimensions.get('window').width / 7;
                   let itemWidth = Dimensions.get('window').width / 3.5;
-                  let isMiddle = index % 3 == 1
+                  let isMiddle = index % 3 == 1;
                   return (
                     <Pressable
                       alignItems="flex-start"
@@ -273,18 +273,20 @@ export default class Home extends Component {
                         <Text fontSize="xs" color="grey">
                           Rp {toCurrency(harga)}
                         </Text>
-                        <HStack alignItems="center" mt={1}>
-                          <Icon
-                            as={Ionicons}
-                            name="star"
-                            size={'xs'}
-                            color="orange"
-                            mr={1}
-                          />
-                          <Text fontSize="xs" color="grey">
-                            {rating} | Terjual {terjual}
-                          </Text>
-                        </HStack>
+                        {terjual > 0 ? (
+                          <HStack alignItems="center" mt={1}>
+                            <Icon
+                              as={Ionicons}
+                              name="star"
+                              size={'xs'}
+                              color="orange"
+                              mr={1}
+                            />
+                            <Text fontSize="xs" color="grey">
+                              {rating} | Terjual {terjual}
+                            </Text>
+                          </HStack>
+                        ) : null}
                       </Box>
                       {/* </View> */}
                     </Pressable>
