@@ -152,25 +152,39 @@ export default class MyProduk extends React.Component {
                   <Text fontSize="sm" color="grey" mt={1}>
                     {'Stok : ' + item.stok}
                   </Text>
-
-                  <HStack space="2">
-                    <Button
-                      size="sm"
-                      onPress={() => this.editBarang(item.id)}
-                      flex={1}
-                      mt={3}
-                      variant="outline">
-                      Ubah Barang
-                    </Button>
+                  {this.props.route.params && (
                     <Button
                       size="sm"
                       mt={3}
-                      onPress={() => this.hapusBarang(item.id)}
-                      colorScheme="danger"
+                      onPress={() => {
+                        this.props.route.params.pilih(item);
+                        this.props.navigation.goBack();
+                      }}
+                      colorScheme="primary"
                       variant="outline">
-                      Hapus Barang
+                      Pilih Barang
                     </Button>
-                  </HStack>
+                  )}
+                  {!this.props.route.params && (
+                    <HStack space="2">
+                      <Button
+                        size="sm"
+                        onPress={() => this.editBarang(item.id)}
+                        flex={1}
+                        mt={3}
+                        variant="outline">
+                        Ubah Barang
+                      </Button>
+                      <Button
+                        size="sm"
+                        mt={3}
+                        onPress={() => this.hapusBarang(item.id)}
+                        colorScheme="danger"
+                        variant="outline">
+                        Hapus Barang
+                      </Button>
+                    </HStack>
+                  )}
                 </Box>
               )}
             />

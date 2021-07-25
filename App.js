@@ -65,6 +65,7 @@ import Pencarian from './src/components/dashboard/Pencarian';
 import DetailProduk from './src/components/dashboard/DetailProduk';
 import DetailToko from './src/components/dashboard/DetailToko';
 import UbahKeranjang from './src/components/dashboard/UbahKeranjang';
+import Posting from './src/components/akun/Posting';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -150,6 +151,7 @@ class App extends Component {
               component={FormAlamat}
             />
             <Stack.Screen name="Alamat" component={Alamat} />
+            <Stack.Screen name="Posting" component={Posting} />
           </Stack.Navigator>
         </NavigationContainer>
       </NativeBaseProvider>
