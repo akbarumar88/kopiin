@@ -278,7 +278,7 @@ export default class Keranjang extends Component {
               <Button
                 size="sm"
                 onPress={() => {
-                  this.props.navigation.navigate("Alamat", {
+                  this.props.navigation.navigate("PilihAlamat", {
                     idorder: item.id,
                     selected: item.id_alamat,
                   })

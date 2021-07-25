@@ -68,47 +68,10 @@ export default class Alamat extends React.Component {
       });
   };
 
-  hapusAlamat = id => {
-    this.alert.show(
-      {message: 'Anda yakin ingin menghapus data ini ?'},
-      async () => {
-        await axios.delete(`${BASE_URL()}/alamat/${id}`).then(e => {
-          this.refreshData();
-        });
-      },
-    );
-  };
-
-  setAlamatDefault = id => {
-    this.setState({loading: true});
-    axios
-      .put(
-        `${BASE_URL()}/alamat/default/${id}`,
-        QueryString.stringify({id_user: this.state.iduser}),
-      )
-      .then(res => {
-        this.setState({loading: false});
-        this.refreshData();
-      })
-      .catch(e => {
-        this.setState({loading: false});
-        this.alertOk.show({
-          message:
-            e.response?.data?.errorMessage ?? errMsg('Set Alamat Default'),
-        });
-      });
-  };
-
   refreshData = () => {
     this.setState({refresh: new Date()});
   };
 
-  editAlamat = id => {
-    this.props.navigation.navigate('FormAlamat', {
-      idalamat: id,
-      refreshData: this.refreshData,
-    });
-  };
   tambahAlamat = () => {
     this.props.navigation.navigate('FormAlamat', {
       refreshData: this.refreshData,
@@ -165,8 +128,8 @@ export default class Alamat extends React.Component {
   );
 
   itemAlamat = (item, index) => {
-    let alamatDefault = item.flagdefault == 1;
-    let condProps = alamatDefault
+    let alamatSelected = this.props.route.params.selected == item.id
+    let condProps = alamatSelected
       ? {
           borderWidth: 1,
           borderColor: theme.primary,
@@ -175,7 +138,7 @@ export default class Alamat extends React.Component {
       : {borderWidth: 1, borderColor: 'coolGray.200', backgroundColor: `#fff`};
     return (
       <Box my={1} mx={1} rounded={5} py={4} bg="white" px={4} {...condProps}>
-        {alamatDefault ? <Text bold color="coolGray.500" fontSize="xs">Alamat Utama</Text> : null}
+        {alamatSelected ? <Text bold color="coolGray.500" fontSize="xs">Alamat Utama</Text> : null}
         <Text bold={true}>{item.nama}</Text>
         <Text fontSize="sm" color="grey" mt={1}>
           {item.no_telp}
@@ -209,16 +172,16 @@ export default class Alamat extends React.Component {
                 onPress={() => this.editAlamat(item.id)}
                 flex={1}
                 mt={3}
-                variant={alamatDefault ? 'solid' : 'outline'}>
+                variant={alamatSelected ? 'solid' : 'outline'}>
                 Ubah Alamat
               </Button>
-              {!alamatDefault ? (
+              {!alamatSelected ? (
                 <Button
                   size="sm"
                   mt={3}
                   onPress={() => this.hapusAlamat(item.id)}
                   colorScheme="danger"
-                  variant={alamatDefault ? 'solid' : 'outline'}>
+                  variant={alamatSelected ? 'solid' : 'outline'}>
                   Hapus Alamat
                 </Button>
               ) : null}
@@ -227,10 +190,10 @@ export default class Alamat extends React.Component {
               size="sm"
               mt={3}
               onPress={() => this.setAlamatDefault(item.id)}
-              colorScheme={alamatDefault ? 'coolGray' : 'primary'}
-              variant={alamatDefault ? 'outline' : 'solid'}
-              disabled={alamatDefault}>
-              {alamatDefault ? 'Alamat Default' : 'Jadikan Default'}
+              colorScheme={alamatSelected ? 'coolGray' : 'primary'}
+              variant={alamatSelected ? 'outline' : 'solid'}
+              disabled={alamatSelected}>
+              {alamatSelected ? 'Alamat Default' : 'Jadikan Default'}
             </Button>
           </VStack>
         )}

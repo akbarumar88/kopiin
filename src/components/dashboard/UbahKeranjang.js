@@ -17,6 +17,7 @@ import {BASE_URL} from './../../utilitas/Config';
 import {toCurrency} from './../../utilitas/Function';
 import axios from 'axios';
 import AsyncStorage from '@react-native-community/async-storage';
+import FooterLoading from '../universal/FooterLoading';
 export default class UbahKeranjang extends Component {
   constructor(props) {
     super(props);
@@ -156,9 +157,7 @@ export default class UbahKeranjang extends Component {
 
             if (loading) {
               return (
-                <Box flex={1}>
-                  <Spinner color="green" />
-                </Box>
+                <FooterLoading full />
               );
             } else if (!loading && dataDetail != data.data) {
               this.setState({

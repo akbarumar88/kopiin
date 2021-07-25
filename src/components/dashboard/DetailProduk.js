@@ -68,6 +68,11 @@ export default class DetailProduk extends Component {
       this.setState({ loading: true })
       let id = await AsyncStorage.getItem("id")
 
+      if (!id) {
+        this.alert.show({message: 'Silakan melakukan login terlebih dahulu.'}, () => {
+          this.props.navigation.navigate('Login')
+        })
+      }
       let body = QueryString.stringify({
         id_user: id,
         id_merchant: this.state.dataProduk.id_merchant,
@@ -94,6 +99,10 @@ export default class DetailProduk extends Component {
           this.alert.show({
             message:
               e.response?.data?.errorMessage ?? errMsg("Tambah Keranjang"),
+          }, () => {
+            if (e.response.data?.code == 'NO_ADDRESS') {
+              this.props.navigation.navigate('FormAlamat', {})
+            } 
           })
         })
     }

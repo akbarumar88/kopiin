@@ -72,6 +72,42 @@ import PembayaranStack from "./src/components/pembayaran/PembayaranStack"
 const Stack = createStackNavigator()
 const Tab = createMaterialBottomTabNavigator()
 
+import Ionicons from "react-native-vector-icons/Ionicons"
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
+
+import Home from "./src/components/dashboard/Home"
+import Feed from "./src/components/dashboard/Feed"
+import Keranjang from "./src/components/dashboard/Keranjang"
+import Akun from "./src/components/dashboard/Akun"
+import Login from "./src/components/dashboard/Login"
+import Register from "./src/components/dashboard/Register"
+import Profil from "./src/components/akun/Profil"
+import Dashboard from "./src/components/dashboard/Index"
+import { theme } from "./src/utilitas/Config"
+import AsyncStorage from "@react-native-community/async-storage"
+
+import PilihLokasi from "./src/components/akun/PilihLokasi"
+import Shop from "./src/components/dashboard/Shop"
+import FormProduk from "./src/components/akun/FormProduk"
+import MyProduk from "./src/components/akun/MyProduk"
+import UbahPasssword from "./src/components/akun/UbahPassword"
+
+import FormAlamat from "./src/components/akun/FormAlamat"
+import Alamat from "./src/components/akun/Alamat"
+import PilihAlamat from "./src/components/order/PilihAlamat"
+
+import HasilPencarian from "./src/components/dashboard/HasilPencarian"
+import Pencarian from "./src/components/dashboard/Pencarian"
+import DetailProduk from "./src/components/dashboard/DetailProduk"
+import DetailToko from "./src/components/dashboard/DetailToko"
+import UbahKeranjang from "./src/components/dashboard/UbahKeranjang"
+
+import PembayaranStack from "./src/components/pembayaran/PembayaranStack"
+
+const Stack = createStackNavigator()
+const Tab = createMaterialBottomTabNavigator()
+
 class App extends Component {
   constructor(props) {
     super(props)
@@ -109,7 +145,11 @@ class App extends Component {
             />
             <Stack.Screen name="Register" component={Register} />
             <Stack.Screen name="Profil" component={Profil} />
-            <Stack.Screen name="UbahKeranjang" component={UbahKeranjang} />
+            <Stack.Screen
+              name="UbahKeranjang"
+              component={UbahKeranjang}
+              options={{ title: "Ubah Keranjang" }}
+            />
             <Stack.Screen
               name="UbahPassword"
               component={UbahPasssword}
@@ -150,11 +190,14 @@ class App extends Component {
             <Stack.Screen name="MyProduk" component={MyProduk} />
             <Stack.Screen
               name="FormAlamat"
-              options={{ title: "Alamat" }}
+              options={{ title: "Tambah Alamat" }}
               component={FormAlamat}
             />
             <Stack.Screen name="Alamat" component={Alamat} />
             <Stack.Screen name="Posting" component={Posting} />
+
+            <Stack.Screen name="Alamat" component={Alamat} />
+            <Stack.Screen name="PilihAlamat" component={PilihAlamat} />
             <Stack.Screen name="PembayaranStack" component={PembayaranStack} />
           </Stack.Navigator>
         </NavigationContainer>
