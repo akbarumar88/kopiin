@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Alert,ToastAndroid} from 'react-native';
+import {Alert, ToastAndroid} from 'react-native';
 import {
   NativeBaseProvider,
   Box,
@@ -29,21 +29,21 @@ import auth from '@react-native-firebase/auth';
 import axios from 'axios';
 import QueryString from 'qs';
 import AlertOkV2 from '../universal/AlertOkV2';
-import { errMsg } from '../../utilitas/Function';
+import {errMsg} from '../../utilitas/Function';
 import AsyncStorage from '@react-native-community/async-storage';
 
 class Register extends React.Component {
   constructor(props) {
     super(props);
 
-    const {email,nama,username} = props.route.params
+    const {email, nama, username} = props.route.params;
     this.state = {
       loggingIn: false,
       error: {},
       form: {
         email,
         nama,
-        username
+        username,
       },
       showpass: false,
       showkonfpass: false,
@@ -123,8 +123,8 @@ class Register extends React.Component {
   };
 
   register = () => {
-    const {form} = this.state
-    this.setState({loggingIn: true})
+    const {form} = this.state;
+    this.setState({loggingIn: true});
     axios
       .post(
         `${BASE_URL()}/auth/register`,
@@ -137,7 +137,7 @@ class Register extends React.Component {
         }),
       )
       .then(async ({data}) => {
-        this.setState({loggingIn: false})
+        this.setState({loggingIn: false});
         if (!data.status) {
           this.alert.show({
             message:
@@ -145,7 +145,10 @@ class Register extends React.Component {
           });
           return;
         }
-        ToastAndroid.show('Pendaftaran Berhasil, anda akan diarahkan ke halaman home.', ToastAndroid.SHORT);
+        ToastAndroid.show(
+          'Pendaftaran Berhasil, anda akan diarahkan ke halaman home.',
+          ToastAndroid.SHORT,
+        );
         let sessionData = [
           ['nama', form.nama],
           ['username', form.username],
@@ -153,16 +156,15 @@ class Register extends React.Component {
           ['notelp', form.notelp],
           ['id', data.data.id.toString()],
           ['token', data.token],
-        ]
-        console.warn(sessionData)
+        ];
+        console.warn(sessionData);
         await AsyncStorage.multiSet(sessionData);
         this.props.navigation.reset({index: 0, routes: [{name: 'Dashboard'}]});
       })
       .catch(e => {
-        this.setState({loggingIn: false})
+        this.setState({loggingIn: false});
         this.alert.show({
-          message:
-            e.response?.data?.errorMessage ?? errMsg('Register'),
+          message: e.response?.data?.errorMessage ?? errMsg('Register'),
         });
         console.warn(e.response?.data ?? e.message);
       });
@@ -413,4 +415,4 @@ function withHook(Component) {
   };
 }
 
-export default (Register);
+export default Register;
