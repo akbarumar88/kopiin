@@ -13,6 +13,7 @@ import {
   ScrollView,
   Pressable,
   Image,
+  FlatList,
 } from 'native-base';
 import {BASE_URL} from '../../utilitas/Config';
 import {errMsg, toCurrency} from '../../utilitas/Function';
@@ -52,11 +53,10 @@ export default class Home extends Component {
           {/* <Box>
             <Text>Ini Header Gan</Text>
           </Box> */}
-          <ScrollView
+          <FlatList
             paddingX={4}
             paddingY={4}
             backgroundColor={'#fff'}
-            nestedScrollEnabled
             refreshControl={
               <RefreshControl
                 refreshing={false}
@@ -64,17 +64,21 @@ export default class Home extends Component {
                   this.setState(s => ({refresh: s.refresh + 1}));
                 }}
               />
-            }>
-            {!initialLoading ? (
-              <Box>
-                {this.searchBox()}
-                <Text bold>Toko / Kedai Terdekat</Text>
-                {this.listToko()}
-                <Text bold>Mungkin anda suka</Text>
-                {this.listBarang()}
-              </Box>
-            ) : null}
-          </ScrollView>
+            }
+            ListHeaderComponent={
+              <>
+                {!initialLoading ? (
+                  <Box>
+                    {this.searchBox()}
+                    <Text bold>Toko / Kedai Terdekat</Text>
+                    {this.listToko()}
+                    <Text bold>Mungkin anda suka</Text>
+                    {this.listBarang()}
+                  </Box>
+                ) : null}
+              </>
+            }
+          />
         </Box>
       </NativeBaseProvider>
     );
@@ -174,7 +178,7 @@ export default class Home extends Component {
                             {kota}
                           </Text>
                           <Text fontSize="xs" color="grey">
-                            {distance.toFixed(1)} KM dari lokasi anda.
+                            {distance?.toFixed(1) ?? '??'} KM dari lokasi anda.
                           </Text>
                         </Box>
                         {/* </View> */}
@@ -228,8 +232,8 @@ export default class Home extends Component {
                   let imgWidth = Dimensions.get('screen').width / 4;
                   let itemWidth = Dimensions.get('screen').width / 3.7;
                   let isMiddle = index % 3 == 1;
-                  let isFirst = index %3 == 0
-                  let isLast = index %3 == 2
+                  let isFirst = index % 3 == 0;
+                  let isLast = index % 3 == 2;
                   return (
                     <Pressable
                       alignItems="flex-start"
