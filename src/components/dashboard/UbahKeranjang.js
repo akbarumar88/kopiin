@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from "react"
 import {
   NativeBaseProvider,
   FlatList,
@@ -9,62 +9,62 @@ import {
   Input,
   Spinner,
   Box,
-} from 'native-base';
-import ImageLoad from './../universal/ImageLoad';
-import {Dimensions, TextInput, ToastAndroid} from 'react-native';
-import Resource from './../universal/Resource';
-import {BASE_URL} from './../../utilitas/Config';
-import {toCurrency} from './../../utilitas/Function';
-import axios from 'axios';
-import AsyncStorage from '@react-native-community/async-storage';
-import FooterLoading from '../universal/FooterLoading';
+} from "native-base"
+import ImageLoad from "./../universal/ImageLoad"
+import { Dimensions, TextInput, ToastAndroid } from "react-native"
+import Resource from "./../universal/Resource"
+import { BASE_URL } from "./../../utilitas/Config"
+import { toCurrency } from "./../../utilitas/Function"
+import axios from "axios"
+import AsyncStorage from "@react-native-community/async-storage"
+import FooterLoading from "../universal/FooterLoading"
 export default class UbahKeranjang extends Component {
   constructor(props) {
-    super(props);
+    super(props)
 
     this.state = {
       dataDetail: [],
       errors: [],
-    };
+    }
   }
 
   simpanDetail = async () => {
-    const {dataDetail} = this.state;
+    const { dataDetail } = this.state
     await axios.post(
-      BASE_URL() + '/orderdetail/v2',
+      BASE_URL() + "/orderdetail/v2",
       JSON.stringify(dataDetail),
       {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-      },
-    );
-    AsyncStorage.setItem('refreshKeranjang', 'Oke');
-    this.props.navigation.goBack();
-  };
+      }
+    )
+    AsyncStorage.setItem("refreshKeranjang", "Oke")
+    this.props.navigation.goBack()
+  }
 
   validation = () => {
-    const {dataDetail} = this.state;
-    let validated = true;
-    dataDetail.some(item => {
+    const { dataDetail } = this.state
+    let validated = true
+    dataDetail.some((item) => {
       if (isNaN(parseInt(item.jumlah.toString()))) {
         ToastAndroid.show(
-          'Isi jumlah ' + item.nama + ' dengan benar',
-          ToastAndroid.SHORT,
-        );
-        validated = false;
-        return true;
+          "Isi jumlah " + item.nama + " dengan benar",
+          ToastAndroid.SHORT
+        )
+        validated = false
+        return true
       }
-    });
+    })
     if (validated) {
-      this.simpanDetail();
+      this.simpanDetail()
     }
-  };
+  }
 
   itemRender = (item, index) => {
-    const {dataDetail} = this.state;
-    const imageWidth = Dimensions.get('window').width * 0.15;
-    const urlGambar = `${BASE_URL()}/image/barang/`;
+    const { dataDetail } = this.state
+    const imageWidth = Dimensions.get("window").width * 0.15
+    const urlGambar = `${BASE_URL()}/image/barang/`
     return (
       <Box mx={2} my={1} p={4} bg="white" flex={1}>
         <HStack mb={2} space={2} alignItems="center">
@@ -76,7 +76,7 @@ export default class UbahKeranjang extends Component {
 
           <VStack>
             <Text bold>{item.nama}</Text>
-            <Text fontSize="md" color="red">
+            <Text fontSize="md" color="grey">
               {toCurrency(item.harga)}
             </Text>
           </VStack>
@@ -85,45 +85,48 @@ export default class UbahKeranjang extends Component {
           <Button
             onPress={() => {
               if (dataDetail[index].jumlah > 1) {
-                dataDetail[index].jumlah--;
-                this.setState({dataDetail: dataDetail});
+                dataDetail[index].jumlah--
+                this.setState({ dataDetail: dataDetail })
               } else if (isNaN(parseInt(dataDetail[index].jumlah.toString))) {
-                dataDetail[index].jumlah = 1;
-                this.setState({dataDetail: dataDetail});
+                dataDetail[index].jumlah = 1
+                this.setState({ dataDetail: dataDetail })
               }
             }}
             size="sm"
-            _text={{color: 'white'}}
-            colorScheme="danger">
+            _text={{ color: "white" }}
+            colorScheme="danger"
+          >
             -
           </Button>
           <TextInput
             keyboardType="number-pad"
             value={dataDetail[index]?.jumlah?.toString()}
-            onChangeText={e => {
+            onChangeText={(e) => {
               dataDetail[index].jumlah = isNaN(parseInt(e))
-                ? ''
+                ? ""
                 : parseInt(e) <= 0
                 ? 1
-                : parseInt(e);
-              this.setState({dataDetail: dataDetail});
+                : parseInt(e)
+              this.setState({ dataDetail: dataDetail })
             }}
             style={{
               paddingVertical: 0,
               paddingHorizontal: 10,
-              textAlign: 'center',
+              textAlign: "center",
+              color: "black",
             }}
           />
           <Button
             onPress={() => {
               if (isNaN(parseInt(dataDetail[index].jumlah.toString()))) {
-                dataDetail[index].jumlah = 1;
+                dataDetail[index].jumlah = 1
               } else {
-                dataDetail[index].jumlah++;
+                dataDetail[index].jumlah++
               }
-              this.setState({dataDetail: dataDetail});
+              this.setState({ dataDetail: dataDetail })
             }}
-            size="sm">
+            size="sm"
+          >
             +
           </Button>
         </HStack>
@@ -131,19 +134,20 @@ export default class UbahKeranjang extends Component {
           <Input
             flex={1}
             variant="underlined"
+            fontSize="sm"
             value={dataDetail[index]?.keterangan}
-            onChangeText={e => {
-              dataDetail[index].keterangan = e;
+            onChangeText={(e) => {
+              dataDetail[index].keterangan = e
               this.setState({
                 dataDetail: dataDetail,
-              });
+              })
             }}
             placeholder="Tulis Catatan"
           />
         </HStack>
       </Box>
-    );
-  };
+    )
+  }
 
   render() {
     return (
@@ -151,38 +155,38 @@ export default class UbahKeranjang extends Component {
         <Resource
           url={`${BASE_URL()}/orderdetail/orders/${
             this.props.route.params.idorder
-          }`}>
-          {({loading, error, payload: data, refetch, fetchMore}) => {
-            const {dataDetail} = this.state;
+          }`}
+        >
+          {({ loading, error, payload: data, refetch, fetchMore }) => {
+            const { dataDetail } = this.state
 
             if (loading) {
-              return (
-                <FooterLoading full />
-              );
+              return <FooterLoading full />
             } else if (!loading && dataDetail != data.data) {
               this.setState({
                 dataDetail: data.data,
-              });
+              })
             }
 
             return (
               <FlatList
                 flex={1}
                 data={loading ? [] : data.data}
-                renderItem={({item, index}) => this.itemRender(item, index)}
+                renderItem={({ item, index }) => this.itemRender(item, index)}
               />
-            );
+            )
           }}
         </Resource>
 
         <Button
           m={3}
           onPress={() => {
-            this.validation();
-          }}>
+            this.validation()
+          }}
+        >
           Simpan
         </Button>
       </NativeBaseProvider>
-    );
+    )
   }
 }

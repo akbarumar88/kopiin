@@ -12,6 +12,7 @@ import {
   HStack,
   Divider,
   Avatar,
+  Icon,
   Button,
 } from "native-base"
 import { Dimensions, ToastAndroid, Alert } from "react-native"
@@ -24,6 +25,8 @@ import axios from "axios"
 import AlertOkV2 from "./../universal/AlertOkV2"
 import ImageLoad from "./../universal/ImageLoad"
 import FooterLoading from "../universal/FooterLoading"
+import Loading from "./../universal/Loading"
+import AlertYesNoV2 from "./../universal/AlertYesNoV2"
 export default class DetailProduk extends Component {
   constructor(props) {
     super(props)
@@ -32,8 +35,71 @@ export default class DetailProduk extends Component {
       varian: undefined,
       dataProduk: [],
       loading: false,
+      loadingDialog: false,
       refresh: new Date(),
+      iduser: false,
     }
+  }
+
+  async componentDidMount() {
+    let id = await AsyncStorage.getItem("id")
+    this.setState({ iduser: id })
+  }
+
+  saveWishList = (state) => {
+    this.setState({ loadingDialog: true })
+    axios
+      .post(
+        `${BASE_URL()}/wishlist`,
+        QueryString.stringify({
+          id_barang: this.state.dataProduk.id,
+          id_user: this.state.iduser,
+          liked: state,
+        })
+      )
+      .then(() => {
+        this.setState({ loadingDialog: false })
+      })
+      .catch(() => {
+        this.setState({ loadingDialog: false })
+      })
+  }
+
+  setWishlist = (state) => {
+    this.props.navigation.setOptions({
+      headerRight: () => (
+        <Pressable
+          onPress={() => {
+            if (!state) {
+              this.dialog.show(
+                {
+                  message:
+                    "Anda yakin ingin menghapus produk ini dari wishlist ?",
+                },
+                () => {
+                  this.saveWishList(state)
+                  this.setWishlist(!state)
+                }
+              )
+            } else {
+              this.saveWishList(state)
+              this.setWishlist(!state)
+            }
+          }}
+        >
+          <Icon
+            as={
+              <MaterialCommunityIcons
+                name={state ? "heart-outline" : "heart"}
+              />
+            }
+            color={state ? "grey" : "red"}
+            size="md"
+            mr={4}
+          />
+        </Pressable>
+      ),
+    })
   }
 
   showAlert = () => {
@@ -67,11 +133,13 @@ export default class DetailProduk extends Component {
     } else {
       this.setState({ loading: true })
       let id = await AsyncStorage.getItem("id")
-
       if (!id) {
-        this.alert.show({message: 'Silakan melakukan login terlebih dahulu.'}, () => {
-          this.props.navigation.navigate('Login')
-        })
+        this.alert.show(
+          { message: "Silakan melakukan login terlebih dahulu." },
+          () => {
+            this.props.navigation.navigate("Login")
+          }
+        )
       }
       let body = QueryString.stringify({
         id_user: id,
@@ -96,14 +164,17 @@ export default class DetailProduk extends Component {
         .catch((e) => {
           this.setState({ loading: false })
 
-          this.alert.show({
-            message:
-              e.response?.data?.errorMessage ?? errMsg("Tambah Keranjang"),
-          }, () => {
-            if (e.response.data?.code == 'NO_ADDRESS') {
-              this.props.navigation.navigate('FormAlamat', {})
-            } 
-          })
+          this.alert.show(
+            {
+              message:
+                e.response?.data?.errorMessage ?? errMsg("Tambah Keranjang"),
+            },
+            () => {
+              if (e.response.data?.code == "NO_ADDRESS") {
+                this.props.navigation.navigate("FormAlamat", {})
+              }
+            }
+          )
         })
     }
   }
@@ -127,7 +198,7 @@ export default class DetailProduk extends Component {
           renderItem={({ item, index }) => (
             <Pressable
               onPress={() => {
-                this.props.navigation.navigate("DetailProduk", {
+                this.props.navigation.push("DetailProduk", {
                   idproduk: item.id,
                 })
               }}
@@ -184,152 +255,157 @@ export default class DetailProduk extends Component {
   render() {
     const urlGambar = `${BASE_URL()}/image/barang/`
     const urlToko = `${BASE_URL()}/image/merchant/`
+    const { loadingDialog } = this.state
     return (
       <NativeBaseProvider>
+        <AlertYesNoV2 ref={(ref) => (this.dialog = ref)} />
         <AlertOkV2 ref={(ref) => (this.alert = ref)} />
+        <Loading isVisible={loadingDialog} />
         <Box flex={1}>
-          {/* <Box>
-            <Text>Ini Header Gan</Text>
-          </Box> */}
-          <Resource
-            url={`${BASE_URL()}/barang/${this.props.route.params.idproduk}`}
-          >
-            {({ loading, error, payload: data, refetch }) => {
-              if (loading) {
-                return <FooterLoading full />
-              }
+          {this.state.iduser && (
+            <Resource
+              url={`${BASE_URL()}/barang/${this.props.route.params.idproduk}`}
+              params={{ iduser: this.state.iduser }}
+            >
+              {({ loading, error, payload: data, refetch }) => {
+                if (loading) {
+                  return <FooterLoading full />
+                }
 
-              if (this.state.dataProduk != data.data) {
-                this.setState({ dataProduk: data.data })
-              }
+                if (this.state.dataProduk != data.data) {
+                  this.setState({ dataProduk: data.data })
+                  this.setWishlist(data.data?.wishlist == 0)
+                }
 
-              return (
-                <FlatList
-                  flex={1}
-                  keyExtractor={(item) => item + "parent"}
-                  data={[1]}
-                  renderItem={() => {
-                    return (
-                      <>
-                        <Box
-                          bg="white"
-                          height={Dimensions.get("screen").height * 0.25}
-                        >
-                          <ImageLoad
-                            flex={1}
-                            style={{
-                              resizeMode: "contain",
-                            }}
-                            url={
-                              urlGambar +
-                              data.data.foto_barang +
-                              "?date=" +
-                              this.state.refresh
-                            }
-                            alt={data.data.nama}
-                          />
-                        </Box>
-                        <Box bg="white" mt={2} py={4} px={3}>
-                          <Text bold fontSize={20}>
-                            Rp.{toCurrency(data.data.harga)}
-                          </Text>
-                          <Text fontSize={14}>{data.data.nama}</Text>
-                        </Box>
-                        <Pressable
-                          onPress={() => {
-                            this.props.navigation.navigate("DetailToko", {
-                              idtoko: data.data.id_merchant,
-                            })
-                          }}
-                        >
-                          <Box bg="white" mt={2} py={4} px={3}>
-                            <HStack alignItems="center">
-                              <Avatar
-                                mr={4}
-                                source={{
-                                  uri: urlToko + data.data.foto_merchant,
-                                }}
-                                alt={data.data.nama_toko}
-                              />
-                              <Text bold={true}>{data.data.nama_toko}</Text>
-                            </HStack>
-                          </Box>
-                        </Pressable>
-
-                        {data.data.varian?.length > 0 && (
-                          <Box bg="white" mt={2} py={4} px={3}>
-                            <Text bold={true}>Pilih Variasi</Text>
-                            <FlatList
-                              mt={2}
-                              data={data.data.varian}
-                              numColumns={4}
-                              keyExtractor={(item, index) => item.id + "varian"}
-                              renderItem={({ item }) => {
-                                return (
-                                  <Pressable
-                                    onPress={() => {
-                                      this.setState({ varian: item.id })
-                                    }}
-                                  >
-                                    <Box
-                                      py={3}
-                                      px={4}
-                                      rounded={10}
-                                      bgColor={
-                                        item.id == this.state.varian
-                                          ? "#007bff"
-                                          : "grey"
-                                      }
-                                      mx={1}
-                                      my={1}
-                                    >
-                                      <Text fontSize={13} color="white">
-                                        {item.nama_varian}
-                                      </Text>
-                                    </Box>
-                                  </Pressable>
-                                )
+                return (
+                  <FlatList
+                    flex={1}
+                    keyExtractor={(item) => item + "parent"}
+                    data={[1]}
+                    renderItem={() => {
+                      return (
+                        <>
+                          <Box
+                            bg="white"
+                            height={Dimensions.get("screen").height * 0.25}
+                          >
+                            <ImageLoad
+                              flex={1}
+                              style={{
+                                resizeMode: "contain",
                               }}
+                              url={
+                                urlGambar +
+                                data.data.foto_barang +
+                                "?date=" +
+                                this.state.refresh
+                              }
+                              alt={data.data.nama}
                             />
                           </Box>
-                        )}
-                        <Box bg="white" mt={2} py={4} px={3} pb={8}>
-                          <Text bold={true}>Detail Produk</Text>
-                          <HStack space={1} mt={4} mb={2}>
-                            <Text fontSize={14} flex={1}>
-                              Berat :
+                          <Box bg="white" mt={2} py={4} px={3}>
+                            <Text bold fontSize={20}>
+                              Rp.{toCurrency(data.data.harga)}
                             </Text>
-                            <Text fontSize={14} flex={1}>
-                              {data.data.berat} gram
-                            </Text>
-                          </HStack>
-                          <Divider />
-                          <HStack space={1} mt={2} mb={2}>
-                            <Text fontSize={14} flex={1}>
-                              Tersedia :
-                            </Text>
-                            <Text fontSize={14} flex={1}>
-                              {data.data.stok}
-                            </Text>
-                          </HStack>
-                          <Divider />
-                          <Text mt={4}>{data.data.deskripsi}</Text>
-                        </Box>
+                            <Text fontSize={14}>{data.data.nama}</Text>
+                          </Box>
+                          <Pressable
+                            onPress={() => {
+                              this.props.navigation.navigate("DetailToko", {
+                                idtoko: data.data.id_merchant,
+                              })
+                            }}
+                          >
+                            <Box bg="white" mt={2} py={4} px={3}>
+                              <HStack alignItems="center">
+                                <Avatar
+                                  mr={4}
+                                  source={{
+                                    uri: urlToko + data.data.foto_merchant,
+                                  }}
+                                  alt={data.data.nama_toko}
+                                />
+                                <Text bold={true}>{data.data.nama_toko}</Text>
+                              </HStack>
+                            </Box>
+                          </Pressable>
 
-                        {data.data?.terkait?.length > 0 &&
-                          this.listProdukTerkait(data.data?.terkait)}
-                      </>
-                    )
-                  }}
-                  refreshing={false}
-                  onRefresh={() => {
-                    refetch()
-                  }}
-                />
-              )
-            }}
-          </Resource>
+                          {data.data.varian?.length > 0 && (
+                            <Box bg="white" mt={2} py={4} px={3}>
+                              <Text bold={true}>Pilih Variasi</Text>
+                              <FlatList
+                                mt={2}
+                                data={data.data.varian}
+                                numColumns={4}
+                                keyExtractor={(item, index) =>
+                                  item.id + "varian"
+                                }
+                                renderItem={({ item }) => {
+                                  return (
+                                    <Pressable
+                                      onPress={() => {
+                                        this.setState({ varian: item.id })
+                                      }}
+                                    >
+                                      <Box
+                                        py={3}
+                                        px={4}
+                                        rounded={10}
+                                        bgColor={
+                                          item.id == this.state.varian
+                                            ? "#007bff"
+                                            : "grey"
+                                        }
+                                        mx={1}
+                                        my={1}
+                                      >
+                                        <Text fontSize={13} color="white">
+                                          {item.nama_varian}
+                                        </Text>
+                                      </Box>
+                                    </Pressable>
+                                  )
+                                }}
+                              />
+                            </Box>
+                          )}
+                          <Box bg="white" mt={2} py={4} px={3} pb={8}>
+                            <Text bold={true}>Detail Produk</Text>
+                            <HStack space={1} mt={4} mb={2}>
+                              <Text fontSize={14} flex={1}>
+                                Berat :
+                              </Text>
+                              <Text fontSize={14} flex={1}>
+                                {data.data.berat} gram
+                              </Text>
+                            </HStack>
+                            <Divider />
+                            <HStack space={1} mt={2} mb={2}>
+                              <Text fontSize={14} flex={1}>
+                                Tersedia :
+                              </Text>
+                              <Text fontSize={14} flex={1}>
+                                {data.data.stok}
+                              </Text>
+                            </HStack>
+                            <Divider />
+                            <Text mt={4}>{data.data.deskripsi}</Text>
+                          </Box>
 
+                          {data.data?.terkait?.length > 0 &&
+                            this.listProdukTerkait(data.data?.terkait)}
+                        </>
+                      )
+                    }}
+                    refreshing={false}
+                    onRefresh={() => {
+                      refetch()
+                    }}
+                  />
+                )
+              }}
+            </Resource>
+          )}
           <Box bg="white">
             <Button
               mx={3}

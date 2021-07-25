@@ -37,6 +37,7 @@ import UbahKeranjang from "./src/components/dashboard/UbahKeranjang"
 import Posting from "./src/components/akun/Posting"
 import PembayaranStack from "./src/components/pembayaran/PembayaranStack"
 import PilihAlamat from "./src/components/order/PilihAlamat"
+import Wishlist from "./src/components/dashboard/Wishlist"
 const Stack = createStackNavigator()
 const Tab = createMaterialBottomTabNavigator()
 
@@ -129,6 +130,7 @@ class App extends Component {
             <Stack.Screen name="Posting" component={Posting} />
 
             <Stack.Screen name="PilihAlamat" component={PilihAlamat} />
+            <Stack.Screen name="Wishlist" component={Wishlist} />
             <Stack.Screen name="PembayaranStack" component={PembayaranStack} />
           </Stack.Navigator>
         </NavigationContainer>

@@ -15,6 +15,9 @@ import {
   Icon,
   FlatList,
   Pressable,
+  Actionsheet,
+  useDisclose,
+  HamburgerIcon,
 } from "native-base"
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
 import AsyncStorage from "@react-native-community/async-storage"
@@ -111,9 +114,12 @@ export class Post extends Component {
                 }}
                 size="md"
               />
-              <Text fontSize="sm" bold>
+              <Text fontSize="sm" flex={1} bold>
                 {item.nama_lengkap}
               </Text>
+              {item.id_user == this.props.iduser && (
+                <ActionStatus id={item.id} refetch={this.props.refetch} />
+              )}
             </HStack>
             {item.foto_postingan && (
               <ImageLoad
@@ -197,6 +203,46 @@ export class Post extends Component {
   }
 }
 
+export function ActionStatus({ id, refetch }) {
+  const { isOpen, onOpen, onClose } = useDisclose()
+  const deletePost = () => {
+    axios
+      .delete(`${BASE_URL()}/postingan/${id}`)
+      .then(() => {
+        onClose()
+        refetch()
+      })
+      .catch(() => {
+        onClose()
+        refetch()
+      })
+  }
+  return (
+    <>
+      <Pressable onPress={onOpen}>
+        <HamburgerIcon size={5} />
+      </Pressable>
+
+      <Actionsheet isOpen={isOpen} onClose={onClose}>
+        <Actionsheet.Content>
+          <Actionsheet.Item
+            onPress={deletePost}
+            startIcon={
+              <Icon
+                as={<MaterialCommunityIcons name="delete" />}
+                color="red.500"
+                mr={3}
+              />
+            }
+          >
+            Hapus Postingan
+          </Actionsheet.Item>
+        </Actionsheet.Content>
+      </Actionsheet>
+    </>
+  )
+}
+
 export default class Feed extends Component {
   constructor(props) {
     super(props)
@@ -257,6 +303,7 @@ export default class Feed extends Component {
     return (
       <NativeBaseProvider>
         {this.postArea()}
+
         {!this.state.initialLoading && (
           <Resource
             url={`${BASE_URL()}/postingan`}
@@ -277,7 +324,7 @@ export default class Feed extends Component {
               return (
                 <FlatList
                   showsVerticalScrollIndicator={false}
-                  data={data.data}
+                  data={[...data.data]}
                   flex={1}
                   keyExtractor={(item, index) => item.id}
                   refreshing={false}
@@ -285,7 +332,14 @@ export default class Feed extends Component {
                     this.setState({ hasMorePost: true })
                     refetch()
                   }}
-                  renderItem={({ item }) => <Post item={item} />}
+                  renderItem={({ item }) => (
+                    <Post iduser={id} refetch={refetch} item={item} />
+                  )}
+                  onContentSizeChange={() => {
+                    if (data.data.length == 0) {
+                      this.setState({ hasMorePost: false })
+                    }
+                  }}
                   onEndReachedThreshold={0.01}
                   onEndReached={({ distanceFromEnd }) => {
                     if (data.data.length) {
