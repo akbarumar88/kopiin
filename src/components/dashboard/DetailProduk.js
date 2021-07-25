@@ -94,6 +94,10 @@ export default class DetailProduk extends Component {
           this.alert.show({
             message:
               e.response?.data?.errorMessage ?? errMsg("Tambah Keranjang"),
+          }, () => {
+            if (e.response.data?.code == 'NO_ADDRESS') {
+              this.props.navigation.navigate('FormAlamat', {})
+            } 
           })
         })
     }

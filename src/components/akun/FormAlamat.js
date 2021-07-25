@@ -168,7 +168,7 @@ export default class FormAlamat extends React.Component {
             'Berhasil menambah alamat. Data anda telah disimpan.',
             ToastAndroid.SHORT,
           );
-          this.props.route.params.refreshData();
+          this.props.route.params?.refreshData?.();
           this.props.navigation.goBack();
         }
       })
@@ -215,7 +215,7 @@ export default class FormAlamat extends React.Component {
             ToastAndroid.SHORT,
           );
           console.log(this.props.navigation.params);
-          this.props.route.params.refreshData();
+          this.props.route.params?.refreshData?.();
           this.props.navigation.goBack();
         }
       })
@@ -381,7 +381,7 @@ export default class FormAlamat extends React.Component {
         <ScrollView>
           <Box flex={1} paddingX={8} pt={5} pb={8} bg="white">
             <Heading size="lg" color={theme.primary}>
-              {this.props.route.params.idalamat
+              {this.props.route.params?.idalamat
                 ? 'Edit Alamat'
                 : 'Tambah Alamat'}
             </Heading>
@@ -438,7 +438,7 @@ export default class FormAlamat extends React.Component {
                 <Input
                   ref={ref => (this.idetail = ref)}
                   onSubmitEditing={() => {
-                    this.ikodepos.focus();
+                   return this.izipcode.focus()
                   }}
                   onChangeText={val => {
                     this.setState({
@@ -446,6 +446,7 @@ export default class FormAlamat extends React.Component {
                     });
                   }}
                   value={form.detail}
+                  autoCapitalize="words"
                 />
 
                 <FormControl.ErrorMessage
@@ -460,7 +461,7 @@ export default class FormAlamat extends React.Component {
                   Kode Pos
                 </FormControl.Label>
                 <Input
-                  ref={ref => (this.ikodepos = ref)}
+                  ref={ref => (this.izipcode = ref)}
                   onSubmitEditing={() => this.iprovinsi.focus()}
                   keyboardType="number-pad"
                   onChangeText={val => {
@@ -488,7 +489,6 @@ export default class FormAlamat extends React.Component {
                 </FormControl.Label>
                 <Input
                   isDisabled
-                  ref={ref => (this.ikodepos = ref)}
                   onSubmitEditing={() => {}}
                   value={Region.namaalamat}
                 />

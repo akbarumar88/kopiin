@@ -148,7 +148,7 @@ class App extends Component {
             <Stack.Screen name="MyProduk" component={MyProduk} />
             <Stack.Screen
               name="FormAlamat"
-              options={{title: 'Alamat'}}
+              options={{title: 'Tambah Alamat'}}
               component={FormAlamat}
             />
             <Stack.Screen name="Alamat" component={Alamat} />
