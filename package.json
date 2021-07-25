@@ -60,7 +60,7 @@
   "jest": {
     "preset": "react-native"
   },
-  "prettier":{
+  "prettier": {
     "semi": false
   }
 }
