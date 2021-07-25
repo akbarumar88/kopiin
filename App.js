@@ -67,6 +67,8 @@ import DetailToko from './src/components/dashboard/DetailToko';
 import UbahKeranjang from './src/components/dashboard/UbahKeranjang';
 import Posting from './src/components/akun/Posting';
 
+import PembayaranStack from './src/components/pembayaran/PembayaranStack';
+
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
 
@@ -151,7 +153,11 @@ class App extends Component {
               component={FormAlamat}
             />
             <Stack.Screen name="Alamat" component={Alamat} />
+<<<<<<< HEAD
             <Stack.Screen name="Posting" component={Posting} />
+=======
+            <Stack.Screen name="PembayaranStack" component={PembayaranStack} />
+>>>>>>> b689028a00290f3987e4c09429c29ef074248fda
           </Stack.Navigator>
         </NavigationContainer>
       </NativeBaseProvider>

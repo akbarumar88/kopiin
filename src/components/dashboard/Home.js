@@ -136,7 +136,7 @@ export default class Home extends Component {
                     let itemWidth = Dimensions.get('window').width / 3.5;
                     return (
                       <Pressable
-                        shadow={4}
+                        shadow={3}
                         alignItems="flex-start"
                         bgColor="coolGray.100"
                         _pressed={{backgroundColor: 'coolGray.300'}}
@@ -227,18 +227,19 @@ export default class Home extends Component {
                   kota = kota.split(/\s/)[1];
                   let imgWidth = Dimensions.get('window').width / 7;
                   let itemWidth = Dimensions.get('window').width / 3.5;
+                  let isMiddle = index % 3 == 1;
                   return (
                     <Pressable
                       alignItems="flex-start"
                       bgColor="coolGray.100"
                       _pressed={{backgroundColor: 'coolGray.300'}}
                       p={2}
-                      mr={3}
-                      mb={2}
+                      mb={3}
+                      mx={isMiddle ? 3 : 0}
                       key={index}
                       w={itemWidth}
                       borderRadius={8}
-                      shadow={4}
+                      shadow={3}
                       onPress={() => {
                         this.props.navigation.navigate('DetailProduk', {
                           idproduk: id,
@@ -272,18 +273,20 @@ export default class Home extends Component {
                         <Text fontSize="xs" color="grey">
                           Rp {toCurrency(harga)}
                         </Text>
-                        <HStack alignItems="center" mt={1}>
-                          <Icon
-                            as={Ionicons}
-                            name="star"
-                            size={'xs'}
-                            color="orange"
-                            mr={1}
-                          />
-                          <Text fontSize="xs" color="grey">
-                            {rating} | Terjual {terjual}
-                          </Text>
-                        </HStack>
+                        {terjual > 0 ? (
+                          <HStack alignItems="center" mt={1}>
+                            <Icon
+                              as={Ionicons}
+                              name="star"
+                              size={'xs'}
+                              color="orange"
+                              mr={1}
+                            />
+                            <Text fontSize="xs" color="grey">
+                              {rating} | Terjual {terjual}
+                            </Text>
+                          </HStack>
+                        ) : null}
                       </Box>
                       {/* </View> */}
                     </Pressable>
