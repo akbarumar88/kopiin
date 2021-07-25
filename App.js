@@ -59,6 +59,7 @@ import UbahPasssword from './src/components/akun/UbahPassword';
 
 import FormAlamat from './src/components/akun/FormAlamat';
 import Alamat from './src/components/akun/Alamat';
+import PilihAlamat from './src/components/order/PilihAlamat';
 
 import HasilPencarian from './src/components/dashboard/HasilPencarian';
 import Pencarian from './src/components/dashboard/Pencarian';
@@ -107,7 +108,7 @@ class App extends Component {
             />
             <Stack.Screen name="Register" component={Register} />
             <Stack.Screen name="Profil" component={Profil} />
-            <Stack.Screen name="UbahKeranjang" component={UbahKeranjang} />
+            <Stack.Screen name="UbahKeranjang" component={UbahKeranjang} options={{title:'Ubah Keranjang'}} />
             <Stack.Screen
               name="UbahPassword"
               component={UbahPasssword}
@@ -152,6 +153,7 @@ class App extends Component {
               component={FormAlamat}
             />
             <Stack.Screen name="Alamat" component={Alamat} />
+            <Stack.Screen name="PilihAlamat" component={PilihAlamat} />
             <Stack.Screen name="PembayaranStack" component={PembayaranStack} />
           </Stack.Navigator>
         </NavigationContainer>

@@ -175,6 +175,7 @@ export default class Alamat extends React.Component {
       : {borderWidth: 1, borderColor: 'coolGray.200', backgroundColor: `#fff`};
     return (
       <Box my={1} mx={1} rounded={5} py={4} bg="white" px={4} {...condProps}>
+        {alamatDefault ? <Text bold color="coolGray.500" fontSize="xs">Alamat Utama</Text> : null}
         <Text bold={true}>{item.nama}</Text>
         <Text fontSize="sm" color="grey" mt={1}>
           {item.no_telp}
