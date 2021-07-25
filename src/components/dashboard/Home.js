@@ -13,6 +13,7 @@ import {
   ScrollView,
   Pressable,
   Image,
+  FlatList
 } from 'native-base';
 import {BASE_URL} from '../../utilitas/Config';
 import {errMsg, toCurrency} from '../../utilitas/Function';
@@ -48,36 +49,39 @@ export default class Home extends Component {
     const {initialLoading} = this.state;
     return (
       <NativeBaseProvider>
-        <Box bgColor={'#ff0000'} flex={1}>
+        <Box bgColor={"#ff0000"} flex={1}>
           {/* <Box>
             <Text>Ini Header Gan</Text>
           </Box> */}
-          <ScrollView
+          <FlatList
             paddingX={4}
             paddingY={4}
-            backgroundColor={'#fff'}
-            nestedScrollEnabled
+            backgroundColor={"#fff"}
             refreshControl={
               <RefreshControl
                 refreshing={false}
                 onRefresh={() => {
-                  this.setState(s => ({refresh: s.refresh + 1}));
+                  this.setState((s) => ({ refresh: s.refresh + 1 }))
                 }}
               />
-            }>
-            {!initialLoading ? (
-              <Box>
-                {this.searchBox()}
-                <Text bold>Toko / Kedai Terdekat</Text>
-                {this.listToko()}
-                <Text bold>Mungkin anda suka</Text>
-                {this.listBarang()}
-              </Box>
-            ) : null}
-          </ScrollView>
+            }
+            ListHeaderComponent={
+              <>
+                {!initialLoading ? (
+                  <Box>
+                    {this.searchBox()}
+                    <Text bold>Toko / Kedai Terdekat</Text>
+                    {this.listToko()}
+                    <Text bold>Mungkin anda suka</Text>
+                    {this.listBarang()}
+                  </Box>
+                ) : null}
+              </>
+            }
+          />
         </Box>
       </NativeBaseProvider>
-    );
+    )
   }
 
   searchBox = () => (
