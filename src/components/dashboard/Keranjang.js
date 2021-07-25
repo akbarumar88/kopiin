@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
-import {RefreshControl, Dimensions, TextInput} from 'react-native';
-import ImageLoad from './../universal/ImageLoad';
+import React, { Component } from "react"
+import { RefreshControl, Dimensions, TextInput } from "react-native"
+import ImageLoad from "./../universal/ImageLoad"
 import {
   Checkbox,
   NativeBaseProvider,
@@ -16,102 +16,102 @@ import {
   Icon,
   Pressable,
   Menu,
-} from 'native-base';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Resource from './../universal/Resource';
-import {BASE_URL} from './../../utilitas/Config';
-import {toCurrency} from './../../utilitas/Function';
-import axios from 'axios';
-import AsyncStorage from '@react-native-community/async-storage';
-import AlertYesNoV2 from './../universal/AlertYesNoV2';
+} from "native-base"
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
+import Resource from "./../universal/Resource"
+import { BASE_URL, theme } from "./../../utilitas/Config"
+import { toCurrency } from "./../../utilitas/Function"
+import axios from "axios"
+import AsyncStorage from "@react-native-community/async-storage"
+import AlertYesNoV2 from "./../universal/AlertYesNoV2"
 export default class Keranjang extends Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       cartData: [],
       changedData: false,
       refresh: false,
-      iduser: '0',
+      iduser: "0",
       paramrefresh: new Date(),
       savedNumber: 0,
-    };
+    }
   }
 
   async getUser() {
-    let iduser = await AsyncStorage.getItem('id');
+    let iduser = await AsyncStorage.getItem("id")
 
     this.setState({
       iduser: iduser,
-    });
+    })
   }
 
   componentDidMount() {
-    this.getUser();
-    this._focus = this.props.navigation.addListener('focus', async () => {
-      let loadAgain = await AsyncStorage.getItem('refreshKeranjang');
+    this.getUser()
+    this._focus = this.props.navigation.addListener("focus", async () => {
+      let loadAgain = await AsyncStorage.getItem("refreshKeranjang")
 
       if (loadAgain) {
-        AsyncStorage.removeItem('refreshKeranjang');
-        this.setState({paramrefresh: new Date()});
+        AsyncStorage.removeItem("refreshKeranjang")
+        this.setState({ paramrefresh: new Date() })
       }
-    });
+    })
   }
 
   componentWillUnmount() {
-    this._focus();
+    this._focus()
   }
 
-  deleteItem = id => {
+  deleteItem = (id) => {
     this.alert.show(
-      {message: 'Apakah Anda yakin ingin menghapus data ini ?'},
+      { message: "Apakah Anda yakin ingin menghapus data ini ?" },
       async () => {
-        this.setState({paramrefresh: new Date()});
-        await axios.delete(`${BASE_URL()}/orderdetail/${id}`).then(e => {});
-      },
-    );
-  };
+        this.setState({ paramrefresh: new Date() })
+        await axios.delete(`${BASE_URL()}/orderdetail/${id}`).then((e) => {})
+      }
+    )
+  }
 
-  deleteOrder = id => {
+  deleteOrder = (id) => {
     this.alert.show(
-      {message: 'Apakah Anda yakin ingin menghapus data ini ?'},
+      { message: "Apakah Anda yakin ingin menghapus data ini ?" },
       async () => {
-        await axios.delete(`${BASE_URL()}/order/${id}`).then(e => {});
-        this.setState({paramrefresh: new Date()});
-      },
-    );
-  };
+        await axios.delete(`${BASE_URL()}/order/${id}`).then((e) => {})
+        this.setState({ paramrefresh: new Date() })
+      }
+    )
+  }
 
   getCountOrder = () =>
     this.state.cartData.reduce((total, item) => {
       if (!item.selected) {
-        return total + 0;
+        return total + 0
       }
-      return total + 1;
-    }, 0);
+      return total + 1
+    }, 0)
 
   getTotalDetailSelected = () =>
     this.state.cartData.reduce((total, item) => {
       if (!item.selected) {
-        return total + 0;
+        return total + 0
       }
       return (
         total +
         item.orderdetail.reduce(
           (sub, item) => sub + parseInt(item.harga) * parseInt(item.jumlah),
-          0,
+          0
         )
-      );
-    }, 0);
+      )
+    }, 0)
 
-  getSubTotal = orderIndex =>
+  getSubTotal = (orderIndex) =>
     this.state.cartData[orderIndex].orderdetail.reduce(
       (sub, item) => sub + parseInt(item.harga) * parseInt(item.jumlah),
-      0,
-    );
+      0
+    )
 
   //Header Checkbox
   header = () => {
-    const {cartData} = this.state;
+    const { cartData } = this.state
     return (
       <Checkbox
         mt={2}
@@ -122,30 +122,31 @@ export default class Keranjang extends Component {
         isChecked={
           cartData.reduce((check, item) => {
             if (item.selected) {
-              check += 1;
+              check += 1
             }
-            return check;
+            return check
           }, 0) == cartData.length
         }
-        colorScheme="success"
-        onChange={checked => {
+        color={theme.primary}
+        onChange={(checked) => {
           this.setState({
-            cartData: cartData.map(item => {
-              item.selected = checked;
-              return item;
+            cartData: cartData.map((item) => {
+              item.selected = checked
+              return item
             }),
-          });
-        }}>
+          })
+        }}
+      >
         Pilih Semua
       </Checkbox>
-    );
-  };
+    )
+  }
 
   //Produk
   detailList = (item, index, orderIndex) => {
-    const {cartData} = this.state;
-    const imgWidth = Dimensions.get('screen').width * 0.175;
-    const urlGambar = `${BASE_URL()}/image/barang/`;
+    const { cartData } = this.state
+    const imgWidth = Dimensions.get("screen").width * 0.175
+    const urlGambar = `${BASE_URL()}/image/barang/`
     return (
       <HStack mb={2} space={3}>
         <IconButton
@@ -161,15 +162,16 @@ export default class Keranjang extends Component {
         />
         <Pressable
           onPress={() =>
-            this.props.navigation.navigate('DetailProduk', {
+            this.props.navigation.navigate("DetailProduk", {
               idproduk: item.id_barang,
             })
-          }>
+          }
+        >
           <HStack mb={2} space={3}>
             <ImageLoad
               style={{
-                resizeMode: 'contain',
-                alignSelf: 'center',
+                resizeMode: "contain",
+                alignSelf: "center",
               }}
               w={imgWidth}
               h={imgWidth}
@@ -180,7 +182,7 @@ export default class Keranjang extends Component {
               <Text fontSize="sm" bold>
                 {item.nama}
               </Text>
-              {item.varian != '-' && (
+              {item.varian != "-" && (
                 <Text fontSize="xs">Varian : {item.varian}</Text>
               )}
               <Text color="grey" bold>
@@ -193,51 +195,55 @@ export default class Keranjang extends Component {
           </HStack>
         </Pressable>
       </HStack>
-    );
-  };
+    )
+  }
 
   //Order
   orderList = (item, orderIndex) => {
-    const {cartData, checkedAll} = this.state;
+    const { cartData, checkedAll } = this.state
 
     return (
       <Box ml={2} bg="white" flex={1} my={2}>
         <VStack space={2}>
           <HStack mb={2}>
             <Checkbox
-              aria-label={orderIndex + 'a'}
+              aria-label={orderIndex + "a"}
               isChecked={cartData[orderIndex]?.selected || false}
               value="success"
-              colorScheme="success"
-              _text={{fontWeight: 'bold'}}
-              onChange={state => {
-                cartData[orderIndex].selected = state;
+              color={theme.primary}
+              _text={{ fontWeight: "bold" }}
+              onChange={(state) => {
+                cartData[orderIndex].selected = state
 
                 this.setState({
                   cartData: cartData,
-                });
-              }}>
+                })
+              }}
+            >
               {item.nama_toko}
             </Checkbox>
             <Box flex={1}></Box>
             <Menu
               mr={2}
-              trigger={triggerProps => {
+              trigger={(triggerProps) => {
                 return (
                   <Pressable
                     accessibilityLabel="More options menu"
-                    {...triggerProps}>
+                    {...triggerProps}
+                  >
                     <HamburgerIcon size="sm" fontSize="sm" />
                   </Pressable>
-                );
-              }}>
+                )
+              }}
+            >
               <Menu.Item
-                _text={{padding: 0}}
+                _text={{ padding: 0 }}
                 onPress={() =>
-                  this.props.navigation.navigate('UbahKeranjang', {
+                  this.props.navigation.navigate("UbahKeranjang", {
                     idorder: item.id,
                   })
-                }>
+                }
+              >
                 Edit
               </Menu.Item>
               <Menu.Item onPress={() => this.deleteOrder(item.id)}>
@@ -249,8 +255,8 @@ export default class Keranjang extends Component {
           {/* Item Keranjang */}
           <FlatList
             data={item.orderdetail}
-            renderItem={({item, index}) => {
-              return this.detailList(item, index, orderIndex);
+            renderItem={({ item, index }) => {
+              return this.detailList(item, index, orderIndex)
             }}
           />
           {/* Footer */}
@@ -262,7 +268,8 @@ export default class Keranjang extends Component {
               <Text fontSize="sm">{item.nama}</Text>
               <Text
                 color="grey"
-                fontSize="xs">{`${item.detail} , ${item.kecamatan} , ${item.kota} , ${item.provinsi}`}</Text>
+                fontSize="xs"
+              >{`${item.detail} , ${item.kecamatan} , ${item.kota} , ${item.provinsi}`}</Text>
               <Text color="grey" fontSize="xs">
                 {item.no_telp}
               </Text>
@@ -271,11 +278,12 @@ export default class Keranjang extends Component {
               <Button
                 size="sm"
                 onPress={() => {
-                  this.props.navigation.navigate('Alamat', {
+                  this.props.navigation.navigate("Alamat", {
                     idorder: item.id,
                     selected: item.id_alamat,
-                  });
-                }}>
+                  })
+                }}
+              >
                 Ubah
               </Button>
             </VStack>
@@ -304,33 +312,34 @@ export default class Keranjang extends Component {
                   ? this.getSubTotal(orderIndex)
                   : item?.orderdetail.reduce(
                       (sub, item) => sub + parseInt(item.harga),
-                      0,
-                    ),
+                      0
+                    )
               )}
             </Text>
           </HStack>
         </VStack>
       </Box>
-    );
-  };
+    )
+  }
 
   render() {
-    const {iduser} = this.state;
+    const { iduser } = this.state
     return (
       <NativeBaseProvider>
-        <AlertYesNoV2 ref={ref => (this.alert = ref)} />
+        <AlertYesNoV2 ref={(ref) => (this.alert = ref)} />
         <Box bg="white" flex={1} pb={0}>
           {
             <Resource
               url={`${BASE_URL()}/orderdetail/user/${iduser}`}
-              params={this.state.paramrefresh}>
-              {({loading, error, payload: data, refetch, fetchMore}) => {
-                const {cartData, refresh} = this.state;
+              params={this.state.paramrefresh}
+            >
+              {({ loading, error, payload: data, refetch, fetchMore }) => {
+                const { cartData, refresh } = this.state
 
                 if (cartData != data.data && !loading) {
                   this.setState({
                     cartData: data.data,
-                  });
+                  })
                 }
                 return (
                   <>
@@ -341,8 +350,8 @@ export default class Keranjang extends Component {
                           onRefresh={async () => {
                             this.setState({
                               refresh: false,
-                            });
-                            refetch();
+                            })
+                            refetch()
                           }}
                         />
                       }
@@ -351,7 +360,7 @@ export default class Keranjang extends Component {
                       flex={1}
                       data={loading ? [] : data.data}
                       showsVerticalScrollIndicator={false}
-                      renderItem={({item, index}) =>
+                      renderItem={({ item, index }) =>
                         this.orderList(item, index)
                       }
                     />
@@ -370,12 +379,12 @@ export default class Keranjang extends Component {
                       </HStack>
                     </Box>
                   </>
-                );
+                )
               }}
             </Resource>
           }
         </Box>
       </NativeBaseProvider>
-    );
+    )
   }
 }
