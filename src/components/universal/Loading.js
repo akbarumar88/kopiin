@@ -13,11 +13,14 @@ import PropTypes from 'prop-types'
 export default class Loading extends Component {
   static propTypes = {
     /** Custom Messagenya gan.  */
-    message: PropTypes.string
+    message: PropTypes.string,
+    /** Apakah Visible?.  */
+    isVisible: PropTypes.bool,
   }
 
   static defaultProps = {
-    message: "Sedang memvalidasi data"
+    message: "Sedang memvalidasi data",
+    isVisible: false
   }
 
   render() {
