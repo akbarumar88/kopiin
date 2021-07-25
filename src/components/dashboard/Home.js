@@ -216,7 +216,7 @@ export default class Home extends Component {
                     nama_toko,
                     alamat_toko,
                     jenis,
-                    foto = this.defaultProductAvatar,
+                    foto_barang = this.defaultProductAvatar,
                     jarak,
                     kota,
                     rating = 0,
@@ -225,7 +225,7 @@ export default class Home extends Component {
                   index,
                 ) => {
                   kota = kota.split(/\s/)[1];
-                  let imgWidth = Dimensions.get('window').width / 7;
+                  let imgWidth = Dimensions.get('window').width / 4;
                   let itemWidth = Dimensions.get('window').width / 3.5;
                   let isMiddle = index % 3 == 1;
                   return (
@@ -246,7 +246,7 @@ export default class Home extends Component {
                         });
                       }}>
                       {/* <View style={[{width}, style.wCardApotek, marginLeft]}> */}
-                      <Image
+                      <ImageLoad
                         alignSelf="center"
                         resizeMode="contain"
                         style={[
@@ -256,9 +256,7 @@ export default class Home extends Component {
                             borderTopRightRadius: 10,
                           },
                         ]}
-                        source={{
-                          uri: foto,
-                        }}
+                        url={`${BASE_URL()}/image/barang/${foto_barang}?${new Date()}`}
                         alt={nama}
                         mb={2}
                       />
