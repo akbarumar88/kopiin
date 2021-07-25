@@ -132,14 +132,14 @@ export default class Home extends Component {
                     index,
                   ) => {
                     kota = kota.split(/\s/)[1];
-                    let imgWidth = Dimensions.get('window').width / 4;
-                    let itemWidth = Dimensions.get('window').width / 3.5;
+                    let imgWidth = Dimensions.get('screen').width / 4;
+                    let itemWidth = Dimensions.get('screen').width / 3.5;
                     return (
                       <Pressable
                         shadow={3}
                         alignItems="flex-start"
-                        bgColor="coolGray.100"
-                        _pressed={{backgroundColor: 'coolGray.300'}}
+                        bgColor="#fff"
+                        _pressed={{backgroundColor: 'coolGray.200'}}
                         p={2}
                         mr={3}
                         key={index}
@@ -225,17 +225,20 @@ export default class Home extends Component {
                   index,
                 ) => {
                   kota = kota.split(/\s/)[1];
-                  let imgWidth = Dimensions.get('window').width / 4;
-                  let itemWidth = Dimensions.get('window').width / 3.5;
+                  let imgWidth = Dimensions.get('screen').width / 4;
+                  let itemWidth = Dimensions.get('screen').width / 3.7;
                   let isMiddle = index % 3 == 1;
+                  let isFirst = index %3 == 0
+                  let isLast = index %3 == 2
                   return (
                     <Pressable
                       alignItems="flex-start"
-                      bgColor="coolGray.100"
-                      _pressed={{backgroundColor: 'coolGray.300'}}
+                      bgColor="#fff"
+                      _pressed={{backgroundColor: 'coolGray.200'}}
                       p={2}
                       mb={3}
                       mx={isMiddle ? 3 : 0}
+                      ml={isFirst ? 1 : isLast ? 0 : 3}
                       key={index}
                       w={itemWidth}
                       borderRadius={8}
