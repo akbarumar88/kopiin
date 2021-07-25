@@ -13,7 +13,7 @@ import {
   ScrollView,
   Pressable,
   Image,
-  FlatList
+  FlatList,
 } from 'native-base';
 import {BASE_URL} from '../../utilitas/Config';
 import {errMsg, toCurrency} from '../../utilitas/Function';
@@ -49,19 +49,19 @@ export default class Home extends Component {
     const {initialLoading} = this.state;
     return (
       <NativeBaseProvider>
-        <Box bgColor={"#ff0000"} flex={1}>
+        <Box bgColor={'#ff0000'} flex={1}>
           {/* <Box>
             <Text>Ini Header Gan</Text>
           </Box> */}
           <FlatList
             paddingX={4}
             paddingY={4}
-            backgroundColor={"#fff"}
+            backgroundColor={'#fff'}
             refreshControl={
               <RefreshControl
                 refreshing={false}
                 onRefresh={() => {
-                  this.setState((s) => ({ refresh: s.refresh + 1 }))
+                  this.setState(s => ({refresh: s.refresh + 1}));
                 }}
               />
             }
@@ -81,7 +81,7 @@ export default class Home extends Component {
           />
         </Box>
       </NativeBaseProvider>
-    )
+    );
   }
 
   searchBox = () => (
@@ -178,7 +178,7 @@ export default class Home extends Component {
                             {kota}
                           </Text>
                           <Text fontSize="xs" color="grey">
-                            {distance.toFixed(1)} KM dari lokasi anda.
+                            {distance?.toFixed(1) ?? '??'} KM dari lokasi anda.
                           </Text>
                         </Box>
                         {/* </View> */}
@@ -232,8 +232,8 @@ export default class Home extends Component {
                   let imgWidth = Dimensions.get('screen').width / 4;
                   let itemWidth = Dimensions.get('screen').width / 3.7;
                   let isMiddle = index % 3 == 1;
-                  let isFirst = index %3 == 0
-                  let isLast = index %3 == 2
+                  let isFirst = index % 3 == 0;
+                  let isLast = index % 3 == 2;
                   return (
                     <Pressable
                       alignItems="flex-start"
