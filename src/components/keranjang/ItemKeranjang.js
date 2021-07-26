@@ -54,7 +54,7 @@ export default class ItemKeranjang extends Component {
       item: {shipping},
     } = this.props;
 
-    console.warn(shipping);
+    // console.warn(shipping);
     return (
       <Box ml={2} bg="white" flex={1} my={2}>
         <AlertYesNoV2 ref={ref => (this.alert = ref)} />
@@ -443,7 +443,7 @@ export default class ItemKeranjang extends Component {
         couriers: listKurir.map(itemKurir => itemKurir.ong_kode).toString(),
         items: [item],
       };
-      console.warn(params);
+      // console.warn(params);
       const BASE = 'https://api.biteship.com';
       let {data: res} = await axios.post(`${BASE}/v1/rates/couriers`, params, {
         headers: {
