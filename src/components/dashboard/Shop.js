@@ -493,6 +493,7 @@ export default class Shop extends React.Component {
                     });
                   }}
                   value={form.alamatToko}
+                  autoCapitalize="words"
                 />
 
                 <FormControl.ErrorMessage

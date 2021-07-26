@@ -23,6 +23,7 @@ import Resource from '../universal/Resource';
 import {BASE_URL, theme} from '../../utilitas/Config';
 import {toCurrency} from '../../utilitas/Function';
 import {TabView, TabBar, SceneMap} from 'react-native-tab-view';
+import FooterLoading from '../universal/FooterLoading';
 export default class DetailToko extends Component {
   constructor(props) {
     super(props);
@@ -81,9 +82,7 @@ export default class DetailToko extends Component {
           {({loading, error, payload: data, refetch}) => {
             if (loading) {
               return (
-                <Box flex={1} justifyContent="center">
-                  <Spinner size="lg" color="green" />
-                </Box>
+                <FooterLoading full />
               );
             }
 
@@ -202,9 +201,7 @@ export default class DetailToko extends Component {
             {({loading, error, payload: data, refetch}) => {
               if (loading) {
                 return (
-                  <Box flex={1}>
-                    <Spinner color="green" />
-                  </Box>
+                  <FooterLoading full />
                 );
               } else {
               }

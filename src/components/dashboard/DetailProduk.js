@@ -36,6 +36,7 @@ export default class DetailProduk extends Component {
       dataProduk: [],
       loading: false,
       loadingDialog: false,
+      loadingWishlist: false,
       refresh: new Date(),
       iduser: false,
     };
@@ -45,9 +46,9 @@ export default class DetailProduk extends Component {
     let id = await AsyncStorage.getItem('id');
     this.setState({iduser: id});
   }
-
   saveWishList = state => {
-    this.setState({loadingDialog: true});
+    // console.warn(state)
+    this.setState({loadingWishlist: true});
     axios
       .post(
         `${BASE_URL()}/wishlist`,
@@ -58,7 +59,14 @@ export default class DetailProduk extends Component {
         }),
       )
       .then(() => {
-        this.setWishlist(state);
+        ToastAndroid.show(
+          `Wishlist berhasil di${state ? 'tambahkan' : 'hapus'}`,
+          ToastAndroid.SHORT,
+        );
+        this.setState({loadingWishlist: false});
+      })
+      .catch(() => {
+        this.setState({loadingWishlist: false});
       })
       .catch(() => {});
   };

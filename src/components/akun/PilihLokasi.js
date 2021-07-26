@@ -12,7 +12,7 @@ import {
   HStack,
   IconButton,
 } from "native-base"
-import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps"
+import MapView, { PROVIDER_GOOGLE, Marker, PROVIDER_DEFAULT } from "react-native-maps"
 import Geocoder from "react-native-geocoding"
 import Geolocation from "@react-native-community/geolocation"
 
@@ -194,7 +194,10 @@ export default class PilihLokasi extends Component {
         }
         this.setState({ namaalamat: namaalamat })
       })
-      .catch((error) => console.log(error))
+      .catch((error) => {
+        this.setState({loadalamat: false})
+        console.log(error)
+      })
   }
 
   getLatLong() {
@@ -212,7 +215,10 @@ export default class PilihLokasi extends Component {
         this.change(Region)
         this.animate(Region)
       })
-      .catch((error) => console.warn(error))
+      .catch((error) => {
+        this.setState({loading:false})
+        console.warn(error)
+      })
   }
 
   change(Region) {
