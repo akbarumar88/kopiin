@@ -1,5 +1,5 @@
-import React, { Component } from "react"
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
+import React, {Component} from 'react';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   NativeBaseProvider,
   Box,
@@ -14,22 +14,22 @@ import {
   Avatar,
   Icon,
   Button,
-} from "native-base"
-import { Dimensions, ToastAndroid, Alert } from "react-native"
-import Resource from "./../universal/Resource"
-import { BASE_URL } from "./../../utilitas/Config"
-import { toCurrency, errMsg } from "../../utilitas/Function"
-import AsyncStorage from "@react-native-community/async-storage"
-import QueryString from "qs"
-import axios from "axios"
-import AlertOkV2 from "./../universal/AlertOkV2"
-import ImageLoad from "./../universal/ImageLoad"
-import FooterLoading from "../universal/FooterLoading"
-import Loading from "./../universal/Loading"
-import AlertYesNoV2 from "./../universal/AlertYesNoV2"
+} from 'native-base';
+import {Dimensions, ToastAndroid, Alert} from 'react-native';
+import Resource from './../universal/Resource';
+import {BASE_URL} from './../../utilitas/Config';
+import {toCurrency, errMsg} from '../../utilitas/Function';
+import AsyncStorage from '@react-native-community/async-storage';
+import QueryString from 'qs';
+import axios from 'axios';
+import AlertOkV2 from './../universal/AlertOkV2';
+import ImageLoad from './../universal/ImageLoad';
+import FooterLoading from '../universal/FooterLoading';
+import Loading from './../universal/Loading';
+import AlertYesNoV2 from './../universal/AlertYesNoV2';
 export default class DetailProduk extends Component {
   constructor(props) {
-    super(props)
+    super(props);
 
     this.state = {
       varian: undefined,
@@ -38,16 +38,16 @@ export default class DetailProduk extends Component {
       loadingDialog: false,
       refresh: new Date(),
       iduser: false,
-    }
+    };
   }
 
   async componentDidMount() {
-    let id = await AsyncStorage.getItem("id")
-    this.setState({ iduser: id })
+    let id = await AsyncStorage.getItem('id');
+    this.setState({iduser: id});
   }
 
-  saveWishList = (state) => {
-    this.setState({ loadingDialog: true })
+  saveWishList = state => {
+    this.setState({loadingDialog: true});
     axios
       .post(
         `${BASE_URL()}/wishlist`,
@@ -55,17 +55,15 @@ export default class DetailProduk extends Component {
           id_barang: this.state.dataProduk.id,
           id_user: this.state.iduser,
           liked: state,
-        })
+        }),
       )
       .then(() => {
-        this.setState({ loadingDialog: false })
+        this.setWishlist(state);
       })
-      .catch(() => {
-        this.setState({ loadingDialog: false })
-      })
-  }
+      .catch(() => {});
+  };
 
-  setWishlist = (state) => {
+  setWishlist = state => {
     this.props.navigation.setOptions({
       headerRight: () => (
         <Pressable
@@ -74,72 +72,69 @@ export default class DetailProduk extends Component {
               this.dialog.show(
                 {
                   message:
-                    "Anda yakin ingin menghapus produk ini dari wishlist ?",
+                    'Anda yakin ingin menghapus produk ini dari wishlist ?',
                 },
                 () => {
-                  this.saveWishList(state)
-                  this.setWishlist(!state)
-                }
-              )
+                  this.saveWishList(state);
+                },
+              );
             } else {
-              this.saveWishList(state)
-              this.setWishlist(!state)
+              this.saveWishList(state);
             }
-          }}
-        >
+          }}>
           <Icon
             as={
               <MaterialCommunityIcons
-                name={state ? "heart-outline" : "heart"}
+                name={state ? 'heart-outline' : 'heart'}
               />
             }
-            color={state ? "grey" : "red"}
+            color={state ? 'grey' : 'red'}
             size="md"
             mr={4}
           />
         </Pressable>
       ),
-    })
-  }
+    });
+  };
 
   showAlert = () => {
-    AsyncStorage.setItem("refreshKeranjang", "IYA")
+    AsyncStorage.setItem('refreshKeranjang', 'IYA');
     Alert.alert(
-      "Berhasil",
-      "Berhasil dimasukkan keranjang",
+      'Berhasil',
+      'Berhasil dimasukkan keranjang',
       [
         {
-          text: "Lanjutkan Belanja",
+          text: 'Lanjutkan Belanja',
 
-          style: "default",
+          style: 'default',
         },
         {
-          text: "Bayar",
+          text: 'Bayar',
           onPress: () => {
-            this.props.navigation.navigate("Keranjang")
+            this.props.navigation.navigate('Keranjang');
           },
-          style: "default",
+          style: 'default',
         },
       ],
       {
         cancelable: true,
-      }
-    )
-  }
+      },
+    );
+  };
 
   tambahKeranjang = async () => {
     if (!this.state.varian && this.state.dataProduk.varian.length > 0) {
-      ToastAndroid.show("Pilih variasi terlebih dahulu", ToastAndroid.SHORT)
+      ToastAndroid.show('Pilih variasi terlebih dahulu', ToastAndroid.SHORT);
     } else {
-      this.setState({ loading: true })
-      let id = await AsyncStorage.getItem("id")
+      this.setState({loading: true});
+      let id = await AsyncStorage.getItem('id');
       if (!id) {
         this.alert.show(
-          { message: "Silakan melakukan login terlebih dahulu." },
+          {message: 'Silakan melakukan login terlebih dahulu.'},
           () => {
-            this.props.navigation.navigate("Login")
-          }
-        )
+            this.props.navigation.navigate('Login');
+          },
+        );
       }
       let body = QueryString.stringify({
         id_user: id,
@@ -148,41 +143,41 @@ export default class DetailProduk extends Component {
         id_barang: this.state.dataProduk.id,
         harga: this.state.dataProduk.harga,
         jumlah: 1,
-      })
+      });
       axios
         .post(`${BASE_URL()}/orderdetail`, body)
-        .then(async ({ data }) => {
-          this.setState({ loading: false })
+        .then(async ({data}) => {
+          this.setState({loading: false});
           if (data.status) {
-            this.showAlert()
+            this.showAlert();
             // ToastAndroid.show(
             //   'Berhasil dimasukkan keranjang',
             //   ToastAndroid.SHORT,
             // );
           }
         })
-        .catch((e) => {
-          this.setState({ loading: false })
+        .catch(e => {
+          this.setState({loading: false});
 
           this.alert.show(
             {
               message:
-                e.response?.data?.errorMessage ?? errMsg("Tambah Keranjang"),
+                e.response?.data?.errorMessage ?? errMsg('Tambah Keranjang'),
             },
             () => {
-              if (e.response.data?.code == "NO_ADDRESS") {
-                this.props.navigation.navigate("FormAlamat", {})
+              if (e.response.data?.code == 'NO_ADDRESS') {
+                this.props.navigation.navigate('FormAlamat', {});
               }
-            }
-          )
-        })
+            },
+          );
+        });
     }
-  }
+  };
 
-  listProdukTerkait = (dataProduk) => {
-    const urlGambar = `${BASE_URL()}/image/barang/`
+  listProdukTerkait = dataProduk => {
+    const urlGambar = `${BASE_URL()}/image/barang/`;
 
-    const imgWidth = (Dimensions.get("screen").width * 0.85) / 2
+    const imgWidth = (Dimensions.get('screen').width * 0.85) / 2;
     return (
       <Box py={3} mt={2} px={3} bg="white">
         <Text mt={2} bold={true}>
@@ -193,16 +188,15 @@ export default class DetailProduk extends Component {
           mt={5}
           horizontal={true}
           data={dataProduk}
-          keyExtractor={(item, index) => item.id + "idproduk"}
+          keyExtractor={(item, index) => item.id + 'idproduk'}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item, index }) => (
+          renderItem={({item, index}) => (
             <Pressable
               onPress={() => {
-                this.props.navigation.push("DetailProduk", {
+                this.props.navigation.push('DetailProduk', {
                   idproduk: item.id,
-                })
-              }}
-            >
+                });
+              }}>
               <Box
                 bgColor="coolGray.100"
                 mx={1}
@@ -210,8 +204,7 @@ export default class DetailProduk extends Component {
                 borderRadius={20}
                 pb={4}
                 mb={1}
-                alignItems="center"
-              >
+                alignItems="center">
                 <Image
                   alignSelf="center"
                   resizeMode="contain"
@@ -219,7 +212,7 @@ export default class DetailProduk extends Component {
                   mb={2}
                   onError={() => {}}
                   style={[
-                    { width: imgWidth, height: imgWidth },
+                    {width: imgWidth, height: imgWidth},
                     {
                       borderTopLeftRadius: 10,
                       borderTopRightRadius: 10,
@@ -230,7 +223,7 @@ export default class DetailProduk extends Component {
                     uri: item.foto_barang
                       ? urlGambar +
                         item.foto_barang +
-                        "?url=" +
+                        '?url=' +
                         this.state.refresh
                       : this.defaultProductAvatar,
                   }}
@@ -249,55 +242,53 @@ export default class DetailProduk extends Component {
           )}
         />
       </Box>
-    )
-  }
+    );
+  };
 
   render() {
-    const urlGambar = `${BASE_URL()}/image/barang/`
-    const urlToko = `${BASE_URL()}/image/merchant/`
-    const { loadingDialog } = this.state
+    const urlGambar = `${BASE_URL()}/image/barang/`;
+    const urlToko = `${BASE_URL()}/image/merchant/`;
+    const {loadingDialog} = this.state;
     return (
       <NativeBaseProvider>
-        <AlertYesNoV2 ref={(ref) => (this.dialog = ref)} />
-        <AlertOkV2 ref={(ref) => (this.alert = ref)} />
+        <AlertYesNoV2 ref={ref => (this.dialog = ref)} />
+        <AlertOkV2 ref={ref => (this.alert = ref)} />
         <Loading isVisible={loadingDialog} />
         <Box flex={1}>
           {this.state.iduser && (
             <Resource
               url={`${BASE_URL()}/barang/${this.props.route.params.idproduk}`}
-              params={{ iduser: this.state.iduser }}
-            >
-              {({ loading, error, payload: data, refetch }) => {
+              params={{iduser: this.state.iduser}}>
+              {({loading, error, payload: data, refetch}) => {
                 if (loading) {
-                  return <FooterLoading full />
+                  return <FooterLoading full />;
                 }
 
                 if (this.state.dataProduk != data.data) {
-                  this.setState({ dataProduk: data.data })
-                  this.setWishlist(data.data?.wishlist == 0)
+                  this.setState({dataProduk: data.data});
+                  this.setWishlist(data.data?.wishlist == 0);
                 }
 
                 return (
                   <FlatList
                     flex={1}
-                    keyExtractor={(item) => item + "parent"}
+                    keyExtractor={item => item + 'parent'}
                     data={[1]}
                     renderItem={() => {
                       return (
                         <>
                           <Box
                             bg="white"
-                            height={Dimensions.get("screen").height * 0.25}
-                          >
+                            height={Dimensions.get('screen').height * 0.25}>
                             <ImageLoad
                               flex={1}
                               style={{
-                                resizeMode: "contain",
+                                resizeMode: 'contain',
                               }}
                               url={
                                 urlGambar +
                                 data.data.foto_barang +
-                                "?date=" +
+                                '?date=' +
                                 this.state.refresh
                               }
                               alt={data.data.nama}
@@ -311,11 +302,10 @@ export default class DetailProduk extends Component {
                           </Box>
                           <Pressable
                             onPress={() => {
-                              this.props.navigation.navigate("DetailToko", {
+                              this.props.navigation.navigate('DetailToko', {
                                 idtoko: data.data.id_merchant,
-                              })
-                            }}
-                          >
+                              });
+                            }}>
                             <Box bg="white" mt={2} py={4} px={3}>
                               <HStack alignItems="center">
                                 <Avatar
@@ -338,33 +328,31 @@ export default class DetailProduk extends Component {
                                 data={data.data.varian}
                                 numColumns={4}
                                 keyExtractor={(item, index) =>
-                                  item.id + "varian"
+                                  item.id + 'varian'
                                 }
-                                renderItem={({ item }) => {
+                                renderItem={({item}) => {
                                   return (
                                     <Pressable
                                       onPress={() => {
-                                        this.setState({ varian: item.id })
-                                      }}
-                                    >
+                                        this.setState({varian: item.id});
+                                      }}>
                                       <Box
                                         py={3}
                                         px={4}
                                         rounded={10}
                                         bgColor={
                                           item.id == this.state.varian
-                                            ? "#007bff"
-                                            : "grey"
+                                            ? '#007bff'
+                                            : 'grey'
                                         }
                                         mx={1}
-                                        my={1}
-                                      >
+                                        my={1}>
                                         <Text fontSize={13} color="white">
                                           {item.nama_varian}
                                         </Text>
                                       </Box>
                                     </Pressable>
-                                  )
+                                  );
                                 }}
                               />
                             </Box>
@@ -395,14 +383,14 @@ export default class DetailProduk extends Component {
                           {data.data?.terkait?.length > 0 &&
                             this.listProdukTerkait(data.data?.terkait)}
                         </>
-                      )
+                      );
                     }}
                     refreshing={false}
                     onRefresh={() => {
-                      refetch()
+                      refetch();
                     }}
                   />
-                )
+                );
               }}
             </Resource>
           )}
@@ -413,13 +401,12 @@ export default class DetailProduk extends Component {
               isLoading={this.state.loading}
               isLoadingText="Proses"
               onPress={() => this.tambahKeranjang()}
-              colorScheme="success"
-            >
+              colorScheme="success">
               Masukkan Keranjang
             </Button>
           </Box>
         </Box>
       </NativeBaseProvider>
-    )
+    );
   }
 }
