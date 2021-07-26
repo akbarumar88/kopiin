@@ -1,5 +1,5 @@
 import React, {Component, useState} from 'react';
-import {Dimensions, View, StatusBar} from 'react-native';
+import {Dimensions} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   ScrollView,
@@ -10,11 +10,9 @@ import {
   Icon,
   Pressable,
   HStack,
-  Tabs,
   Text,
   FlatList,
   Divider,
-  VStack,
   Button,
   useDisclose,
   Actionsheet,
@@ -32,7 +30,6 @@ export function ActionStatus({sorting}) {
   const [filterRating, setfilterRating] = useState(false);
   const [filterKategori, setfilterKategori] = useState('');
   const [sortingTemp, setSortingTemp] = useState('uploadSort');
-
   function refresh() {
     let field = '';
     let type = 'ASC';
