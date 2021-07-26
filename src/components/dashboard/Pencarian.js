@@ -53,6 +53,12 @@ export default class Pencarian extends Component {
     };
   }
 
+  componentDidMount() {
+    setTimeout(() => {
+      this.ipencarian.focus()
+    })
+  }
+  
   render() {
     return (
       <NativeBaseProvider>
@@ -75,6 +81,7 @@ export default class Pencarian extends Component {
   searchBox = () => (
     <FormControl>
       <Input
+        ref={ref => this.ipencarian = ref}
         placeholder="Cari"
         value={this.state.cari}
         onChangeText={e => this.setState({cari: e})}

@@ -21,6 +21,7 @@ import {BASE_URL, theme} from './../../utilitas/Config';
 import {TabView, TabBar, SceneMap} from 'react-native-tab-view';
 import FooterLoading from '../universal/FooterLoading';
 import ImageLoad from './../universal/ImageLoad';
+import EmptyCart from '../universal/EmptyCart';
 
 export default class HasilPencarian extends Component {
   defaultStoreAvatar =
@@ -39,7 +40,7 @@ export default class HasilPencarian extends Component {
         {key: 'barang', title: 'Barang'},
         {key: 'toko', title: 'Toko'},
       ],
-      limit: 4,
+      limit: 10,
       hasMoreProduct: true,
       hasMoreShop: true,
     };
@@ -111,6 +112,22 @@ export default class HasilPencarian extends Component {
               <Box flex={1} justifyContent="center">
                 <FooterLoading full />
               </Box>
+            );
+          }
+          if (!data.data.length) {
+            return (
+              <EmptyCart
+                title="Data tidak ditemukan"
+                description="Data yang anda cari tidak ditemukan, Coba cari kata kunci yang lain."
+                icon={
+                  <Icon
+                    as={MaterialCommunityIcons}
+                    name="file-search"
+                    size="lg"
+                    color="#555"
+                  />
+                }
+              />
             );
           }
           let nextOffset = data.data.length;
@@ -208,6 +225,20 @@ export default class HasilPencarian extends Component {
                 <FooterLoading full />
               </Box>
             );
+          }
+          if (!data.data.length) {
+            return <EmptyCart
+                title="Data tidak ditemukan"
+                description="Data yang anda cari tidak ditemukan, Coba cari kata kunci yang lain."
+                icon={
+                  <Icon
+                    as={MaterialCommunityIcons}
+                    name="file-search"
+                    size="lg"
+                    color="#555"
+                  />
+                }
+              />
           }
           let nextOffset = data.data.length;
 

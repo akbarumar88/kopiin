@@ -100,8 +100,8 @@ class App extends Component {
               name="Search"
               component={Pencarian}
             />
-            <Stack.Screen name="DetailProduk" component={DetailProduk} />
-            <Stack.Screen name="DetailToko" component={DetailToko} />
+            <Stack.Screen name="DetailProduk" component={DetailProduk} options={{ title: 'Detail Produk'}}  />
+            <Stack.Screen name="DetailToko" component={DetailToko} options={{ title: 'Detail Toko'}} />
             <Stack.Screen
               options={{
                 title: "Hasil Pencarian",

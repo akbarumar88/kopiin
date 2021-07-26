@@ -121,7 +121,7 @@ export default class Home extends Component {
             <ScrollView
               horizontal={true}
               showsHorizontalScrollIndicator={false}>
-              <HStack my={4}>
+              <HStack my={4} alignItems="flex-start">
                 {data.data.map(
                   (
                     {
@@ -178,7 +178,17 @@ export default class Home extends Component {
                             {kota}
                           </Text>
                           <Text fontSize="xs" color="grey">
-                            {distance?.toFixed(1) ?? '??'} KM dari lokasi anda.
+                            {(() => {
+                              if (distance) {
+                                if (distance > 20) {
+                                  return 
+                                } else {
+                                  return `${distance?.toFixed(1)} KM dari lokasi anda.`
+                                }
+                              } else {
+                                return '?? KM dari lokasi anda.'
+                              }
+                            })()}
                           </Text>
                         </Box>
                         {/* </View> */}
