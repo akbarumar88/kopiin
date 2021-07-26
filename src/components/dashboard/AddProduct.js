@@ -200,7 +200,7 @@ export default class AddProduct extends React.Component {
               <FormControl isRequired isInvalid={'berat' in error}>
                 <FormControl.Label
                   _text={{color: 'muted.700', fontSize: 'sm', fontWeight: 600}}>
-                  Berat
+                  Berat (gram)
                 </FormControl.Label>
                 <Input
                   keyboardType="number-pad"
