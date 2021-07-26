@@ -159,7 +159,8 @@ export default class ItemKeranjang extends Component {
                 size="sm"
                 onPress={() => {
                   this.sheetKurir.open();
-                  if(!this.state.listOngkir.length)this.loadOngkosKurirOnline();
+                  if (!this.state.listOngkir.length)
+                    this.loadOngkosKurirOnline();
                 }}>
                 Ubah
               </Button>
@@ -172,7 +173,8 @@ export default class ItemKeranjang extends Component {
               Total
             </Text>
             <Text mb={3} bold>
-              Rp {toCurrency(
+              Rp{' '}
+              {toCurrency(
                 cartData[orderIndex]
                   ? this.getSubTotal(orderIndex)
                   : item?.orderdetail.reduce(
@@ -312,14 +314,14 @@ export default class ItemKeranjang extends Component {
 
                             return (
                               <Pressable
-                              style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                paddingRight: 16,
-                                paddingLeft: 32,
-                                paddingVertical: 12,
-                              }}
-                              _pressed={{backgroundColor:'coolGray.200'}}
+                                style={{
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  paddingRight: 16,
+                                  paddingLeft: 32,
+                                  paddingVertical: 12,
+                                }}
+                                _pressed={{backgroundColor: 'coolGray.200'}}
                                 key={index}
                                 onPress={() => {
                                   this.sheetKurir.close();
@@ -333,11 +335,8 @@ export default class ItemKeranjang extends Component {
                                     courier_code,
                                     courier_service_code,
                                   };
-                                  let {
-                                    item: current,
-                                    orderIndex,
-                                  } = this.props;
-                                  
+                                  let {item: current, orderIndex} = this.props;
+
                                   this.props.updateQuery(oldPayload => {
                                     let cartData = [...oldPayload.data];
                                     // console.warn(cartData);
@@ -346,38 +345,37 @@ export default class ItemKeranjang extends Component {
                                       shipping: dataPengiriman,
                                     };
 
-                                    this.props.setParentState({cartData})
+                                    // this.props.setParentState({cartData})
                                     return {
                                       ...oldPayload,
                                       data: cartData,
                                     };
                                     // this.props.setParentState({cartData})
                                   });
-                                  
+
                                   // alert(JSON.stringify(dataPengiriman))
                                   // this._pilihPengiriman(dataPengiriman);
                                 }}>
-                                
-                                  <View>
-                                    <Text
-                                      style={[
-                                        s.teksTebal,
-                                        {
-                                          fontSize: 14,
-                                        },
-                                      ]}>
-                                      {courier_service_name} ({estimasi})
-                                    </Text>
-                                    <Text
-                                      style={[
-                                        s.teks,
-                                        {
-                                          fontSize: 12,
-                                        },
-                                      ]}>
-                                      Rp. {toCurrency(biaya)}{' '}
-                                    </Text>
-                                  </View>
+                                <View>
+                                  <Text
+                                    style={[
+                                      s.teksTebal,
+                                      {
+                                        fontSize: 14,
+                                      },
+                                    ]}>
+                                    {courier_service_name} ({estimasi})
+                                  </Text>
+                                  <Text
+                                    style={[
+                                      s.teks,
+                                      {
+                                        fontSize: 12,
+                                      },
+                                    ]}>
+                                    Rp. {toCurrency(biaya)}{' '}
+                                  </Text>
+                                </View>
                               </Pressable>
                             );
                           })
@@ -504,13 +502,16 @@ export default class ItemKeranjang extends Component {
   };
 
   getSubTotal = orderIndex => {
-    const {cartData,item:{shipping}} = this.props;
+    const {
+      cartData,
+      item: {shipping},
+    } = this.props;
     let totalDetail = cartData[orderIndex].orderdetail.reduce(
       (sub, item) => sub + parseInt(item.harga) * parseInt(item.jumlah),
       0,
     );
-    return totalDetail + (shipping?.biaya ?? 0)
-  }
+    return totalDetail + (shipping?.biaya ?? 0);
+  };
 }
 
 const s = StyleSheet.create({

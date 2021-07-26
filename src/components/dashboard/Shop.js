@@ -469,6 +469,7 @@ export default class Shop extends React.Component {
                     this.setState({form: {...this.state.form, namaToko: val}});
                   }}
                   value={form.namaToko}
+                  autoCapitalize="words"
                 />
 
                 <FormControl.ErrorMessage
@@ -537,7 +538,6 @@ export default class Shop extends React.Component {
                 </FormControl.Label>
                 <Input
                   isDisabled
-                  ref={ref => (this.ikodepos = ref)}
                   onSubmitEditing={() => {}}
                   value={Region.namaalamat}
                 />

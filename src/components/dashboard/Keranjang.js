@@ -25,6 +25,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-community/async-storage';
 import AlertYesNoV2 from './../universal/AlertYesNoV2';
 import ItemKeranjang from '../keranjang/ItemKeranjang';
+import AlertOkV2 from '../universal/AlertOkV2';
 export default class Keranjang extends Component {
   constructor(props) {
     super(props);
@@ -80,7 +81,8 @@ export default class Keranjang extends Component {
         item.orderdetail.reduce(
           (sub, item) => sub + parseInt(item.harga) * parseInt(item.jumlah),
           0,
-        ) + (item.shipping?.biaya ?? 0)
+        ) +
+        (item.shipping?.biaya ?? 0)
       );
     }, 0);
 
@@ -123,15 +125,27 @@ export default class Keranjang extends Component {
     return (
       <NativeBaseProvider>
         <AlertYesNoV2 ref={ref => (this.alert = ref)} />
+        <AlertOkV2 ref={ref => (this.alertOk = ref)} />
         <Box bg="white" flex={1} pb={0}>
           {
             <Resource
               url={`${BASE_URL()}/orderdetail/user/${iduser}`}
               params={this.state.paramrefresh}>
-              {({loading, error, payload: data, refetch, fetchMore, updateQuery}) => {
+              {({
+                loading,
+                error,
+                payload: data,
+                refetch,
+                fetchMore,
+                updateQuery,
+              }) => {
                 const {cartData, refresh} = this.state;
 
-                if (cartData != data.data && !loading) {
+                if (
+                  JSON.stringify(cartData) != JSON.stringify(data.data) &&
+                  !loading
+                ) {
+                  // console.warn('update cartData');
                   this.setState({
                     cartData: data.data,
                   });
@@ -170,7 +184,15 @@ export default class Keranjang extends Component {
                         );
                       }}
                     />
-                    <Box roundedTop={8} bg="#FF7F00" p={4}>
+                    <Pressable
+                      roundedTop={8}
+                      bg="orange.500"
+                      _pressed={{backgroundColor: 'orange.600'}}
+                      p={4}
+                      onPress={() => {
+                        this.validate(data.data);
+                      }}
+                      disabled={!data?.data?.length}>
                       <HStack space={2}>
                         <Text bold rounded={4} px={2} bg="white">
                           {this.getCountOrder()}
@@ -183,7 +205,7 @@ export default class Keranjang extends Component {
                           {toCurrency(this.getTotalDetailSelected())}
                         </Text>
                       </HStack>
-                    </Box>
+                    </Pressable>
                   </>
                 );
               }}
@@ -193,4 +215,24 @@ export default class Keranjang extends Component {
       </NativeBaseProvider>
     );
   }
+
+  validate = cartData => {
+    cartData = cartData.filter(cartItem => cartItem.selected);
+    if (!cartData.length) {
+      this.alertOk.show({message: 'Tidak ada pesanan yang dipilih.'});
+      return;
+    }
+
+    for (let i = 0; i < cartData.length; i++) {
+      const cartItem = cartData[i];
+      if (!cartItem.shipping) {
+        this.alertOk.show({message: 'Harap pilih pengiriman.'});
+        return;
+      }
+    }
+
+    this.props.navigation.navigate('MetodePembayaran', {
+      cartData,
+    });
+  };
 }

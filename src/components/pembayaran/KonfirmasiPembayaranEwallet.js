@@ -88,10 +88,16 @@ class KonfirmasiPembayaranEwallet extends Component {
       checkout_url: 'https://www.google.com',
       error: {}
     };
+    props.navigation.setOptions({
+      headerStyle: {backgroundColor: this.state.mainColor},
+      headerTintColor: '#fff',
+    });
   }
 
   async componentDidMount() {
-    this.inotelp?.focus()
+    setTimeout(() => {
+      this.inotelp?.focus()
+    })
     this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
       this.props.navigation.goBack();
       return true;
@@ -109,7 +115,7 @@ class KonfirmasiPembayaranEwallet extends Component {
     const {metode, total_biaya, reference_id, mainColor, prosedur,error} = this.state;
 
     return (
-      <Box style={s.Container}>
+      <Box style={s.Container} flex={1}>
         <StatusBar backgroundColor={mainColor} />
         <Loading isVisible={this.state.loading} message="Loading..." />
 
@@ -117,10 +123,12 @@ class KonfirmasiPembayaranEwallet extends Component {
         <ScrollView>
           <View style={{padding: 12}}>
             <Text
+              fontFamily=""
               style={{
                 fontSize: 18,
                 marginBottom: 4,
-              }}>
+              }}
+              >
               Cara Pembayaran
             </Text>
             <View>
@@ -133,10 +141,10 @@ class KonfirmasiPembayaranEwallet extends Component {
                       flexDirection: 'row',
                       backgroundColor: '#fff',
                     }}>
-                    <Text style={{marginRight: 8, color: '#444'}}>
+                    <Text fontWeight="" style={{marginRight: 8, color: '#444'}}>
                       {i + 1}.
                     </Text>
-                    <Text style={{flex: 1}}>{step}</Text>
+                    <Text  style={{flex: 1}} >{step}</Text>
                   </View>
                 );
               })}
