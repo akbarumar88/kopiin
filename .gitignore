@@ -59,3 +59,4 @@ buck-out/
 /ios/Pods/
 package-lock.json
 src/utilitas/Config.js
+package-lock.json

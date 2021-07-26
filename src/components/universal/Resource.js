@@ -68,11 +68,17 @@ export default class Resource extends Component {
     this.setState({payload: newPayload});
   };
 
+  updateQuery = async callback => {
+    let newPayload = await callback(this.state.payload);
+    this.setState({payload: newPayload});
+  };
+
   render() {
     return this.props.children({
       ...this.state,
       refetch: this.fetchData,
       fetchMore: this.fetchMore,
+      updateQuery: this.updateQuery,
     });
   }
 }
