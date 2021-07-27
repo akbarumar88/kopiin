@@ -110,6 +110,13 @@ export function FilterProduk({sorting}) {
           </Text>
           <Button
             mb={3}
+            startIcon={
+              <Icon
+                as={<MaterialCommunityIcons name="star" />}
+                color="orange"
+                size="xs"
+              />
+            }
             onPress={() => {
               setfilterRating(!filterRating);
             }}
