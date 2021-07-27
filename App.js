@@ -40,6 +40,8 @@ import PilihAlamat from './src/components/order/PilihAlamat';
 import Wishlist from './src/components/dashboard/Wishlist';
 import MetodePembayaran from './src/components/pembayaran/MetodePembayaran';
 import KonfirmasiPembayaranEwallet from './src/components/pembayaran/KonfirmasiPembayaranEwallet';
+import LaporanTransaksiUser from './src/components/akun/LaporanTransaksiUser';
+import LaporanTransaksiToko from './src/components/akun/LaporanTransaksiToko';
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
 
@@ -140,6 +142,16 @@ class App extends Component {
 
             <Stack.Screen name="PilihAlamat" component={PilihAlamat} />
             <Stack.Screen name="Wishlist" component={Wishlist} />
+            <Stack.Screen
+              name="LaporanTransaksiUser"
+              options={{title: 'Histori Transaksi'}}
+              component={LaporanTransaksiUser}
+            />
+            <Stack.Screen
+              name="LaporanTransaksiToko"
+              options={{title: 'Laporan Transaksi'}}
+              component={LaporanTransaksiToko}
+            />
             {/* <Stack.Screen name="PembayaranStack" component={PembayaranStack} /> */}
             <Stack.Screen
               name="MetodePembayaran"
@@ -149,7 +161,10 @@ class App extends Component {
             <Stack.Screen
               name="KonfirmasiPembayaranEwallet"
               component={KonfirmasiPembayaranEwallet}
-              options={{title: 'Konfirmasi Pembayaran',headerTintColor:'#000'}}
+              options={{
+                title: 'Konfirmasi Pembayaran',
+                headerTintColor: '#000',
+              }}
             />
           </Stack.Navigator>
         </NavigationContainer>

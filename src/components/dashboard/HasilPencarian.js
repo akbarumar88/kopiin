@@ -32,6 +32,8 @@ export function FilterProduk({sorting}) {
   const [filterRating, setfilterRating] = useState(false);
   const [filterKategori, setfilterKategori] = useState('');
   const [sortingTemp, setSortingTemp] = useState('uploadSort');
+  const [kategori, setKategori] = useState();
+
   function refresh() {
     let field = '';
     let type = 'ASC';
@@ -83,7 +85,7 @@ export function FilterProduk({sorting}) {
             Urutkan
           </Text>
           <ScrollView horizontal={true}>
-            <HStack space={2}>
+            <HStack space={2} pr={2}>
               <Button
                 variant={sortingTemp == 'uploadSort' ? 'solid' : 'outline'}
                 onPress={() => setSortingTemp('uploadSort')}
@@ -125,42 +127,74 @@ export function FilterProduk({sorting}) {
             Rating 4
           </Button>
           <Divider mt={4} mb={2} />
-          <Resource url={`${BASE_URL()}/kategori`}>
-            {({loading, error, payload: data, refetch, fetchMore}) => {
-              if (loading) {
-                return <FooterLoading />;
-              }
-              return (
-                <>
-                  <Text bold mx={3} mb={2}>
-                    Kategori
-                  </Text>
-                  <FlatList
-                    horizontal={true}
-                    data={data.data}
-                    renderItem={({item}) => (
-                      <Button
-                        mb={3}
-                        mr={2}
-                        onPress={() => {
-                          if (filterKategori == item.id) {
-                            setfilterKategori('');
-                          } else {
-                            setfilterKategori(item.id);
+          {kategori && (
+            <>
+              <Text bold mx={3} mb={2}>
+                Kategori
+              </Text>
+              <FlatList
+                horizontal={true}
+                data={kategori}
+                renderItem={({item}) => (
+                  <Button
+                    mb={3}
+                    mr={2}
+                    onPress={() => {
+                      if (filterKategori == item.id) {
+                        setfilterKategori('');
+                      } else {
+                        setfilterKategori(item.id);
+                      }
+                    }}
+                    variant={filterKategori == item.id ? 'solid' : 'outline'}
+                    size="sm">
+                    {item.nama_kategori}
+                  </Button>
+                )}
+              />
+            </>
+          )}
+          {!kategori && (
+            <Resource url={`${BASE_URL()}/kategori`}>
+              {({loading, error, payload: data, refetch}) => {
+                if (loading) {
+                  console.log('Loading...');
+                  return <FooterLoading />;
+                } else {
+                }
+                setKategori(data.data);
+                return (
+                  <>
+                    <Text bold mx={3} mb={2}>
+                      Kategori
+                    </Text>
+                    <FlatList
+                      horizontal={true}
+                      data={data.data}
+                      renderItem={({item}) => (
+                        <Button
+                          mb={3}
+                          mr={2}
+                          onPress={() => {
+                            if (filterKategori == item.id) {
+                              setfilterKategori('');
+                            } else {
+                              setfilterKategori(item.id);
+                            }
+                          }}
+                          variant={
+                            filterKategori == item.id ? 'solid' : 'outline'
                           }
-                        }}
-                        variant={
-                          filterKategori == item.id ? 'solid' : 'outline'
-                        }
-                        size="sm">
-                        {item.nama_kategori}
-                      </Button>
-                    )}
-                  />
-                </>
-              );
-            }}
-          </Resource>
+                          size="sm">
+                          {item.nama_kategori}
+                        </Button>
+                      )}
+                    />
+                  </>
+                );
+              }}
+            </Resource>
+          )}
           <HStack mt={2}>
             <Button
               onPress={() => {
@@ -183,7 +217,7 @@ export function FilterToko({sorting}) {
   const {isOpen, onOpen, onClose} = useDisclose();
   const [sortingToko, setSortingToko] = useState('');
   const [filterJenisToko, setfilterJenisToko] = useState('');
-
+  const [jenisToko, setJenisToko] = useState();
   function refresh() {
     sorting(sortingToko, filterJenisToko);
   }
@@ -227,43 +261,73 @@ export function FilterToko({sorting}) {
             Lokasi Terdekat
           </Button>
           <Divider mt={4} mb={2} />
-
-          <Resource url={`${BASE_URL()}/jenis`}>
-            {({loading, error, payload: data, refetch, fetchMore}) => {
-              if (loading) {
-                return <FooterLoading />;
-              }
-              return (
-                <>
-                  <Text bold mx={3} mb={2}>
-                    Jenis Toko
-                  </Text>
-                  <FlatList
-                    horizontal={true}
-                    data={data.data}
-                    renderItem={({item}) => (
-                      <Button
-                        mb={3}
-                        mr={2}
-                        onPress={() => {
-                          if (filterJenisToko == item.id) {
-                            setfilterJenisToko('');
-                          } else {
-                            setfilterJenisToko(item.id);
+          {jenisToko && (
+            <>
+              <Text bold mx={3} mb={2}>
+                Jenis Toko
+              </Text>
+              <FlatList
+                horizontal={true}
+                data={jenisToko}
+                renderItem={({item}) => (
+                  <Button
+                    mb={3}
+                    mr={2}
+                    onPress={() => {
+                      if (filterJenisToko == item.id) {
+                        setfilterJenisToko('');
+                      } else {
+                        setfilterJenisToko(item.id);
+                      }
+                    }}
+                    variant={filterJenisToko == item.id ? 'solid' : 'outline'}
+                    size="sm">
+                    {item.jenis}
+                  </Button>
+                )}
+              />
+            </>
+          )}
+          {!jenisToko && (
+            <Resource url={`${BASE_URL()}/jenis`}>
+              {({loading, error, payload: data, refetch, fetchMore}) => {
+                if (loading) {
+                  return <FooterLoading />;
+                } else {
+                  setJenisToko(data.data);
+                }
+                return (
+                  <>
+                    <Text bold mx={3} mb={2}>
+                      Jenis Toko
+                    </Text>
+                    <FlatList
+                      horizontal={true}
+                      data={data.data}
+                      renderItem={({item}) => (
+                        <Button
+                          mb={3}
+                          mr={2}
+                          onPress={() => {
+                            if (filterJenisToko == item.id) {
+                              setfilterJenisToko('');
+                            } else {
+                              setfilterJenisToko(item.id);
+                            }
+                          }}
+                          variant={
+                            filterJenisToko == item.id ? 'solid' : 'outline'
                           }
-                        }}
-                        variant={
-                          filterJenisToko == item.id ? 'solid' : 'outline'
-                        }
-                        size="sm">
-                        {item.jenis}
-                      </Button>
-                    )}
-                  />
-                </>
-              );
-            }}
-          </Resource>
+                          size="sm">
+                          {item.jenis}
+                        </Button>
+                      )}
+                    />
+                  </>
+                );
+              }}
+            </Resource>
+          )}
           <HStack mt={2}>
             <Button
               onPress={() => {

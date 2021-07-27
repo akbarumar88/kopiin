@@ -1,8 +1,8 @@
-import React, { Component } from "react"
-import { View, Dimensions } from "react-native"
+import React, {Component} from 'react';
+import {View, Dimensions} from 'react-native';
 
-import moment from "moment"
-import ImageLoad from "./../universal/ImageLoad"
+import moment from 'moment';
+import ImageLoad from './../universal/ImageLoad';
 import {
   NativeBaseProvider,
   HStack,
@@ -18,93 +18,93 @@ import {
   Actionsheet,
   useDisclose,
   HamburgerIcon,
-} from "native-base"
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
-import AsyncStorage from "@react-native-community/async-storage"
-import Resource from "./../universal/Resource"
-import { BASE_URL } from "./../../utilitas/Config"
-import { toCurrency } from "./../../utilitas/Function"
-import FooterLoading from "../universal/FooterLoading"
-import QueryString from "qs"
-import axios from "axios"
+} from 'native-base';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-community/async-storage';
+import Resource from './../universal/Resource';
+import {BASE_URL} from './../../utilitas/Config';
+import {toCurrency} from './../../utilitas/Function';
+import FooterLoading from '../universal/FooterLoading';
+import QueryString from 'qs';
+import axios from 'axios';
+import EmptyCart from './../universal/EmptyCart';
 export class Post extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
-      liked: this.props.item.liked == "0",
+      liked: this.props.item.liked == '0',
       like: 0,
       isLoaded: false,
       clicked: false,
-    }
+    };
   }
 
   componentDidMount() {
     this.setState({
-      liked: this.props.item.liked == "0",
-    })
+      liked: this.props.item.liked == '0',
+    });
   }
 
   likePost = async () => {
-    let id = await AsyncStorage.getItem("id")
-    let idPostingan = this.props.item.id
+    let id = await AsyncStorage.getItem('id');
+    let idPostingan = this.props.item.id;
     axios
       .post(
         `${BASE_URL()}/postingan/like/${idPostingan}`,
         QueryString.stringify({
           liked: !this.state.liked,
           id_user: id,
-        })
+        }),
       )
-      .then(({ data }) => {
-        this.setState({ isLoaded: false })
+      .then(({data}) => {
+        this.setState({isLoaded: false});
       })
-      .catch((e) => {
-        this.setState({ isLoaded: false })
-      })
-  }
+      .catch(e => {
+        this.setState({isLoaded: false});
+      });
+  };
 
   getRange = () => {
-    let a = moment()
-    let b = moment(this.props.item.tglpostingan)
-    let hari = a.diff(b, "days")
-    let bulan = a.diff(b, "months")
+    let a = moment();
+    let b = moment(this.props.item.tglpostingan);
+    let hari = a.diff(b, 'days');
+    let bulan = a.diff(b, 'months');
     if (bulan > 0) {
-      return bulan.toString() + " bulan yang lalu"
+      return bulan.toString() + ' bulan yang lalu';
     } else if (hari <= 0) {
-      return "Hari Ini"
+      return 'Hari Ini';
     } else if (hari == 1) {
-      return "Kemarin"
+      return 'Kemarin';
     }
-    return hari.toString() + " hari yang lalu"
-  }
+    return hari.toString() + ' hari yang lalu';
+  };
 
   render() {
-    const { item } = this.props
-    const { like, liked, isLoaded, clicked } = this.state
-    const imgPost = Dimensions.get("window").width * 0.8
-    const imgproduct = Dimensions.get("window").width * 0.15
+    const {item} = this.props;
+    const {like, liked, isLoaded, clicked} = this.state;
+    const imgPost = Dimensions.get('window').width * 0.8;
+    const imgproduct = Dimensions.get('window').width * 0.15;
     return (
       <Pressable
         onPress={() => {
-          clearTimeout(this.clearClick)
+          clearTimeout(this.clearClick);
           if (!isLoaded && clicked) {
-            let temp = like
+            let temp = like;
             if (this.state.liked) {
-              temp++
+              temp++;
               this.setState({
                 liked: !this.state.liked,
                 like: temp,
                 isLoaded: true,
-              })
-              this.likePost()
+              });
+              this.likePost();
             }
           }
-          this.setState({ clicked: true })
+          this.setState({clicked: true});
           this.clearClick = setTimeout(() => {
-            this.setState({ clicked: false })
-          }, 600)
-        }}
-      >
+            this.setState({clicked: false});
+          }, 600);
+        }}>
         <Box bg="white" mx={2} rounded={8} mt={1} mb={1} px={3} py={5} pb={3}>
           <VStack space={2}>
             <HStack space={2} alignItems="center">
@@ -159,23 +159,22 @@ export class Post extends Component {
                 color="grey"
                 flex={1}
                 justifyContent="flex-end"
-                alignItems="center"
-              >
+                alignItems="center">
                 <IconButton
                   onPress={() => {
                     if (!isLoaded) {
-                      let temp = like
+                      let temp = like;
                       if (this.state.liked) {
-                        temp++
+                        temp++;
                       } else {
-                        temp--
+                        temp--;
                       }
                       this.setState({
                         liked: !this.state.liked,
                         like: temp,
                         isLoaded: true,
-                      })
-                      this.likePost()
+                      });
+                      this.likePost();
                     }
                   }}
                   variant="ghost"
@@ -183,10 +182,10 @@ export class Post extends Component {
                     <Icon
                       as={
                         <MaterialCommunityIcons
-                          name={liked ? "heart-outline" : "heart"}
+                          name={liked ? 'heart-outline' : 'heart'}
                         />
                       }
-                      color={liked ? "grey" : "red"}
+                      color={liked ? 'grey' : 'red'}
                       size="xs"
                     />
                   }
@@ -199,24 +198,24 @@ export class Post extends Component {
           </VStack>
         </Box>
       </Pressable>
-    )
+    );
   }
 }
 
-export function ActionStatus({ id, refetch }) {
-  const { isOpen, onOpen, onClose } = useDisclose()
+export function ActionStatus({id, refetch}) {
+  const {isOpen, onOpen, onClose} = useDisclose();
   const deletePost = () => {
     axios
       .delete(`${BASE_URL()}/postingan/${id}`)
       .then(() => {
-        onClose()
-        refetch()
+        onClose();
+        refetch();
       })
       .catch(() => {
-        onClose()
-        refetch()
-      })
-  }
+        onClose();
+        refetch();
+      });
+  };
   return (
     <>
       <Pressable onPress={onOpen}>
@@ -233,42 +232,41 @@ export function ActionStatus({ id, refetch }) {
                 color="red.500"
                 mr={3}
               />
-            }
-          >
+            }>
             Hapus Postingan
           </Actionsheet.Item>
         </Actionsheet.Content>
       </Actionsheet>
     </>
-  )
+  );
 }
 
 export default class Feed extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
-      id: "",
+      id: '',
       initialLoading: true,
       hasMorePost: false,
       limit: 5,
-    }
+    };
   }
 
   async componentDidMount() {
-    let id = await AsyncStorage.getItem("id")
-    this.setState({ id: id, initialLoading: false })
+    let id = await AsyncStorage.getItem('id');
+    this.setState({id: id, initialLoading: false});
   }
 
   postArea = () => {
-    const { id } = this.state
+    const {id} = this.state;
     return (
-      <Pressable onPress={() => this.props.navigation.navigate("Posting")}>
+      <Pressable onPress={() => this.props.navigation.navigate('Posting')}>
         <Box bg="white" px={3} py={5}>
           <HStack space={2}>
             <Resource url={`${BASE_URL()}/user/${id}`}>
-              {({ loading, error, payload: data, refetch, fetchMore }) => {
+              {({loading, error, payload: data, refetch, fetchMore}) => {
                 if (loading) {
-                  return <Avatar alt={id} size="md" />
+                  return <Avatar alt={id} size="md" />;
                 } else {
                   return (
                     <Avatar
@@ -279,7 +277,7 @@ export default class Feed extends Component {
                           `${BASE_URL()}/image/user/` + data?.data?.foto_user,
                       }}
                     />
-                  )
+                  );
                 }
               }}
             </Resource>
@@ -295,11 +293,11 @@ export default class Feed extends Component {
           </HStack>
         </Box>
       </Pressable>
-    )
-  }
+    );
+  };
 
   render() {
-    const { limit, id, initialLoading } = this.state
+    const {limit, id, initialLoading} = this.state;
     return (
       <NativeBaseProvider>
         {this.postArea()}
@@ -310,17 +308,32 @@ export default class Feed extends Component {
             params={{
               user: this.state.id,
               limit,
-            }}
-          >
-            {({ loading, error, payload: data, refetch, fetchMore }) => {
+            }}>
+            {({loading, error, payload: data, refetch, fetchMore}) => {
               if (loading) {
                 return (
                   <Box flex={1} justifyContent="center">
                     <FooterLoading full />
                   </Box>
-                )
+                );
               }
-              let nextOffset = data.data.length
+              if (!data.data.length) {
+                return (
+                  <EmptyCart
+                    title="Data tidak ditemukan"
+                    description="Data yang anda cari tidak ditemukan, Coba cari kata kunci yang lain."
+                    icon={
+                      <Icon
+                        as={MaterialCommunityIcons}
+                        name="file-search"
+                        size="lg"
+                        color="#555"
+                      />
+                    }
+                  />
+                );
+              }
+              let nextOffset = data.data.length;
               return (
                 <FlatList
                   showsVerticalScrollIndicator={false}
@@ -329,44 +342,44 @@ export default class Feed extends Component {
                   keyExtractor={(item, index) => item.id}
                   refreshing={false}
                   onRefresh={() => {
-                    this.setState({ hasMorePost: true })
-                    refetch()
+                    this.setState({hasMorePost: true});
+                    refetch();
                   }}
-                  renderItem={({ item }) => (
+                  renderItem={({item}) => (
                     <Post iduser={id} refetch={refetch} item={item} />
                   )}
                   onContentSizeChange={() => {
                     if (data.data.length == 0) {
-                      this.setState({ hasMorePost: false })
+                      this.setState({hasMorePost: false});
                     }
                   }}
                   onEndReachedThreshold={0.01}
-                  onEndReached={({ distanceFromEnd }) => {
+                  onEndReached={({distanceFromEnd}) => {
                     if (data.data.length) {
                       fetchMore(
-                        { offset: nextOffset },
+                        {offset: nextOffset},
                         (newPayload, oldPayload) => {
                           // console.warn(newPayload);
                           if (newPayload.data < limit) {
-                            this.setState({ hasMorePost: false })
+                            this.setState({hasMorePost: false});
                           }
                           return {
                             ...oldPayload,
                             data: [...oldPayload.data, ...newPayload.data],
-                          }
-                        }
-                      )
+                          };
+                        },
+                      );
                     }
                   }}
                   ListFooterComponent={
                     this.state.hasMorePost ? <FooterLoading /> : null
                   }
                 />
-              )
+              );
             }}
           </Resource>
         )}
       </NativeBaseProvider>
-    )
+    );
   }
 }
