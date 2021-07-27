@@ -25,7 +25,8 @@ import {
 import Loading from '../universal/Loading';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import {toCurrency} from '../../utilitas/Function';
-import { theme } from '../../utilitas/Config';
+import { BASE_URL, theme } from '../../utilitas/Config';
+import axios from 'axios';
 
 export default class MetodePembayaran extends Component {
   constructor(props) {
@@ -260,8 +261,8 @@ export default class MetodePembayaran extends Component {
               return;
             }
 
-            // let {reference_id} = await this.generateFaktur(0);
-            let reference_id = 'KP21072400001'
+            let {reference_id} = await this.generateFaktur(0, 'OVO');
+            reference_id = 'KP21072400001'
             this.konfirmasiPembayaran('ovo', tagihan, reference_id);
           }}
         />
@@ -306,6 +307,25 @@ export default class MetodePembayaran extends Component {
       </>
     );
   };
+
+  generateFaktur = async (nominal, metode_pembayaran) => {
+    let {cartData} = this.props.route.params;
+    cartData = cartData.map(itemCart => ({...itemCart, metode_pembayaran}))
+    try {
+      let {data} = await axios.put(`${BASE_URL()}/order/generate`, {
+        cartData: cartData
+      })
+      return {
+        reference_id: 'KP21072400001'
+      }
+    } catch (e) {
+      console.warn(e.response?.data?.message ?? e.message)
+      return {
+        reference_id: 'KP21072400001'
+      }
+    }
+    
+  }
 
   konfirmasiPembayaran = (metode, total_biaya, reference_id) => {
     this.props.navigation.navigate('KonfirmasiPembayaranEwallet', {
