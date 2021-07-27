@@ -33,13 +33,13 @@ export default class MetodePembayaran extends Component {
 
     this.state = {
       loading: false,
-      vpayOn: false,
-      saldoVPay: 0,
+      epayOn: false,
+      saldoEPay: 0,
       min_pembayaran: {
         gopay: 0,
-        ovo: 0,
-        dana: 0,
-        linkaja: 0,
+        ovo: 10,
+        dana: 10,
+        linkaja: 100,
       },
 
       // Inputan Password
@@ -48,22 +48,23 @@ export default class MetodePembayaran extends Component {
       method: '',
       errorVerifMessage: '',
     };
+    // console.warn(props.route.params)
   }
 
   render() {
-    const {vpayOn, saldoVPay} = this.state;
+    const {epayOn, saldoEPay} = this.state;
     const total = this.getGrandTotal();
 
     // Perhitungan VPay
-    let vpayTerpakai = 0;
-    if (saldoVPay < total) {
+    let epayTerpakai = 0;
+    if (saldoEPay < total) {
       // Jika saldo kurang dari total, maka gunakan semua saldo
-      vpayTerpakai = saldoVPay;
+      epayTerpakai = saldoEPay;
     } else {
       // Jika saldo lebih dari/sama dengan total, gunakan saldo sebanyak totalnya
-      vpayTerpakai = total;
+      epayTerpakai = total;
     }
-    let tagihan = vpayOn ? total - vpayTerpakai : total;
+    let tagihan = epayOn ? total - epayTerpakai : total;
     return (
       <>
         <AlertOkV2 ref={ref => (this.alert = ref)} />
@@ -75,7 +76,7 @@ export default class MetodePembayaran extends Component {
             {/* Kasih Wrapper agar warna space marginnya abu2 */}
             <View style={[{backgroundColor: '#f5f5f5'}]}>
               <View style={[s.Card]}>
-                {vpayOn ? this.infoPenggunaanVPay() : null}
+                {epayOn ? this.infoPenggunaanVPay() : null}
 
                 <View style={[s.spaceBetween]}>
                   <Text
@@ -117,28 +118,31 @@ export default class MetodePembayaran extends Component {
                         color: '#555',
                         fontSize: 18,
                       }}>
-                      Gunakan Saldo VPay
+                      Gunakan Saldo Ekopee
                     </Text>
-                    <Text>Saldo VPay Rp {toCurrency(saldoVPay, 2)}</Text>
+                    <Text>Saldo Ekopee Rp {toCurrency(saldoEPay, 2)}</Text>
                   </View>
                 </View>
                 <Switch
                   trackColor={{false: '#ccc', true: theme.primary}}
                   thumbColor={'#f4f3f4'}
                   ios_backgroundColor="#3e3e3e"
-                  onValueChange={this.toggleSwitch}
-                  value={vpayOn}
+                  onValueChange={() => {
+                    this.setState(prev => ({ epayOn: !prev.epayOn }))
+                  }}
+                  value={epayOn}
+                  isDisabled={saldoEPay==0}
                 />
               </View>
 
               <View style={[s.Card, {marginBottom: 0}]}>
                 {/* List Metode Pembayaran (jika VPay off atau VPay on namun ada sisa tagihan) */}
-                {!vpayOn || tagihan > 0
+                {!epayOn || tagihan > 0
                   ? this.listMetodePembayaran(tagihan)
                   : null}
 
                 {/* Tampil tombol bayar jika VPay meng-cover */}
-                {vpayOn && tagihan == 0 ? (
+                {epayOn && tagihan == 0 ? (
                   <TouchableNativeFeedback
                     id="btn-bayar"
                     onPress={_ => {
@@ -171,20 +175,20 @@ export default class MetodePembayaran extends Component {
   }
 
   infoPenggunaanVPay = () => {
-    const {saldoVPay} = this.state;
+    const {saldoEPay} = this.state;
     const total = this.getGrandTotal();
 
     // Perhitungan VPay
-    let vpayTerpakai = 0;
-    if (saldoVPay < total) {
+    let epayTerpakai = 0;
+    if (saldoEPay < total) {
       // Jika saldo kurang dari total, maka gunakan semua saldo
-      vpayTerpakai = saldoVPay;
+      epayTerpakai = saldoEPay;
     } else {
       // Jika saldo lebih dari/sama dengan total, gunakan saldo sebanyak totalnya
-      vpayTerpakai = total;
+      epayTerpakai = total;
     }
-    let sisaSaldo = saldoVPay - vpayTerpakai;
-    let tagihan = total - vpayTerpakai;
+    let sisaSaldo = saldoEPay - epayTerpakai;
+    let tagihan = total - epayTerpakai;
     return (
       <>
         <View
@@ -210,7 +214,7 @@ export default class MetodePembayaran extends Component {
               fontFamily: 'sans-serif-light',
               fontSize: 15,
             }}>
-            - {toCurrency(vpayTerpakai, 2)}
+            - {toCurrency(epayTerpakai, 2)}
           </Text>
         </View>
 
@@ -239,7 +243,7 @@ export default class MetodePembayaran extends Component {
   };
 
   listMetodePembayaran = tagihan => {
-    const {vpayOn, min_pembayaran} = this.state;
+    const {epayOn, min_pembayaran} = this.state;
     return (
       <>
         <PaymentMethod
@@ -311,9 +315,17 @@ export default class MetodePembayaran extends Component {
     });
   };
 
-  getGrandTotal = () => {
-    return 10000;
-  };
+  getGrandTotal = () =>
+    this.props.route.params.cartData.reduce((total, item) => {
+      return (
+        total +
+        item.orderdetail.reduce(
+          (sub, item) => sub + parseInt(item.harga) * parseInt(item.jumlah),
+          0,
+        ) +
+        (item.shipping?.biaya ?? 0)
+      );
+    }, 0);
 }
 
 let PaymentMethod = ({name, image, onPress}) => {
@@ -338,6 +350,8 @@ let PaymentMethod = ({name, image, onPress}) => {
       <FontAwesome5Icon name="caret-right" size={20} color="#999" />
     </Pressable>
   );
+
+  
 };
 
 const s = StyleSheet.create({

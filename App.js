@@ -5,125 +5,134 @@
  * @format
  * @flow strict-local
  */
-import "react-native-gesture-handler"
-import React, { Component } from "react"
-import { StyleSheet } from "react-native"
+import 'react-native-gesture-handler';
+import React, {Component} from 'react';
+import {StyleSheet} from 'react-native';
 
-import { NavigationContainer } from "@react-navigation/native"
-import { createStackNavigator } from "@react-navigation/stack"
-import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs"
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 
-import Splash from "./src/components/universal/Splash"
-import { NativeBaseProvider } from "native-base"
+import Splash from './src/components/universal/Splash';
+import {NativeBaseProvider} from 'native-base';
 
-import Register from "./src/components/dashboard/Register"
-import Profil from "./src/components/akun/Profil"
-import Dashboard from "./src/components/dashboard/Index"
+import Register from './src/components/dashboard/Register';
+import Profil from './src/components/akun/Profil';
+import Dashboard from './src/components/dashboard/Index';
 
-import PilihLokasi from "./src/components/akun/PilihLokasi"
-import Shop from "./src/components/dashboard/Shop"
-import FormProduk from "./src/components/akun/FormProduk"
-import MyProduk from "./src/components/akun/MyProduk"
-import UbahPasssword from "./src/components/akun/UbahPassword"
+import PilihLokasi from './src/components/akun/PilihLokasi';
+import Shop from './src/components/dashboard/Shop';
+import FormProduk from './src/components/akun/FormProduk';
+import MyProduk from './src/components/akun/MyProduk';
+import UbahPasssword from './src/components/akun/UbahPassword';
 
-import FormAlamat from "./src/components/akun/FormAlamat"
-import Alamat from "./src/components/akun/Alamat"
+import FormAlamat from './src/components/akun/FormAlamat';
+import Alamat from './src/components/akun/Alamat';
 
-import HasilPencarian from "./src/components/dashboard/HasilPencarian"
-import Pencarian from "./src/components/dashboard/Pencarian"
-import DetailProduk from "./src/components/dashboard/DetailProduk"
-import DetailToko from "./src/components/dashboard/DetailToko"
-import UbahKeranjang from "./src/components/dashboard/UbahKeranjang"
-import Posting from "./src/components/akun/Posting"
-import PembayaranStack from "./src/components/pembayaran/PembayaranStack"
-import PilihAlamat from "./src/components/order/PilihAlamat"
-import Wishlist from "./src/components/dashboard/Wishlist"
-const Stack = createStackNavigator()
-const Tab = createMaterialBottomTabNavigator()
+import HasilPencarian from './src/components/dashboard/HasilPencarian';
+import Pencarian from './src/components/dashboard/Pencarian';
+import DetailProduk from './src/components/dashboard/DetailProduk';
+import DetailToko from './src/components/dashboard/DetailToko';
+import UbahKeranjang from './src/components/dashboard/UbahKeranjang';
+import Posting from './src/components/akun/Posting';
+import PembayaranStack from './src/components/pembayaran/PembayaranStack';
+import PilihAlamat from './src/components/order/PilihAlamat';
+import Wishlist from './src/components/dashboard/Wishlist';
+import MetodePembayaran from './src/components/pembayaran/MetodePembayaran';
+import KonfirmasiPembayaranEwallet from './src/components/pembayaran/KonfirmasiPembayaranEwallet';
+const Stack = createStackNavigator();
+const Tab = createMaterialBottomTabNavigator();
 
 class App extends Component {
   constructor(props) {
-    super(props)
+    super(props);
 
     this.state = {
       loading: true,
       userToken: null,
-    }
+    };
   }
 
   componentDidMount() {
     setTimeout(() => {
-      this.setState({ loading: false })
-    }, 1000)
+      this.setState({loading: false});
+    }, 1000);
   }
 
   render() {
-    const { loading, userToken } = this.state
+    const {loading, userToken} = this.state;
     return (
       <NativeBaseProvider>
         <NavigationContainer>
           <Stack.Navigator
             initialRouteName="Splash"
-            screenOptions={{ headerShown: true }}
-          >
+            screenOptions={{headerShown: true}}>
             <Stack.Screen
               name="Splash"
               component={Splash}
-              options={{ headerShown: false }}
+              options={{headerShown: false}}
             />
             <Stack.Screen
               name="Dashboard"
               component={Dashboard}
-              options={{ headerShown: false }}
+              options={{headerShown: false}}
             />
             <Stack.Screen name="Register" component={Register} />
             <Stack.Screen name="Profil" component={Profil} />
             <Stack.Screen
               name="UbahKeranjang"
               component={UbahKeranjang}
-              options={{ title: "Ubah Keranjang" }}
+              options={{title: 'Ubah Keranjang'}}
             />
             <Stack.Screen
               name="UbahPassword"
               component={UbahPasssword}
-              options={{ title: "Ubah Password" }}
+              options={{title: 'Ubah Password'}}
             />
             <Stack.Screen
               name="FormProduk"
-              options={{ title: "Tambah Produk" }}
+              options={{title: 'Tambah Produk'}}
               component={FormProduk}
             />
             <Stack.Screen
               options={{
-                title: "Pencarian",
+                title: 'Pencarian',
               }}
               name="Search"
               component={Pencarian}
             />
-            <Stack.Screen name="DetailProduk" component={DetailProduk} options={{ title: 'Detail Produk'}}  />
-            <Stack.Screen name="DetailToko" component={DetailToko} options={{ title: 'Detail Toko'}} />
+            <Stack.Screen
+              name="DetailProduk"
+              component={DetailProduk}
+              options={{title: 'Detail Produk'}}
+            />
+            <Stack.Screen
+              name="DetailToko"
+              component={DetailToko}
+              options={{title: 'Detail Toko'}}
+            />
             <Stack.Screen
               options={{
-                title: "Hasil Pencarian",
+                title: 'Hasil Pencarian',
               }}
-              initialParams={{ cari: "" }}
+              initialParams={{cari: ''}}
               name="SearchResult"
               component={HasilPencarian}
             />
             <Stack.Screen
-              options={{ title: "Profil Toko" }}
+              options={{title: 'Profil Toko'}}
               name="Shop"
               component={Shop}
             />
             <Stack.Screen
-              options={{ title: "Pilih Lokasi", headerShown: false }}
+              options={{title: 'Pilih Lokasi', headerShown: false}}
               name="PilihLokasi"
               component={PilihLokasi}
             />
             <Stack.Screen name="MyProduk" component={MyProduk} />
             <Stack.Screen
               name="FormAlamat"
-              options={{ title: "Tambah Alamat" }}
+              options={{title: 'Tambah Alamat'}}
               component={FormAlamat}
             />
             <Stack.Screen name="Alamat" component={Alamat} />
@@ -131,18 +140,28 @@ class App extends Component {
 
             <Stack.Screen name="PilihAlamat" component={PilihAlamat} />
             <Stack.Screen name="Wishlist" component={Wishlist} />
-            <Stack.Screen name="PembayaranStack" component={PembayaranStack} />
+            {/* <Stack.Screen name="PembayaranStack" component={PembayaranStack} /> */}
+            <Stack.Screen
+              name="MetodePembayaran"
+              component={MetodePembayaran}
+              options={{title: 'Pilih Metode Pembayaran'}}
+            />
+            <Stack.Screen
+              name="KonfirmasiPembayaranEwallet"
+              component={KonfirmasiPembayaranEwallet}
+              options={{title: 'Konfirmasi Pembayaran',headerTintColor:'#000'}}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </NativeBaseProvider>
-    )
+    );
   }
 
-  bottomNavigation = () => {}
+  bottomNavigation = () => {};
 
   splashScreen = () => {
-    return
-  }
+    return;
+  };
 }
 
 const styles = StyleSheet.create({
@@ -152,16 +171,16 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 24,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   sectionDescription: {
     marginTop: 8,
     fontSize: 18,
-    fontWeight: "400",
+    fontWeight: '400',
   },
   highlight: {
-    fontWeight: "700",
+    fontWeight: '700',
   },
-})
+});
 
-export default App
+export default App;
