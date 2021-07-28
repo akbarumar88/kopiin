@@ -109,6 +109,8 @@ export default class LaporanTransaksiUser extends React.Component {
                           color="#555"
                         />
                       }
+                      refreshButton
+                      onRefresh={refetch}
                     />
                   );
                 }

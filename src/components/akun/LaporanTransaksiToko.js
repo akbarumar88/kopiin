@@ -108,6 +108,8 @@ export default class LaporanTransaksiToko extends React.Component {
                           color="#555"
                         />
                       }
+                      refreshButton
+                      onRefresh={refetch}
                     />
                   );
                 }
