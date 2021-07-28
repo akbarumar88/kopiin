@@ -5,6 +5,7 @@ import {
   TouchableNativeFeedback,
   BackHandler,
   TextInput,
+  Linking,
 } from 'react-native';
 import {
   Container,
@@ -27,10 +28,15 @@ import qs from 'qs';
 import {NavigationActions, StackActions} from '@react-navigation/native';
 import Loading from '../universal/Loading';
 import {toCurrency} from '../../utilitas/Function';
-import {BASE_URL} from '../../utilitas/Config';
+import {
+  BASE_REDIRECT_URL,
+  BASE_URL,
+  XENDIT_KEY_BASE64,
+} from '../../utilitas/Config';
 import AlertOkV2 from '../universal/AlertOkV2';
 import {TextInput as MaterialTextInput} from 'react-native-paper';
 
+const BASE_XENDIT = 'https://api.xendit.co';
 class KonfirmasiPembayaranEwallet extends Component {
   constructor(props) {
     super(props);
@@ -43,7 +49,7 @@ class KonfirmasiPembayaranEwallet extends Component {
       ovo: '#4d3394',
       dana: '#1287e3',
       linkaja: '#e92024',
-      
+      shopeepay: '#ee4d2d',
     };
     const prosedurMap = {
       ovo: [
@@ -73,6 +79,15 @@ class KonfirmasiPembayaranEwallet extends Component {
         'Ikuti instruksi selanjutnya',
         'Jika anda tidak menyelesaikan pembayaran dalam jangka waktu yang ditentukan, pembayaran akan secara otomatis dibatalkan',
       ],
+      shopeepay: [
+        'Pastikan anda sudah menginstall aplikasi Shopee',
+        "Klik 'Bayar dengan ShopeePay'",
+        'Pembayaran akan diproses',
+        'Anda akan menerima notifikasi terkait pembayaran OVO atau Buka aplikasi OVO secara manual',
+        'Klik notifikasi tersebut untuk melakukan pembayaran',
+        'Ikuti instruksi selanjutnya',
+        'Jika anda tidak menyelesaikan pembayaran dalam jangka waktu yang ditentukan, pembayaran akan secara otomatis dibatalkan',
+      ],
     };
 
     this.state = {
@@ -86,7 +101,7 @@ class KonfirmasiPembayaranEwallet extends Component {
       notelp: '',
       webViewVisible: true,
       checkout_url: 'https://www.google.com',
-      error: {}
+      error: {},
     };
     props.navigation.setOptions({
       headerStyle: {backgroundColor: this.state.mainColor},
@@ -96,8 +111,8 @@ class KonfirmasiPembayaranEwallet extends Component {
 
   async componentDidMount() {
     setTimeout(() => {
-      this.inotelp?.focus()
-    })
+      this.inotelp?.focus();
+    });
     this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
       this.props.navigation.goBack();
       return true;
@@ -112,7 +127,8 @@ class KonfirmasiPembayaranEwallet extends Component {
   }
 
   render() {
-    const {metode, total_biaya, reference_id, mainColor, prosedur,error} = this.state;
+    const {metode, total_biaya, reference_id, mainColor, prosedur, error} =
+      this.state;
 
     return (
       <Box style={s.Container} flex={1}>
@@ -127,8 +143,7 @@ class KonfirmasiPembayaranEwallet extends Component {
               style={{
                 fontSize: 18,
                 marginBottom: 4,
-              }}
-              >
+              }}>
               Cara Pembayaran
             </Text>
             <View>
@@ -144,14 +159,14 @@ class KonfirmasiPembayaranEwallet extends Component {
                     <Text fontWeight="" style={{marginRight: 8, color: '#444'}}>
                       {i + 1}.
                     </Text>
-                    <Text  style={{flex: 1}} >{step}</Text>
+                    <Text style={{flex: 1}}>{step}</Text>
                   </View>
                 );
               })}
             </View>
 
             {/* Input no. telp (OVO) */}
-            {metode == 'ovo' || metode == 'linkaja' ? (
+            {metode == 'ovo' ? (
               <>
                 <View style={{marginTop: 12}} />
                 {/* <OutlinedTextField
@@ -185,19 +200,23 @@ class KonfirmasiPembayaranEwallet extends Component {
                     No. Telepon
                   </FormControl.Label>
                   <Input
-                    ref={ref => this.inotelp=ref}
+                    ref={ref => (this.inotelp = ref)}
                     borderWidth={2}
                     // borderColor={mainColor}
-                    _focus={{borderColor:mainColor}}
+                    _focus={{borderColor: mainColor}}
                     onSubmitEditing={() => {
-                    //   this.ipass.focus();
+                      //   this.ipass.focus();
                     }}
                     onChangeText={notelp => {
+                      if (notelp.match(/[^0-9\+]/)) {
+                        return
+                      }
                       this.setState({
-                        notelp
+                        notelp,
                       });
                     }}
-                    keyboardType="numeric"
+                    value={this.state.notelp}
+                    keyboardType="phone-pad"
                   />
 
                   <FormControl.ErrorMessage
@@ -239,6 +258,10 @@ class KonfirmasiPembayaranEwallet extends Component {
                     this.checkoutOVO();
                     break;
 
+                  case 'shopeepay':
+                    this.checkoutShopeepay();
+                    break;
+
                   case 'dana':
                     this.checkoutDana();
                     break;
@@ -274,17 +297,34 @@ class KonfirmasiPembayaranEwallet extends Component {
         message: 'Harap isi field No. Telepon',
       });
       return;
+    } else if (!notelp.match(/^\+?[1-9]\d{1,14}$/)) {
+      this.alert.show({
+        title: 'Peringatan',
+        message:
+          'Format No. Telepon tidak memenuhi standar E.164 Format. Tambahkan dengan kode (+62) di depan nomor telepon.',
+      });
+      return;
     }
 
     this.setState({loading: true});
     try {
       let {data: res} = await Axios.post(
-        `${BASE_URL()}/mob-payment-keranjang/checkout-ovo`,
-        qs.stringify({
-          reference_id: `${reference_id}-${moment().format('HHmmss')}`,
-          total: total_biaya,
-          notelp,
-        }),
+        `${BASE_XENDIT}/ewallets/charges`,
+        {
+          reference_id: reference_id,
+          currency: 'IDR',
+          amount: total_biaya,
+          checkout_method: 'ONE_TIME_PAYMENT',
+          channel_code: 'ID_OVO',
+          channel_properties: {
+            mobile_number: notelp,
+          },
+        },
+        {
+          headers: {
+            Authorization: `Basic ${XENDIT_KEY_BASE64}`,
+          },
+        },
       );
       this.setState({loading: false});
 
@@ -294,6 +334,44 @@ class KonfirmasiPembayaranEwallet extends Component {
 
       this.navigateToLapTransaksi();
     } catch (e) {
+      console.warn(e.response?.data ?? e.message);
+      this.setState({loading: false});
+      this.alert.show({title: 'Terjadi Kesalahan', message: e.message});
+    }
+  };
+
+  checkoutShopeepay = async () => {
+    const {notelp, total_biaya, reference_id} = this.state;
+
+    this.setState({loading: true});
+    try {
+      let {data: res} = await Axios.post(
+        `${BASE_XENDIT}/ewallets/charges`,
+        {
+          reference_id: reference_id,
+          currency: 'IDR',
+          amount: total_biaya,
+          checkout_method: 'ONE_TIME_PAYMENT',
+          channel_code: 'ID_SHOPEEPAY',
+          channel_properties: {
+            success_redirect_url: `${BASE_REDIRECT_URL}/order/redirect`,
+          },
+        },
+        {
+          headers: {
+            Authorization: `Basic ${XENDIT_KEY_BASE64}`,
+          },
+        },
+      );
+      this.setState({loading: false});
+
+      // if (res.status == 0) {
+      //   throw new Error('Terjadi kesalahan saat checkout OVO (status 0)');
+      // }
+      Linking.openURL(res.actions.mobile_deeplink_checkout_url);
+      this.navigateToLapTransaksi();
+    } catch (e) {
+      console.warn(e.response?.data ?? e.message);
       this.setState({loading: false});
       this.alert.show({title: 'Terjadi Kesalahan', message: e.message});
     }
@@ -385,22 +463,11 @@ class KonfirmasiPembayaranEwallet extends Component {
   };
 
   navigateToLapTransaksi = _ => {
-    const resetAction = StackActions.reset({
+    this.props.navigation.reset({
       index: 1,
-      actions: [
-        NavigationActions.navigate({
-          routeName: 'Home',
-          action: NavigationActions.navigate({
-            routeName: 'tabKeranjang',
-          }),
-        }),
-        NavigationActions.navigate({
-          routeName: 'LaporanTransaksi',
-          params: {},
-        }),
-      ],
+      routes: [{name: 'Dashboard'}, {name: 'LaporanTransaksiUser'}],
     });
-    this.props.navigation.dispatch(resetAction);
+    // this.props.navigation.dispatch(resetAction);
   };
 }
 

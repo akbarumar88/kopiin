@@ -37,10 +37,11 @@ export default class MetodePembayaran extends Component {
       epayOn: false,
       saldoEPay: 0,
       min_pembayaran: {
-        gopay: 0,
-        ovo: 10,
-        dana: 10,
+        gopay: 100,
+        ovo: 100,
+        dana: 100,
         linkaja: 100,
+        shopeepay: 100
       },
 
       // Inputan Password
@@ -267,6 +268,25 @@ export default class MetodePembayaran extends Component {
           }}
         />
         <PaymentMethod
+          name="ShopeePay"
+          image={require('./img/shopeepay.png')}
+          onPress={async () => {
+            if (tagihan < min_pembayaran.shopeepay) {
+              this.alert.show({
+                message: `Minimal pembayaran ShopeePay harus Rp ${toCurrency(
+                  min_pembayaran.shopeepay,
+                  2,
+                )}`,
+              });
+              return;
+            }
+
+            let {reference_id} = await this.generateFaktur(0, 'SHOPEEPAY');
+            // reference_id = 'KP21072400001';
+            this.konfirmasiPembayaran('shopeepay', tagihan, reference_id);
+          }}
+        />
+        {/* <PaymentMethod
           name="DANA"
           image={require('./img/dana.png')}
           onPress={async () => {
@@ -284,8 +304,8 @@ export default class MetodePembayaran extends Component {
             let reference_id = 'KP21072400001';
             this.konfirmasiPembayaran('dana', tagihan, reference_id);
           }}
-        />
-        <PaymentMethod
+        /> */}
+        {/* <PaymentMethod
           name="LinkAja"
           image={require('./img/linkaja.png')}
           onPress={async () => {
@@ -303,7 +323,7 @@ export default class MetodePembayaran extends Component {
             let reference_id = 'KP21072400001';
             this.konfirmasiPembayaran('linkaja', tagihan, reference_id);
           }}
-        />
+        /> */}
       </>
     );
   };
