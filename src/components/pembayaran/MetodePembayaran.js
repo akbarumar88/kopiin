@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet,  TouchableWithoutFeedback, View} from 'react-native';
+import {StyleSheet, TouchableWithoutFeedback, View} from 'react-native';
 import AlertOkV2 from '../universal/AlertOkV2';
 import {
   NativeBaseProvider,
@@ -20,12 +20,12 @@ import {
   Pressable,
   Image,
   Center,
-  Switch
+  Switch,
 } from 'native-base';
 import Loading from '../universal/Loading';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
-import {toCurrency} from '../../utilitas/Function';
-import { BASE_URL, theme } from '../../utilitas/Config';
+import {errMsg, toCurrency} from '../../utilitas/Function';
+import {BASE_URL, theme} from '../../utilitas/Config';
 import axios from 'axios';
 
 export default class MetodePembayaran extends Component {
@@ -129,10 +129,10 @@ export default class MetodePembayaran extends Component {
                   thumbColor={'#f4f3f4'}
                   ios_backgroundColor="#3e3e3e"
                   onValueChange={() => {
-                    this.setState(prev => ({ epayOn: !prev.epayOn }))
+                    this.setState(prev => ({epayOn: !prev.epayOn}));
                   }}
                   value={epayOn}
-                  isDisabled={saldoEPay==0}
+                  isDisabled={saldoEPay == 0}
                 />
               </View>
 
@@ -262,7 +262,7 @@ export default class MetodePembayaran extends Component {
             }
 
             let {reference_id} = await this.generateFaktur(0, 'OVO');
-            reference_id = 'KP21072400001'
+            // reference_id = 'KP21072400001';
             this.konfirmasiPembayaran('ovo', tagihan, reference_id);
           }}
         />
@@ -281,7 +281,7 @@ export default class MetodePembayaran extends Component {
             }
 
             // let {reference_id} = await this.generateFaktur(0);
-            let reference_id = 'KP21072400001'
+            let reference_id = 'KP21072400001';
             this.konfirmasiPembayaran('dana', tagihan, reference_id);
           }}
         />
@@ -300,7 +300,7 @@ export default class MetodePembayaran extends Component {
             }
 
             // let {reference_id} = await this.generateFaktur(0);
-            let reference_id = 'KP21072400001'
+            let reference_id = 'KP21072400001';
             this.konfirmasiPembayaran('linkaja', tagihan, reference_id);
           }}
         />
@@ -310,22 +310,26 @@ export default class MetodePembayaran extends Component {
 
   generateFaktur = async (nominal, metode_pembayaran) => {
     let {cartData} = this.props.route.params;
-    cartData = cartData.map(itemCart => ({...itemCart, metode_pembayaran}))
+    cartData = cartData.map(itemCart => ({...itemCart, metode_pembayaran}));
+    this.setState({loading: true});
     try {
       let {data} = await axios.put(`${BASE_URL()}/order/generate`, {
-        cartData: cartData
-      })
+        cartData: cartData,
+      });
+
+      this.setState({loading: false});
       return {
-        reference_id: 'KP21072400001'
-      }
+        reference_id: data.reference_id,
+      };
     } catch (e) {
-      console.warn(e.response?.data?.message ?? e.message)
+      this.setState({loading: false});
+      console.warn(e.response?.data?.message ?? e.message);
+      this.alert.show({message: errMsg('Generate Faktur')});
       return {
-        reference_id: 'KP21072400001'
-      }
+        reference_id: null,
+      };
     }
-    
-  }
+  };
 
   konfirmasiPembayaran = (metode, total_biaya, reference_id) => {
     this.props.navigation.navigate('KonfirmasiPembayaranEwallet', {
@@ -370,8 +374,6 @@ let PaymentMethod = ({name, image, onPress}) => {
       <FontAwesome5Icon name="caret-right" size={20} color="#999" />
     </Pressable>
   );
-
-  
 };
 
 const s = StyleSheet.create({
