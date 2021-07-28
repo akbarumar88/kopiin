@@ -20,7 +20,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ImageLoad from '../universal/ImageLoad';
-import {Dimensions, Linking} from 'react-native';
+import {Dimensions, Linking, Pressable} from 'react-native';
 import Resource from '../universal/Resource';
 import AsyncStorage from '@react-native-community/async-storage';
 import {BASE_URL} from '../../utilitas/Config';
@@ -231,31 +231,38 @@ export default class LaporanTransaksiToko extends React.Component {
     const widthImage = 0.15 * Dimensions.get('window').width;
     const image = BASE_URL() + '/image/user/' + item.foto_user;
     return (
-      <Box py={2} mt={4}>
-        <HStack space={3}>
-          <ImageLoad
-            round={widthImage / 4}
-            url={image}
-            w={widthImage}
-            h={widthImage}
-            mx={3}
-          />
-          <VStack>
-            <Text fontSize="xs" color="#0000FF">
-              {item.no_faktur}
-            </Text>
-            <Text fontSize="xs" color="grey">
-              {moment(item.tgl_order).format('DD MMMM yyyy')}
-            </Text>
-            <Text>{item.nama_lengkap}</Text>
-            <Text fontSize="xs" color="grey">
-              {this.getStatus(item.status)}
-            </Text>
-          </VStack>
-        </HStack>
-        {this.getAksiOrder(item.status, item.no_telp)}
-        <Divider my={2} />
-      </Box>
+      <Pressable
+        onPress={() =>
+          this.props.navigation.navigate('DetailTransaksi', {
+            idorder: item.id,
+          })
+        }>
+        <Box py={2} mt={4}>
+          <HStack space={3}>
+            <ImageLoad
+              round={widthImage / 4}
+              url={image}
+              w={widthImage}
+              h={widthImage}
+              mx={3}
+            />
+            <VStack>
+              <Text fontSize="xs" color="#0000FF">
+                {item.no_faktur}
+              </Text>
+              <Text fontSize="xs" color="grey">
+                {moment(item.tgl_order).format('DD MMMM yyyy')}
+              </Text>
+              <Text>{item.nama_lengkap}</Text>
+              <Text fontSize="xs" color="grey">
+                {this.getStatus(item.status)}
+              </Text>
+            </VStack>
+          </HStack>
+          {this.getAksiOrder(item.status, item.no_telp)}
+          <Divider my={2} />
+        </Box>
+      </Pressable>
     );
   };
 
