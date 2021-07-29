@@ -30,6 +30,7 @@ import FooterLoading from './../universal/FooterLoading';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import EmptyCart from './../universal/EmptyCart';
 import AlertYesNoV2 from '../universal/AlertYesNoV2';
+import Axios from 'axios';
 
 export default class LaporanTransaksiUser extends React.Component {
   constructor(props) {
@@ -203,9 +204,7 @@ export default class LaporanTransaksiUser extends React.Component {
     this.dialog.show(
       {message: 'Anda yakin untuk membatalkan pesanan ini ?'},
       async () => {
-        setLoadingAksi(true);
-        axios
-          .put(`${BASE_URL()}/order/batalkan/${id}`)
+        Axios.put(`${BASE_URL()}/order/batalkan/${id}`)
           .then(({data}) => {
             this.setState({refresh: new Date()});
           })
