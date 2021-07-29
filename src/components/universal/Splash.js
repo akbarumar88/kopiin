@@ -1,18 +1,19 @@
 import React, {Component} from 'react';
 import {View} from 'react-native';
-import {NativeBaseProvider, Box, Row, Text} from 'native-base';
+import {NativeBaseProvider, Box, Row, Text, Image} from 'native-base';
 import Geolocation from '@react-native-community/geolocation';
 import RNAndroidLocationEnabler from 'react-native-android-location-enabler';
 import AsyncStorage from '@react-native-community/async-storage';
-
+import Logo from '../../res/img/logo.png';
 export default class Splash extends Component {
   async componentDidMount() {
     await this.setMyPosition();
-    // setTimeout(() => {
-    //   // this.props.navigation.navigate('Dashboard');
-    //   this.props.navigation.reset({index: 0, routes: [{name: 'Dashboard'}]});
-    // }, 1000);
-    this.props.navigation.reset({index: 0, routes: [{name: 'Dashboard'}]});
+    setTimeout(() => {
+      // this.props.navigation.navigate('Dashboard');
+      this.props.navigation.reset({index: 0, routes: [{name: 'Dashboard'}]});
+    }, 1100);
+
+    // this.props.navigation.reset({index: 0, routes: [{name: 'Dashboard'}]});
   }
 
   setMyPosition = async () => {
@@ -59,9 +60,7 @@ export default class Splash extends Component {
     return (
       <NativeBaseProvider>
         <Box bg="#794112" flex={1} justifyContent="center" alignItems="center">
-          <Text color="white" fontSize={32}>
-            Sedang Mengambil Lokasi
-          </Text>
+          <Image w={100} h={100} source={Logo} />
         </Box>
       </NativeBaseProvider>
     );
