@@ -64,6 +64,7 @@ export default class DetailProduk extends Component {
           ToastAndroid.SHORT,
         );
         this.setState({loadingWishlist: false});
+        this.setWishlist(!state);
       })
       .catch(() => {
         this.setState({loadingWishlist: false});
@@ -72,6 +73,7 @@ export default class DetailProduk extends Component {
   };
 
   setWishlist = state => {
+    console.log('oke');
     this.props.navigation.setOptions({
       headerRight: () => (
         <Pressable

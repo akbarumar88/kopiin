@@ -100,6 +100,7 @@ export default class Wishlist extends Component {
               numColumns={2}
               horizontal={false}
               flex={1}
+              px={2}
               data={[...data.data]}
               onContentSizeChange={() => {
                 if (data.data.length == 0) {
@@ -113,12 +114,13 @@ export default class Wishlist extends Component {
                   onPress={() => this.showDetailProduk(item.id_barang)}
                   flex={0.5}>
                   <Box
-                    bgColor="coolGray.100"
+                    bgColor="white"
                     mx={1}
                     key={index}
-                    borderRadius={20}
+                    borderRadius={8}
+                    shadow={3}
                     pb={4}
-                    mb={1}
+                    my={1}
                     alignItems="center">
                     <ImageLoad
                       alignSelf="center"
