@@ -110,7 +110,11 @@ export class Post extends Component {
             <HStack space={2} alignItems="center">
               <Avatar
                 source={{
-                  uri: `${BASE_URL()}/image/user/` + item.foto_user,
+                  uri:
+                    `${BASE_URL()}/image/user/` +
+                    item.foto_user +
+                    '?data=' +
+                    new Date(),
                 }}
                 size="md"
               />
@@ -278,7 +282,9 @@ export default class Feed extends Component {
                           source={{
                             uri:
                               `${BASE_URL()}/image/user/` +
-                              data?.data?.foto_user,
+                              data?.data?.foto_user +
+                              '?data=' +
+                              new Date(),
                           }}
                         />
                       )}
