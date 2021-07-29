@@ -21,7 +21,7 @@ import {
   extendTheme,
 } from 'native-base';
 import {BASE_URL, theme} from '../../utilitas/Config';
-import {Alert} from 'react-native';
+import {Alert, RefreshControl} from 'react-native';
 import AlertYesNoV2 from '../universal/AlertYesNoV2';
 import AsyncStorage from '@react-native-community/async-storage';
 import QueryString from 'qs';
@@ -73,7 +73,10 @@ export default class Akun extends React.Component {
     return (
       <NativeBaseProvider>
         <AlertYesNoV2 ref={ref => (this.alert = ref)} />
-        <ScrollView>
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={false} onRefresh={this.saldoSemua} />
+          }>
           <Box flex={1} p={8} bg="white">
             <Heading size="lg" color={theme.primary} mb={4}>
               Akun Saya
