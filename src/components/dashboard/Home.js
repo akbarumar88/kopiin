@@ -15,12 +15,13 @@ import {
   Image,
   FlatList,
 } from 'native-base';
-import {BASE_URL} from '../../utilitas/Config';
+import {BASE_URL, ONESIGNAL_APPID} from '../../utilitas/Config';
 import {errMsg, toCurrency} from '../../utilitas/Function';
 import AsyncStorage from '@react-native-community/async-storage';
 import Resource from '../universal/Resource';
 import {MerchantShimmer, BarangShimmer} from '../universal/Placeholder';
 import ImageLoad from './../universal/ImageLoad';
+import OneSignal from 'react-native-onesignal';
 
 export default class Home extends Component {
   defaultStoreAvatar =
@@ -40,9 +41,11 @@ export default class Home extends Component {
   }
 
   async componentDidMount() {
+
     let lat = await AsyncStorage.getItem('lat');
     let long = await AsyncStorage.getItem('long');
     this.setState({lat, long, initialLoading: false});
+    
   }
 
   render() {

@@ -263,6 +263,10 @@ export default class MetodePembayaran extends Component {
             }
 
             let {reference_id} = await this.generateFaktur(0, 'OVO');
+            if (!reference_id) {
+              this.alert.show({message:errMsg('generate faktur')})
+              return
+            }
             // reference_id = 'KP21072400001';
             this.konfirmasiPembayaran('ovo', tagihan, reference_id);
           }}
@@ -282,6 +286,10 @@ export default class MetodePembayaran extends Component {
             }
 
             let {reference_id} = await this.generateFaktur(0, 'SHOPEEPAY');
+            if (!reference_id) {
+              this.alert.show({message:errMsg('generate faktur')})
+              return
+            }
             // reference_id = 'KP21072400001';
             this.konfirmasiPembayaran('shopeepay', tagihan, reference_id);
           }}

@@ -141,6 +141,7 @@ export default class AddProduct extends React.Component {
                     });
                   }}
                   value={form.namaBarang}
+                  maxLength={255}
                 />
 
                 <FormControl.ErrorMessage
