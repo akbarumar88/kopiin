@@ -38,7 +38,7 @@ import EmptyCart from './../universal/EmptyCart';
 import axios from 'axios';
 import Modal from 'react-native-modal';
 import AlertYesNoV2 from '../universal/AlertYesNoV2';
-import { getListStatus, getStatus } from '../../utilitas/Function';
+import {getListStatus, getStatus} from '../../utilitas/Function';
 import QueryString from 'qs';
 
 export default class LaporanTransaksiToko extends React.Component {
@@ -528,7 +528,11 @@ function SheetAksiOrder({telp}) {
             py={3}
             my={0}
             onPress={() => {
-              Linking.openURL('https://api.whatsapp.com/send?phone=' + telp);
+              let no =
+                telp.substring(0, 1) == '0'
+                  ? '+62' + telp.substring(1, telp.length)
+                  : telp;
+              Linking.openURL('https://api.whatsapp.com/send?phone=' + no);
               onClose();
             }}
             startIcon={
