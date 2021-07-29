@@ -188,7 +188,7 @@ class PembayaranTransaksi extends React.Component {
         <Divider my={1} />
         <HStack mb={3}>
           <Text flex={1} fontSize="sm" bold color="grey">
-            Total
+            Sub Total
           </Text>
           <Text flex={1} fontSize="sm" bold>
             {toCurrency(
@@ -198,6 +198,31 @@ class PembayaranTransaksi extends React.Component {
             )}
           </Text>
         </HStack>
+        {this.props.data.kurir && (
+          <>
+            <HStack mb={3}>
+              <Text flex={1} fontSize="sm" bold color="grey">
+                Ongkir
+              </Text>
+              <Text flex={1} fontSize="sm" bold>
+                {toCurrency(this.props.data.ongkir)}
+              </Text>
+            </HStack>
+
+            <HStack mb={3}>
+              <Text flex={1} fontSize="sm" bold color="grey">
+                Total
+              </Text>
+              <Text flex={1} fontSize="sm" bold>
+                {toCurrency(
+                  this.props.data.detailorder.reduce((total, data) => {
+                    return total + data.jumlah * data.harga;
+                  }, 0) + this.props.data.ongkir,
+                )}
+              </Text>
+            </HStack>
+          </>
+        )}
       </Stack>
     );
   }
