@@ -32,3 +32,14 @@ const formatMoney = (number, places, symbol, thousand, decimal) => {
       : '')
   );
 };
+
+export const getListStatus = [
+  {id: -1, status: 'Pesanan Dibatalkan oleh User'},
+  {id: 1, status: 'Menunggu Konfirmasi'},
+  {id: 2, status: 'Pesanan Ditolak'},
+  {id: 3, status: 'Pesanan Diterima'},
+  {id: 4, status: 'Siap Diantar'},
+  {id: 5, status: 'Sedang Diantar'},
+  {id: 6, status: 'Sudah Diantar'},
+  {id: 7, status: 'Pesanan Selesai'},
+]

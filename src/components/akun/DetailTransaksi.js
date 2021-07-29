@@ -30,7 +30,7 @@ import FooterLoading from '../universal/FooterLoading';
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import EmptyCart from './../universal/EmptyCart';
-import {toCurrency} from '../../utilitas/Function';
+import {errMsg, toCurrency} from '../../utilitas/Function';
 
 class HeaderTransaksi extends React.Component {
   getStatus = code => {
@@ -242,7 +242,7 @@ export default class DetailTransaksi extends React.Component {
               if (loading) {
                 return <FooterLoading full />;
               } else if (error) {
-                return <></>;
+                return <Text>{errMsg('Load Detail Transaksi')}</Text>;
               }
               return (
                 <FlatList

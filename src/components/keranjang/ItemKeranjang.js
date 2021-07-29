@@ -414,15 +414,16 @@ export default class ItemKeranjang extends Component {
       long_toko,
       lat_user,
       long_user,
+      kurir: listKurir
     } = this.props.item;
     // const {
     //   data: { listKurir = [],  }
     // } = this.props
-    let listKurir = [
-      {ong_kode: 'sicepat'},
-      {ong_kode: 'jne'},
-      {ong_kode: 'pos'},
-    ];
+    // let listKurir = [
+    //   {ong_kode: 'sicepat'},
+    //   {ong_kode: 'jne'},
+    //   {ong_kode: 'pos'},
+    // ];
     // console.warn(orderdetail); return
     // console.warn('kurir', listKurir.toString());
     this.setState({loadingLoadKurir: true});

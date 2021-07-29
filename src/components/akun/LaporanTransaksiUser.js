@@ -29,6 +29,7 @@ import FooterLoading from './../universal/FooterLoading';
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import EmptyCart from './../universal/EmptyCart';
+import { getListStatus } from '../../utilitas/Function';
 import AlertYesNoV2 from '../universal/AlertYesNoV2';
 import Axios from 'axios';
 
@@ -172,9 +173,8 @@ export default class LaporanTransaksiUser extends React.Component {
     let statusOrder = '';
     switch (code) {
       case -1:
-        statusOrder = 'Pesanan dibatalkan';
+        statusOrder = 'Pesanan Dibatalkan oleh User';
         break;
-
       case 1:
         statusOrder = 'Menunggu Konfirmasi';
         break;
@@ -376,16 +376,7 @@ export function FilterTransaksi({filter}) {
 
   const [filterStatus, setFilterStatus] = React.useState('');
   const [buttonSelected, setButtonSelected] = React.useState([]);
-  const [status, setState] = React.useState([
-    {id: -1, status: 'Pesanan dibatalkan'},
-    {id: 1, status: 'Menunggu Konfirmasi'},
-    {id: 2, status: 'Pesanan Ditolak'},
-    {id: 3, status: 'Pesanan Diterima'},
-    {id: 4, status: 'Siap Diantar'},
-    {id: 5, status: 'Sedang Diantar'},
-    {id: 6, status: 'Sudah Diantar'},
-    {id: 7, status: 'Pesanan Selesai'},
-  ]);
+  const [status, setState] = React.useState(getListStatus);
   function refresh() {
     let field = '';
     if (buttonSelected.length > 0) {

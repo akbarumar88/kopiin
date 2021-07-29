@@ -13,10 +13,11 @@ import {
   Image,
   Text,
   FlatList,
+  View,
 } from 'native-base';
 import {BASE_URL, theme} from '../../utilitas/Config';
 import axios from 'axios';
-import {errMsg} from '../../utilitas/Function';
+import {errMsg, toCurrency} from '../../utilitas/Function';
 import QueryString from 'qs';
 import AsyncStorage from '@react-native-community/async-storage';
 import AlertOkV2 from './../universal/AlertOkV2';
@@ -129,29 +130,35 @@ export default class MyProduk extends React.Component {
                   mx={1}
                   shadow={4}
                   rounded={5}
-                  py={4}
+                  py={3}
                   bg="white"
-                  px={4}>
-                  <Image
-                    my={1}
-                    alt="gambar"
-                    alignSelf={{base: 'center'}}
-                    source={{
-                      uri: item.foto_barang
-                        ? `${BASE_URL()}/image/barang/${
-                            item.foto_barang
-                          }?time=${new Date()}`
-                        : 'https://www.pixsy.com/wp-content/uploads/2021/04/ben-sweet-2LowviVHZ-E-unsplash-1.jpeg',
-                    }}
-                    size={Dimensions.get('screen').width * 0.18}
-                  />
-                  <Text bold={true}>{item.nama}</Text>
-                  <Text fontSize="sm" color="grey" mt={1}>
-                    {'Harga : ' + item.harga}
-                  </Text>
-                  <Text fontSize="sm" color="grey" mt={1}>
-                    {'Stok : ' + item.stok}
-                  </Text>
+                  px={3}>
+                  <HStack alignItems="flex-start">
+                    <Image
+                      alt="gambar"
+                      alignSelf={{base: 'center'}}
+                      source={{
+                        uri: item.foto_barang
+                          ? `${BASE_URL()}/image/barang/${
+                              item.foto_barang
+                            }?time=${new Date()}`
+                          : 'https://www.pixsy.com/wp-content/uploads/2021/04/ben-sweet-2LowviVHZ-E-unsplash-1.jpeg',
+                      }}
+                      borderRadius={4}
+                      size={Dimensions.get('screen').width * 0.18}
+                    />
+                    <VStack flex={1} ml={2}>
+                      <Text flex={1} bold={true}>
+                        {item.nama}
+                      </Text>
+                      <Text flex={1} fontSize="sm" color="grey" mt={1}>
+                        {'Harga : ' + toCurrency(item.harga)}
+                      </Text>
+                      <Text flex={1} fontSize="sm" color="grey" mt={1}>
+                        {'Stok : ' + item.stok}
+                      </Text>
+                    </VStack>
+                  </HStack>
                   {this.props.route.params && (
                     <Button
                       size="sm"
@@ -180,6 +187,7 @@ export default class MyProduk extends React.Component {
                         mt={3}
                         onPress={() => this.hapusBarang(item.id)}
                         colorScheme="danger"
+                        flex={1}
                         variant="outline">
                         Hapus Barang
                       </Button>

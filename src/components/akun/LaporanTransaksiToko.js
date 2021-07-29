@@ -38,6 +38,7 @@ import EmptyCart from './../universal/EmptyCart';
 import axios from 'axios';
 import Modal from 'react-native-modal';
 import AlertYesNoV2 from '../universal/AlertYesNoV2';
+import { getListStatus } from '../../utilitas/Function';
 import QueryString from 'qs';
 
 export default class LaporanTransaksiToko extends React.Component {
@@ -426,15 +427,7 @@ function FilterTransaksi({filter}) {
 
   const [filterStatus, setFilterStatus] = React.useState('');
   const [buttonSelected, setButtonSelected] = React.useState([]);
-  const [status, setState] = React.useState([
-    {id: 1, status: 'Menunggu Konfirmasi'},
-    {id: 2, status: 'Pesanan Ditolak'},
-    {id: 3, status: 'Pesanan Diterima'},
-    {id: 4, status: 'Siap Diantar'},
-    {id: 5, status: 'Sedang Diantar'},
-    {id: 6, status: 'Sudah Diantar'},
-    {id: 7, status: 'Pesanan Selesai'},
-  ]);
+  const [status, setState] = React.useState(getListStatus);
   function refresh() {
     let field = '';
     if (buttonSelected.length > 0) {
