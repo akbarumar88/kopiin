@@ -180,7 +180,11 @@ class App extends Component {
             <Stack.Screen name="Alamat" component={Alamat} />
             <Stack.Screen name="Posting" component={Posting} />
 
-            <Stack.Screen name="PilihAlamat" component={PilihAlamat} />
+            <Stack.Screen
+              name="PilihAlamat"
+              options={{title: 'Pilih Alamat'}}
+              component={PilihAlamat}
+            />
             <Stack.Screen name="Wishlist" component={Wishlist} />
             <Stack.Screen
               name="LaporanTransaksiUser"

@@ -485,7 +485,7 @@ export default class ItemKeranjang extends Component {
       {message: 'Apakah Anda yakin ingin menghapus data ini ?'},
       async () => {
         await axios.delete(`${BASE_URL()}/order/${id}`).then(e => {});
-        this.setState({paramrefresh: new Date()});
+        this.props.refetchKeranjang();
       },
     );
   };

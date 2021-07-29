@@ -64,6 +64,7 @@ export default class DetailProduk extends Component {
           ToastAndroid.SHORT,
         );
         this.setState({loadingWishlist: false});
+        this.setWishlist(!state);
       })
       .catch(() => {
         this.setState({loadingWishlist: false});
@@ -72,6 +73,7 @@ export default class DetailProduk extends Component {
   };
 
   setWishlist = state => {
+    console.log('oke');
     this.props.navigation.setOptions({
       headerRight: () => (
         <Pressable
@@ -193,7 +195,7 @@ export default class DetailProduk extends Component {
         </Text>
         <FlatList
           flex={1}
-          mt={5}
+          mt={2}
           horizontal={true}
           data={dataProduk}
           keyExtractor={(item, index) => item.id + 'idproduk'}
@@ -206,14 +208,15 @@ export default class DetailProduk extends Component {
                 });
               }}>
               <Box
-                bgColor="coolGray.100"
+                bgColor="white"
+                shadow={3}
                 mx={1}
                 key={index}
-                borderRadius={20}
+                borderRadius={8}
                 pb={4}
-                mb={1}
+                my={2}
                 alignItems="center">
-                <Image
+                <ImageLoad
                   alignSelf="center"
                   resizeMode="contain"
                   mt={2}
@@ -227,14 +230,9 @@ export default class DetailProduk extends Component {
                     },
                   ]}
                   alt={item.nama}
-                  source={{
-                    uri: item.foto_barang
-                      ? urlGambar +
-                        item.foto_barang +
-                        '?url=' +
-                        this.state.refresh
-                      : this.defaultProductAvatar,
-                  }}
+                  url={
+                    urlGambar + item.foto_barang + '?url=' + this.state.refresh
+                  }
                 />
                 <Text fontSize="sm" isTruncated>
                   {item.nama}

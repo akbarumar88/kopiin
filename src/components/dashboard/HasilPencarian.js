@@ -488,6 +488,7 @@ export default class HasilPencarian extends Component {
                   numColumns={2}
                   horizontal={false}
                   flex={1}
+                  px={1}
                   data={[...data.data]}
                   keyExtractor={(item, index) => item.id}
                   showsVerticalScrollIndicator={false}
@@ -496,12 +497,13 @@ export default class HasilPencarian extends Component {
                       onPress={() => this.showDetailProduk(item.id)}
                       flex={0.5}>
                       <Box
-                        bgColor="coolGray.100"
+                        bgColor="white"
                         mx={1}
                         key={index}
-                        borderRadius={20}
                         pb={4}
-                        mb={1}
+                        my={1}
+                        borderRadius={8}
+                        shadow={3}
                         alignItems="center">
                         <ImageLoad
                           alignSelf="center"
@@ -519,10 +521,15 @@ export default class HasilPencarian extends Component {
                           url={urlGambar + item.foto_barang + '?' + new Date()}
                           alt={item.nama}
                         />
-                        <Text fontSize="sm" isTruncated>
+                        <Text fontSize="sm" isTruncated mx={2}>
                           {item.nama}
                         </Text>
-                        <Text fontSize="xs" bold color="grey">
+                        <Text
+                          fontSize="xs"
+                          isTruncated
+                          mx={2}
+                          bold
+                          color="grey">
                           {item.deskripsi}
                         </Text>
                         <Text fontSize="xs" color="grey">
@@ -628,6 +635,7 @@ export default class HasilPencarian extends Component {
                   numColumns={2}
                   horizontal={false}
                   flex={1}
+                  px={2}
                   data={[...data.data]}
                   keyExtractor={(item, index) => item.id}
                   showsVerticalScrollIndicator={false}
@@ -640,12 +648,13 @@ export default class HasilPencarian extends Component {
                       }}
                       flex={0.5}>
                       <Box
-                        bgColor="coolGray.100"
+                        bgColor="white"
                         mx={1}
                         key={index}
-                        borderRadius={20}
+                        borderRadius={8}
+                        shadow={3}
                         pb={4}
-                        mb={1}
+                        my={1}
                         alignItems="center">
                         <ImageLoad
                           alignSelf="center"
@@ -665,10 +674,15 @@ export default class HasilPencarian extends Component {
                           }
                           alt={item.nama_toko}
                         />
-                        <Text fontSize="sm" isTruncated>
+                        <Text fontSize="sm" isTruncated mx={2}>
                           {item.nama_toko}
                         </Text>
-                        <Text fontSize="xs" bold color="grey">
+                        <Text
+                          fontSize="xs"
+                          isTruncated
+                          mx={2}
+                          bold
+                          color="grey">
                           {item.alamat_toko}
                         </Text>
                       </Box>

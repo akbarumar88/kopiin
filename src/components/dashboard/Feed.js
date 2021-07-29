@@ -269,14 +269,20 @@ export default class Feed extends Component {
                   return <Avatar alt={id} size="md" />;
                 } else {
                   return (
-                    <Avatar
-                      size="md"
-                      alt={id}
-                      source={{
-                        uri:
-                          `${BASE_URL()}/image/user/` + data?.data?.foto_user,
-                      }}
-                    />
+                    <>
+                      {!data.data?.foto_user && <Avatar alt={id} size="md" />}
+                      {data.data?.foto_user && (
+                        <Avatar
+                          size="md"
+                          alt={id}
+                          source={{
+                            uri:
+                              `${BASE_URL()}/image/user/` +
+                              data?.data?.foto_user,
+                          }}
+                        />
+                      )}
+                    </>
                   );
                 }
               }}
@@ -297,7 +303,7 @@ export default class Feed extends Component {
   };
 
   render() {
-    const {limit, id, initialLoading} = this.state;
+    const {limit, id, initialLoading, hasMorePost} = this.state;
     return (
       <NativeBaseProvider>
         {this.postArea()}
@@ -317,7 +323,10 @@ export default class Feed extends Component {
                   </Box>
                 );
               }
-              if (!data.data.length) {
+              if (error && hasMorePost) {
+                this.setState({hasMorePost: false});
+              }
+              if (!data.data?.length) {
                 return (
                   <EmptyCart
                     title="Data tidak ditemukan"
@@ -330,6 +339,8 @@ export default class Feed extends Component {
                         color="#555"
                       />
                     }
+                    refreshButton
+                    onRefresh={refetch}
                   />
                 );
               }

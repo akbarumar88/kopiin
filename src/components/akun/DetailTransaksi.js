@@ -94,7 +94,7 @@ class BodyTransaksi extends React.Component {
         <HStack>
           <Text fontSize="sm">Toko : </Text>
           <Text fontSize="sm" bold>
-            {data?.detailorder[0].nama_toko} {'>'}
+            {data.detailorder[0]?.nama_toko}
           </Text>
         </HStack>
         <FlatList
