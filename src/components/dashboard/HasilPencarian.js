@@ -27,7 +27,6 @@ import FooterLoading from '../universal/FooterLoading';
 import ImageLoad from './../universal/ImageLoad';
 import EmptyCart from '../universal/EmptyCart';
 import AsyncStorage from '@react-native-community/async-storage';
-import StarReview from '../universal/StarRating';
 
 export function FilterProduk({sorting}) {
   const {isOpen, onOpen, onClose} = useDisclose();
