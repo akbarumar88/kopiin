@@ -26,7 +26,11 @@ import AsyncStorage from '@react-native-community/async-storage';
 import AlertYesNoV2 from './../universal/AlertYesNoV2';
 import ItemKeranjang from '../keranjang/ItemKeranjang';
 import AlertOkV2 from '../universal/AlertOkV2';
+<<<<<<< HEAD
 import EmptyCart from './../universal/EmptyCart';
+=======
+import EmptyCart from '../universal/EmptyCart';
+>>>>>>> 2bb37b2a8a0e6556f73ca6123b7fc4da800437f8
 export default class Keranjang extends Component {
   constructor(props) {
     super(props);
@@ -167,7 +171,16 @@ export default class Keranjang extends Component {
                     cartData: data.data,
                   });
                 }
-
+                if (!data.data?.length) {
+                  return (
+                    <EmptyCart
+                      title="Keranjang Kosong"
+                      description="Cari barang di kolom pencarian untuk menambahkan barang ke keranjang anda."
+                      refreshButton
+                      onRefresh={refetch}
+                    />
+                  );
+                }
                 return (
                   <>
                     <FlatList
