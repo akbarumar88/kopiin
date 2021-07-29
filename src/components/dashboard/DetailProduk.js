@@ -216,7 +216,7 @@ export default class DetailProduk extends Component {
                 pb={4}
                 my={2}
                 alignItems="center">
-                <Image
+                <ImageLoad
                   alignSelf="center"
                   resizeMode="contain"
                   mt={2}
@@ -230,14 +230,9 @@ export default class DetailProduk extends Component {
                     },
                   ]}
                   alt={item.nama}
-                  source={{
-                    uri: item.foto_barang
-                      ? urlGambar +
-                        item.foto_barang +
-                        '?url=' +
-                        this.state.refresh
-                      : this.defaultProductAvatar,
-                  }}
+                  url={
+                    urlGambar + item.foto_barang + '?url=' + this.state.refresh
+                  }
                 />
                 <Text fontSize="sm" isTruncated>
                   {item.nama}

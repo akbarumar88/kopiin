@@ -25,6 +25,7 @@ import {toCurrency} from '../../utilitas/Function';
 import {TabView, TabBar, SceneMap} from 'react-native-tab-view';
 import FooterLoading from '../universal/FooterLoading';
 import EmptyCart from './../universal/EmptyCart';
+import ImageLoad from './../universal/ImageLoad';
 export default class DetailToko extends Component {
   constructor(props) {
     super(props);
@@ -128,7 +129,8 @@ export default class DetailToko extends Component {
                       px={4}
                       flexDirection="row"
                       alignItems="center">
-                      <Image
+                      <ImageLoad
+                        url={urlGambar + item.foto_barang}
                         alignSelf="center"
                         resizeMode="contain"
                         mt={2}
@@ -141,9 +143,6 @@ export default class DetailToko extends Component {
                             borderTopRightRadius: 10,
                           },
                         ]}
-                        source={{
-                          uri: urlGambar + item.foto_barang,
-                        }}
                         alt={item.nama}
                       />
                       <VStack ml={3}>
