@@ -182,6 +182,19 @@ export default class LaporanTransaksiUser extends React.Component {
     );
   };
 
+  selesaiOrder = id => {
+    this.dialog.show(
+      {message: 'Anda yakin untuk membatalkan pesanan ini ?'},
+      async () => {
+        Axios.put(`${BASE_URL()}/order/selesai/${id}`)
+          .then(({data}) => {
+            this.setState({refresh: new Date()});
+          })
+          .catch(e => {});
+      },
+    );
+  };
+
   getAksiOrder = (code, telp, id) => {
     return (
       <HStack mt={3} space={2} px={4}>
@@ -201,7 +214,7 @@ export default class LaporanTransaksiUser extends React.Component {
             size="sm"
             colorScheme="success"
             _text={{color: 'white'}}
-            onPress={() => {}}
+            onPress={() => this.selesaiOrder(id)}
             flex={1}>
             Selesai Pesanan
           </Button>
