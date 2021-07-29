@@ -29,7 +29,7 @@ import FooterLoading from './../universal/FooterLoading';
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import EmptyCart from './../universal/EmptyCart';
-import { getListStatus, getStatus } from '../../utilitas/Function';
+import {getListStatus, getStatus} from '../../utilitas/Function';
 import AlertYesNoV2 from '../universal/AlertYesNoV2';
 import Axios from 'axios';
 
@@ -458,7 +458,11 @@ export function SheetAksiOrder({telp}) {
             py={3}
             my={0}
             onPress={() => {
-              Linking.openURL('https://api.whatsapp.com/send?phone=' + telp);
+              let no =
+                telp.substring(0, 1) == '0'
+                  ? '+62' + telp.substring(1, telp.length)
+                  : telp;
+              Linking.openURL('https://api.whatsapp.com/send?phone=' + no);
               onClose();
             }}
             startIcon={
