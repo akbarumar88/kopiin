@@ -29,7 +29,7 @@ import FooterLoading from './../universal/FooterLoading';
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import EmptyCart from './../universal/EmptyCart';
-import { getListStatus } from '../../utilitas/Function';
+import { getListStatus, getStatus } from '../../utilitas/Function';
 import AlertYesNoV2 from '../universal/AlertYesNoV2';
 import Axios from 'axios';
 
@@ -169,37 +169,6 @@ export default class LaporanTransaksiUser extends React.Component {
     );
   }
 
-  getStatus = code => {
-    let statusOrder = '';
-    switch (code) {
-      case -1:
-        statusOrder = 'Pesanan Dibatalkan oleh User';
-        break;
-      case 1:
-        statusOrder = 'Menunggu Konfirmasi';
-        break;
-      case 2:
-        statusOrder = 'Pesanan Ditolak';
-        break;
-      case 3:
-        statusOrder = 'Pesanan Diterima';
-        break;
-      case 4:
-        statusOrder = 'Siap Diantar';
-        break;
-      case 5:
-        statusOrder = 'Sedang Diantar';
-        break;
-      case 6:
-        statusOrder = 'Sudah Diantar';
-        break;
-      case 7:
-        statusOrder = 'Pesanan Selesai';
-        break;
-    }
-    return statusOrder;
-  };
-
   batalOrder = id => {
     this.dialog.show(
       {message: 'Anda yakin untuk membatalkan pesanan ini ?'},
@@ -269,7 +238,7 @@ export default class LaporanTransaksiUser extends React.Component {
               </Text>
               <Text>{item.nama_toko}</Text>
               <Text fontSize="xs" color="grey">
-                {this.getStatus(item.status)}
+                {getStatus(item.status)}
               </Text>
             </VStack>
           </HStack>

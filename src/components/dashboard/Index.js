@@ -34,7 +34,7 @@ export default class Index extends Component {
     OneSignal.setAppId(ONESIGNAL_APPID);
     //END OneSignal Init Code
     OneSignal.getDeviceState().then(state => {
-      console.warn(state)
+      // console.warn(state)
       AsyncStorage.setItem('deviceid', state.userId)
     })
     //Prompt for push on iOS

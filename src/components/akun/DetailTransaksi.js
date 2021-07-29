@@ -30,43 +30,16 @@ import FooterLoading from '../universal/FooterLoading';
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import EmptyCart from './../universal/EmptyCart';
-import {errMsg, toCurrency} from '../../utilitas/Function';
+import {errMsg, getStatus, toCurrency} from '../../utilitas/Function';
 
 class HeaderTransaksi extends React.Component {
-  getStatus = code => {
-    let statusOrder = '';
-    switch (code) {
-      case 1:
-        statusOrder = 'Menunggu Konfirmasi';
-        break;
-      case 2:
-        statusOrder = 'Pesanan Ditolak';
-        break;
-      case 3:
-        statusOrder = 'Pesanan Diterima';
-        break;
-      case 4:
-        statusOrder = 'Siap Diantar';
-        break;
-      case 5:
-        statusOrder = 'Sedang Diantar';
-        break;
-      case 6:
-        statusOrder = 'Sudah Diantar';
-        break;
-      case 7:
-        statusOrder = 'Pesanan Selesai';
-        break;
-    }
-    return statusOrder;
-  };
   render() {
     const {data} = this.props;
     return (
       <Stack space={1} py={2}>
         <Text sub>Status</Text>
         <Text fontSize="sm" bold color="green">
-          {this.getStatus(data.status)}
+          {getStatus(data.status)}
         </Text>
         <Divider my={1} />
         <Text sub>Tanggal Pembelian</Text>

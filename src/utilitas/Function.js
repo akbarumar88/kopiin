@@ -43,3 +43,34 @@ export const getListStatus = [
   {id: 6, status: 'Sudah Diantar'},
   {id: 7, status: 'Pesanan Selesai'},
 ]
+
+export const getStatus = code => {
+  let statusOrder = '';
+  switch (code) {
+    case -1:
+      statusOrder = 'Pesanan Dibatalkan oleh User';
+      break;
+    case 1:
+      statusOrder = 'Menunggu Konfirmasi';
+      break;
+    case 2:
+      statusOrder = 'Pesanan Ditolak';
+      break;
+    case 3:
+      statusOrder = 'Pesanan Diterima';
+      break;
+    case 4:
+      statusOrder = 'Siap Diantar';
+      break;
+    case 5:
+      statusOrder = 'Sedang Diantar';
+      break;
+    case 6:
+      statusOrder = 'Sudah Diantar';
+      break;
+    case 7:
+      statusOrder = 'Pesanan Selesai';
+      break;
+  }
+  return statusOrder;
+};

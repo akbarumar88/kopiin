@@ -468,7 +468,7 @@ export default class HasilPencarian extends Component {
                 </Box>
               );
             }
-            if (!data.data.length) {
+            if (!data.data?.length) {
               return (
                 <EmptyCart
                   title="Data tidak ditemukan"

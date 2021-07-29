@@ -38,7 +38,7 @@ import EmptyCart from './../universal/EmptyCart';
 import axios from 'axios';
 import Modal from 'react-native-modal';
 import AlertYesNoV2 from '../universal/AlertYesNoV2';
-import { getListStatus } from '../../utilitas/Function';
+import { getListStatus, getStatus } from '../../utilitas/Function';
 import QueryString from 'qs';
 
 export default class LaporanTransaksiToko extends React.Component {
@@ -580,37 +580,6 @@ function SheetAksiOrder({telp}) {
 const ItemOrder = ({navigation, item, dialog, batal}) => {
   const [status, setStatus] = React.useState(item.status);
   const [loadingAksi, setLoadingAksi] = React.useState(false);
-  const getStatus = code => {
-    let statusOrder = '';
-
-    switch (code) {
-      case 1:
-        statusOrder = 'Menunggu Konfirmasi';
-        break;
-      case 2:
-        statusOrder = 'Pesanan Ditolak';
-        break;
-      case 3:
-        statusOrder = 'Pesanan Diterima';
-        break;
-      case 4:
-        statusOrder = 'Siap Diantar';
-        break;
-      case 5:
-        statusOrder = 'Sedang Diantar';
-        break;
-      case 6:
-        statusOrder = 'Sudah Diantar';
-        break;
-      case 7:
-        statusOrder = 'Pesanan Selesai';
-        break;
-      case -1:
-        statusOrder = 'Pesanan Dibatalkan';
-        break;
-    }
-    return statusOrder;
-  };
 
   const terimaOrder = () => {
     dialog.show(
