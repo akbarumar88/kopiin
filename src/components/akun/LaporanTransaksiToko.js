@@ -38,7 +38,7 @@ import EmptyCart from './../universal/EmptyCart';
 import axios from 'axios';
 import Modal from 'react-native-modal';
 import AlertYesNoV2 from '../universal/AlertYesNoV2';
-import { getListStatus } from '../../utilitas/Function';
+import {getListStatus} from '../../utilitas/Function';
 import QueryString from 'qs';
 
 export default class LaporanTransaksiToko extends React.Component {
@@ -291,6 +291,7 @@ export default class LaporanTransaksiToko extends React.Component {
                       <ItemOrder
                         batal={this.batalkanPesanan}
                         item={item}
+                        refetch={refetch}
                         dialog={this.dialog}
                         navigation={this.props.navigation}
                       />
@@ -577,7 +578,7 @@ function SheetAksiOrder({telp}) {
   );
 }
 
-const ItemOrder = ({navigation, item, dialog, batal}) => {
+const ItemOrder = ({navigation, item, dialog, batal, refetch}) => {
   const [status, setStatus] = React.useState(item.status);
   const [loadingAksi, setLoadingAksi] = React.useState(false);
   const getStatus = code => {
@@ -639,6 +640,7 @@ const ItemOrder = ({navigation, item, dialog, batal}) => {
           .put(`${BASE_URL()}/order/siapantar/${item.id}`)
           .then(({data}) => {
             setStatus(4);
+            refetch();
             setLoadingAksi(false);
           })
           .catch(e => {
@@ -649,16 +651,14 @@ const ItemOrder = ({navigation, item, dialog, batal}) => {
   };
 
   const simulasi = () => {
+    let statusSub = 'dropping_off';
     let statusPesanan = 'Sedang Diantar';
     let apiAksi = 'antar';
     switch (status) {
       case 5:
         statusPesanan = 'Sudah Diantar';
+        statusSub = 'delivered';
         apiAksi = 'sudahantar';
-        break;
-      case 6:
-        statusPesanan = 'Selesai';
-        apiAksi = 'selesai';
         break;
     }
 
@@ -669,7 +669,13 @@ const ItemOrder = ({navigation, item, dialog, batal}) => {
       async () => {
         setLoadingAksi(true);
         axios
-          .put(`${BASE_URL()}/order/${apiAksi}/${item.id}`)
+          .post(
+            `${BASE_URL()}/order/biteship`,
+            QueryString.stringify({
+              order_id: item.id_order_biteship,
+              status: statusSub,
+            }),
+          )
           .then(({data}) => {
             setStatus(status + 1);
             setLoadingAksi(false);
@@ -723,7 +729,7 @@ const ItemOrder = ({navigation, item, dialog, batal}) => {
             Siap Diantar
           </Button>
         )}
-        {code > 3 && code <= 6 && (
+        {code > 3 && code <= 5 && (
           <Button
             size="sm"
             isLoading={loadingAksi}
