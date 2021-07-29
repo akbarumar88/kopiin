@@ -38,13 +38,15 @@ export default class DetailProduk extends Component {
       loadingDialog: false,
       loadingWishlist: false,
       refresh: new Date(),
-      iduser: false,
+      iduser: 0,
+      merchant: 0,
     };
   }
 
   async componentDidMount() {
     let id = await AsyncStorage.getItem('id');
-    this.setState({iduser: id});
+    let merchant = await AsyncStorage.getItem('id_merchant');
+    this.setState({iduser: id, merchant: merchant});
   }
   saveWishList = state => {
     // console.warn(state)
@@ -73,7 +75,6 @@ export default class DetailProduk extends Component {
   };
 
   setWishlist = state => {
-    console.log('oke');
     this.props.navigation.setOptions({
       headerRight: () => (
         <Pressable
@@ -145,6 +146,7 @@ export default class DetailProduk extends Component {
             this.props.navigation.navigate('Login');
           },
         );
+        return;
       }
       let body = QueryString.stringify({
         id_user: id,
@@ -254,7 +256,7 @@ export default class DetailProduk extends Component {
         <AlertOkV2 ref={ref => (this.alert = ref)} />
         <Loading isVisible={loadingDialog} />
         <Box flex={1}>
-          {this.state.iduser && (
+          {true && (
             <Resource
               url={`${BASE_URL()}/barang/${this.props.route.params.idproduk}`}
               params={{iduser: this.state.iduser}}>
@@ -265,7 +267,12 @@ export default class DetailProduk extends Component {
 
                 if (this.state.dataProduk != data.data) {
                   this.setState({dataProduk: data.data});
-                  this.setWishlist(data.data?.wishlist == 0);
+                  if (
+                    this.state.iduser &&
+                    this.state.merchant != data.data?.id_merchant
+                  ) {
+                    this.setWishlist(data.data?.wishlist == 0);
+                  }
                 }
 
                 return (
@@ -393,17 +400,20 @@ export default class DetailProduk extends Component {
               }}
             </Resource>
           )}
-          <Box bg="white">
-            <Button
-              mx={3}
-              mb={3}
-              isLoading={this.state.loading}
-              isLoadingText="Proses"
-              onPress={() => this.tambahKeranjang()}
-              colorScheme="success">
-              Masukkan Keranjang
-            </Button>
-          </Box>
+          {this.state.merchant != this.state.dataProduk?.id_merchant &&
+            this.state.dataProduk?.id_merchant && (
+              <Box bg="white">
+                <Button
+                  mx={3}
+                  mb={3}
+                  isLoading={this.state.loading}
+                  isLoadingText="Proses"
+                  onPress={() => this.tambahKeranjang()}
+                  colorScheme="success">
+                  Masukkan Keranjang
+                </Button>
+              </Box>
+            )}
         </Box>
       </NativeBaseProvider>
     );

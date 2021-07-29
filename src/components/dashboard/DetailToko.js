@@ -163,7 +163,7 @@ export default class DetailToko extends Component {
                             {' | '} Terjual {item.terjual}
                           </Text>
                         </HStack>
-                        <Text fontSize="xs" bold color="grey">
+                        <Text fontSize="xs" is isTruncated bold color="grey">
                           {item.deskripsi}
                         </Text>
                         <Text fontSize="xs" color="grey">
