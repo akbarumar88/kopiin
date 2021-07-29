@@ -26,6 +26,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import AlertYesNoV2 from './../universal/AlertYesNoV2';
 import ItemKeranjang from '../keranjang/ItemKeranjang';
 import AlertOkV2 from '../universal/AlertOkV2';
+import EmptyCart from './../universal/EmptyCart';
 export default class Keranjang extends Component {
   constructor(props) {
     super(props);
@@ -33,7 +34,7 @@ export default class Keranjang extends Component {
       cartData: [],
       changedData: false,
       refresh: false,
-      iduser: '0',
+      iduser: '',
       paramrefresh: new Date(),
       savedNumber: 0,
     };
@@ -64,7 +65,7 @@ export default class Keranjang extends Component {
   }
 
   getCountOrder = () =>
-    this.state.cartData.reduce((total, item) => {
+    this.state.cartData?.reduce((total, item) => {
       if (!item.selected) {
         return total + 0;
       }
@@ -72,13 +73,13 @@ export default class Keranjang extends Component {
     }, 0);
 
   getTotalDetailSelected = () =>
-    this.state.cartData.reduce((total, item) => {
+    this.state.cartData?.reduce((total, item) => {
       if (!item.selected) {
         return total + 0;
       }
       return (
         total +
-        item.orderdetail.reduce(
+        item.orderdetail?.reduce(
           (sub, item) => sub + parseInt(item.harga) * parseInt(item.jumlah),
           0,
         ) +
@@ -97,7 +98,7 @@ export default class Keranjang extends Component {
         value="success"
         aria-label="t1"
         isChecked={
-          cartData.reduce((check, item) => {
+          cartData?.reduce((check, item) => {
             if (item.selected) {
               check += 1;
             }
@@ -127,7 +128,7 @@ export default class Keranjang extends Component {
         <AlertYesNoV2 ref={ref => (this.alert = ref)} />
         <AlertOkV2 ref={ref => (this.alertOk = ref)} />
         <Box bg="white" flex={1} pb={0}>
-          {
+          {iduser && (
             <Resource
               url={`${BASE_URL()}/orderdetail/user/${iduser}`}
               params={this.state.paramrefresh}>
@@ -141,6 +142,22 @@ export default class Keranjang extends Component {
               }) => {
                 const {cartData, refresh} = this.state;
 
+                if (!data.data?.length && !loading) {
+                  return (
+                    <EmptyCart
+                      title="Keranjang Kosong"
+                      description="Data tidak ditemukan, Coba Masukkan produk ke dalam keranjang"
+                      icon={
+                        <Icon
+                          as={MaterialCommunityIcons}
+                          name="cart"
+                          size="lg"
+                          color="#555"
+                        />
+                      }
+                    />
+                  );
+                }
                 if (
                   JSON.stringify(cartData) != JSON.stringify(data.data) &&
                   !loading
@@ -150,6 +167,7 @@ export default class Keranjang extends Component {
                     cartData: data.data,
                   });
                 }
+
                 return (
                   <>
                     <FlatList
@@ -164,7 +182,9 @@ export default class Keranjang extends Component {
                           }}
                         />
                       }
-                      ListHeaderComponent={() => this.header()}
+                      ListHeaderComponent={() =>
+                        data.data?.length > 0 ? this.header() : <></>
+                      }
                       px={4}
                       flex={1}
                       data={loading ? [] : data.data}
@@ -184,33 +204,35 @@ export default class Keranjang extends Component {
                         );
                       }}
                     />
-                    <Pressable
-                      roundedTop={8}
-                      bg="orange.500"
-                      _pressed={{backgroundColor: 'orange.600'}}
-                      p={4}
-                      onPress={() => {
-                        this.validate(data.data);
-                      }}
-                      disabled={!data?.data?.length}>
-                      <HStack space={2}>
-                        <Text bold rounded={4} px={2} bg="white">
-                          {this.getCountOrder()}
-                        </Text>
+                    {data.data?.length > 0 && (
+                      <Pressable
+                        roundedTop={8}
+                        bg="orange.500"
+                        _pressed={{backgroundColor: 'orange.600'}}
+                        p={4}
+                        onPress={() => {
+                          this.validate(data.data);
+                        }}
+                        disabled={!data?.data?.length}>
+                        <HStack space={2}>
+                          <Text bold rounded={4} px={2} bg="white">
+                            {this.getCountOrder()}
+                          </Text>
 
-                        <Text color="white" bold flex={1}>
-                          BAYAR
-                        </Text>
-                        <Text color="white" bold>
-                          {toCurrency(this.getTotalDetailSelected())}
-                        </Text>
-                      </HStack>
-                    </Pressable>
+                          <Text color="white" bold flex={1}>
+                            BAYAR
+                          </Text>
+                          <Text color="white" bold>
+                            {toCurrency(this.getTotalDetailSelected())}
+                          </Text>
+                        </HStack>
+                      </Pressable>
+                    )}
                   </>
                 );
               }}
             </Resource>
-          }
+          )}
         </Box>
       </NativeBaseProvider>
     );

@@ -24,6 +24,7 @@ import {BASE_URL, theme} from '../../utilitas/Config';
 import {toCurrency} from '../../utilitas/Function';
 import {TabView, TabBar, SceneMap} from 'react-native-tab-view';
 import FooterLoading from '../universal/FooterLoading';
+import EmptyCart from './../universal/EmptyCart';
 export default class DetailToko extends Component {
   constructor(props) {
     super(props);
@@ -81,8 +82,22 @@ export default class DetailToko extends Component {
           }>
           {({loading, error, payload: data, refetch}) => {
             if (loading) {
+              return <FooterLoading full />;
+            }
+            if (!data.data?.length) {
               return (
-                <FooterLoading full />
+                <EmptyCart
+                  title="Data tidak ditemukan"
+                  description="Data yang anda cari tidak ditemukan, Coba cari kata kunci yang lain."
+                  icon={
+                    <Icon
+                      as={MaterialCommunityIcons}
+                      name="file-search"
+                      size="lg"
+                      color="#555"
+                    />
+                  }
+                />
               );
             }
 
@@ -200,9 +215,7 @@ export default class DetailToko extends Component {
             url={`${BASE_URL()}/shop/${this.props.route.params.idtoko}`}>
             {({loading, error, payload: data, refetch}) => {
               if (loading) {
-                return (
-                  <FooterLoading full />
-                );
+                return <FooterLoading full />;
               } else {
               }
 
