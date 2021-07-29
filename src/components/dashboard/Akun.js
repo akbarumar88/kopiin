@@ -26,18 +26,42 @@ import AlertYesNoV2 from '../universal/AlertYesNoV2';
 import AsyncStorage from '@react-native-community/async-storage';
 import QueryString from 'qs';
 import axios from 'axios';
+import {toCurrency} from '../../utilitas/Function';
 
 export default class Akun extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       id_merchant: null,
+      id: null,
+      saldoMerchant: 0,
+      saldoUser: 0,
     };
+  }
+
+  async saldoSemua() {
+    try {
+      const {data: saldouser} = await axios.get(
+        `${BASE_URL()}/jurnal/saldo/user/${this.state.id}`,
+      );
+      const {data: saldoMerchant} = await axios.get(
+        `${BASE_URL()}/jurnal/saldo/user/${this.state.id_merchant}`,
+      );
+      this.setState({
+        saldoUser: saldouser.data.saldo,
+        saldoMerchant: saldoMerchant.data.saldo,
+      });
+      console.log(saldouser);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async cekToko() {
     let id_merchant = await AsyncStorage.getItem('id_merchant');
-    this.setState({id_merchant: id_merchant});
+    let id = await AsyncStorage.getItem('id');
+    this.setState({id_merchant: id_merchant, id: id});
+    this.saldoSemua();
   }
 
   componentDidMount() {
@@ -79,9 +103,10 @@ export default class Akun extends React.Component {
   }
 
   userView = () => {
-    const {id_merchant} = this.state;
+    const {id_merchant, saldoUser} = this.state;
     return (
       <Box>
+        <Text bold>Saldo Anda : {toCurrency(saldoUser)}</Text>
         <Pressable
           paddingY={2}
           onPress={() => this.profil()}
@@ -132,6 +157,8 @@ export default class Akun extends React.Component {
   merchantView = () => {
     return (
       <Box>
+        <Text bold>Saldo Anda : {toCurrency(this.state.saldoMerchant)}</Text>
+
         <Pressable
           paddingY={2}
           onPress={() => this.bukaToko()}
