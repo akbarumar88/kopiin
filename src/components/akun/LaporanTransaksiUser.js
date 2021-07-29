@@ -29,6 +29,7 @@ import FooterLoading from './../universal/FooterLoading';
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import EmptyCart from './../universal/EmptyCart';
+import AlertYesNoV2 from '../universal/AlertYesNoV2';
 
 export default class LaporanTransaksiUser extends React.Component {
   constructor(props) {
@@ -46,6 +47,7 @@ export default class LaporanTransaksiUser extends React.Component {
       initialLoading: true,
       limit: 10,
       statusorder: '',
+      refresh: new Date(),
     };
   }
 
@@ -74,6 +76,7 @@ export default class LaporanTransaksiUser extends React.Component {
     } = this.state;
     return (
       <NativeBaseProvider>
+        <AlertYesNoV2 ref={ref => (this.dialog = ref)} />
         <Box bg="white" flex={1} pt={2}>
           <FilterTransaksi filter={this.setFilterStatus} />
           {this.searchBox()}
@@ -167,6 +170,10 @@ export default class LaporanTransaksiUser extends React.Component {
   getStatus = code => {
     let statusOrder = '';
     switch (code) {
+      case -1:
+        statusOrder = 'Pesanan dibatalkan';
+        break;
+
       case 1:
         statusOrder = 'Menunggu Konfirmasi';
         break;
@@ -192,7 +199,22 @@ export default class LaporanTransaksiUser extends React.Component {
     return statusOrder;
   };
 
-  getAksiOrder = (code, telp) => {
+  batalOrder = id => {
+    this.dialog.show(
+      {message: 'Anda yakin untuk membatalkan pesanan ini ?'},
+      async () => {
+        setLoadingAksi(true);
+        axios
+          .put(`${BASE_URL()}/order/batalkan/${id}`)
+          .then(({data}) => {
+            this.setState({refresh: new Date()});
+          })
+          .catch(e => {});
+      },
+    );
+  };
+
+  getAksiOrder = (code, telp, id) => {
     return (
       <HStack mt={3} space={2} px={4}>
         <SheetAksiOrder telp={telp} />
@@ -201,7 +223,7 @@ export default class LaporanTransaksiUser extends React.Component {
             size="sm"
             colorScheme="danger"
             _text={{color: 'white'}}
-            onPress={() => {}}
+            onPress={() => this.batalOrder(id)}
             flex={1}>
             Batalkan Pesanan
           </Button>
@@ -356,6 +378,7 @@ export function FilterTransaksi({filter}) {
   const [filterStatus, setFilterStatus] = React.useState('');
   const [buttonSelected, setButtonSelected] = React.useState([]);
   const [status, setState] = React.useState([
+    {id: -1, status: 'Pesanan dibatalkan'},
     {id: 1, status: 'Menunggu Konfirmasi'},
     {id: 2, status: 'Pesanan Ditolak'},
     {id: 3, status: 'Pesanan Diterima'},
