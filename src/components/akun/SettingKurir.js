@@ -81,8 +81,10 @@ class DaftarKurir extends React.Component {
                 alignItems="flex-start"
                 px={2}
                 data={item.data}
+                keyExtractor={item => item.kodekurir}
                 renderItem={({item}) => (
                   <Checkbox
+                    aria-label={item.kodekurir}
                     onChange={value => {
                       if (value) {
                         kurir.push(item.kodekurir);
@@ -183,6 +185,7 @@ export default class SettingKurir extends React.Component {
                 return (
                   <FlatList
                     flex={1}
+                    keyExtractor={item => item}
                     refreshing={false}
                     onRefresh={() => {
                       refetch();

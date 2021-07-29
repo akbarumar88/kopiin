@@ -70,8 +70,8 @@ class App extends Component {
     OneSignal.setAppId(ONESIGNAL_APPID);
     //END OneSignal Init Code
     OneSignal.getDeviceState().then(state => {
-      console.warn(state)
-    })
+      console.warn(state);
+    });
     //Prompt for push on iOS
     OneSignal.promptForPushNotificationsWithUserResponse(response => {
       console.log('Prompt response:', response);
@@ -178,7 +178,11 @@ class App extends Component {
             <Stack.Screen name="Alamat" component={Alamat} />
             <Stack.Screen name="Posting" component={Posting} />
 
-            <Stack.Screen name="PilihAlamat" component={PilihAlamat} />
+            <Stack.Screen
+              name="PilihAlamat"
+              options={{title: 'Pilih Alamat'}}
+              component={PilihAlamat}
+            />
             <Stack.Screen name="Wishlist" component={Wishlist} />
             <Stack.Screen
               name="LaporanTransaksiUser"
