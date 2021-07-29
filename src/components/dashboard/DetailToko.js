@@ -151,14 +151,14 @@ export default class DetailToko extends Component {
                         </Text>
 
                         <HStack my={1} alignItems="center">
-                          <Text fontSize="xs" flex={1} isTruncated>
+                          <Text fontSize="xs" isTruncated>
                             {item.rating}
-                            <Icon
-                              color="orange"
-                              size="xs"
-                              as={<MaterialCommunityIcons name="star" />}
-                            />
                           </Text>
+                          <Icon
+                            color="orange"
+                            size="xs"
+                            as={<MaterialCommunityIcons name="star" />}
+                          />
                           <Text color="grey" fontSize="xs" isTruncated>
                             {' | '} Terjual {item.terjual}
                           </Text>

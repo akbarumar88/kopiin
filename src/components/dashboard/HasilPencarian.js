@@ -552,6 +552,9 @@ export default class HasilPencarian extends Component {
                           <Text fontSize="xs" isTruncated mx={1} color="grey">
                             Rp.{toCurrency(item.harga)}
                           </Text>
+                          <Text fontSize="xs" isTruncated mx={1}>
+                            {item.kota}
+                          </Text>
                         </Box>
                       </Box>
                     </Pressable>
@@ -669,7 +672,7 @@ export default class HasilPencarian extends Component {
                         borderRadius={8}
                         shadow={3}
                         px={2}
-                        py={2}
+                        py={1}
                         my={1}>
                         <HStack space={1}>
                           <ImageLoad
@@ -685,7 +688,7 @@ export default class HasilPencarian extends Component {
                             }
                             alt={item.nama_toko}
                           />
-                          <VStack py={1} justifyContent="center">
+                          <VStack flex={1} py={1} justifyContent="center">
                             <Text fontSize="sm" isTruncated mx={2}>
                               {item.nama_toko}
                             </Text>

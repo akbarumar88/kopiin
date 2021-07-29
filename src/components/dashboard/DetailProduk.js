@@ -219,16 +219,9 @@ export default class DetailProduk extends Component {
                 <ImageLoad
                   alignSelf="center"
                   resizeMode="contain"
-                  mt={2}
-                  mb={2}
+                  m={2}
                   onError={() => {}}
-                  style={[
-                    {width: imgWidth, height: imgWidth},
-                    {
-                      borderTopLeftRadius: 10,
-                      borderTopRightRadius: 10,
-                    },
-                  ]}
+                  style={[{width: imgWidth, height: imgWidth}]}
                   alt={item.nama}
                   url={
                     urlGambar + item.foto_barang + '?url=' + this.state.refresh

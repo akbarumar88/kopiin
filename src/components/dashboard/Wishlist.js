@@ -9,7 +9,7 @@ import {
   Input,
   Icon,
   Pressable,
-  Spinner,
+  HStack,
   Tabs,
   Text,
   FlatList,
@@ -57,7 +57,7 @@ export default class Wishlist extends Component {
     const {pencarian, limit} = this.state;
     const urlGambar = `${BASE_URL()}/image/barang/`;
 
-    const imgWidth = (Dimensions.get('screen').width * 0.5) / 2;
+    const imgWidth = (Dimensions.get('screen').width * 0.85) / 2;
     return (
       <Resource
         url={`${BASE_URL()}/wishlist/3`}
@@ -128,22 +128,38 @@ export default class Wishlist extends Component {
                       mt={2}
                       mb={2}
                       onError={() => {}}
-                      style={[
-                        {width: imgWidth, height: imgWidth},
-                        {
-                          borderTopLeftRadius: 10,
-                          borderTopRightRadius: 10,
-                        },
-                      ]}
+                      style={[{width: imgWidth, height: imgWidth}]}
                       url={urlGambar + item.foto_barang + '?' + new Date()}
                       alt={item.nama}
                     />
-                    <Text fontSize="sm" isTruncated>
-                      {item.nama}
-                    </Text>
-                    <Text fontSize="xs" color="grey">
-                      Rp.{toCurrency(item.harga)}
-                    </Text>
+                    <Box flex={1} px={2}>
+                      <Text textAlign="left" fontSize="sm" isTruncated mx={1}>
+                        {item.nama}
+                      </Text>
+
+                      <Text fontSize="xs" isTruncated mx={1} bold color="grey">
+                        {item.deskripsi}
+                      </Text>
+                      <HStack px={1} alignItems="center">
+                        <Text fontSize="xs" isTruncated>
+                          {item.rating}
+                        </Text>
+                        <Icon
+                          color="orange"
+                          size="xs"
+                          as={<MaterialCommunityIcons name="star" />}
+                        />
+                        <Text color="grey" fontSize="xs" isTruncated>
+                          {' | '} Terjual {item.terjual}
+                        </Text>
+                      </HStack>
+                      <Text fontSize="xs" isTruncated mx={1} color="grey">
+                        Rp.{toCurrency(item.harga)}
+                      </Text>
+                      <Text fontSize="xs" isTruncated mx={1}>
+                        {item.kota}
+                      </Text>
+                    </Box>
                   </Box>
                 </Pressable>
               )}
