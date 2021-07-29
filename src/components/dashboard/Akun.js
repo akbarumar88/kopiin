@@ -137,7 +137,13 @@ export default class Akun extends React.Component {
           <Text bold>Profil Toko</Text>
           <Text fontSize="sm">Jenis Toko, Alamat, dan Foto Profil</Text>
         </Pressable>
-
+        <Pressable
+          paddingY={2}
+          onPress={() => this.settingKurir()}
+          borderBottomWidth={0.5}>
+          <Text bold>Setting Kurir</Text>
+          <Text fontSize="sm">Atur Kurir yang tersedia untuk toko</Text>
+        </Pressable>
         <Pressable
           paddingY={2}
           onPress={() => this.myListProduk()}
@@ -194,6 +200,10 @@ export default class Akun extends React.Component {
 
   bukaToko = () => {
     this.props.navigation.navigate('Shop');
+  };
+
+  settingKurir = () => {
+    this.props.navigation.navigate('SettingKurir');
   };
 
   myListProduk = () => {

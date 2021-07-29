@@ -45,6 +45,8 @@ import LaporanTransaksiToko from './src/components/akun/LaporanTransaksiToko';
 import OneSignal from 'react-native-onesignal';
 import {ONESIGNAL_APPID} from './src/utilitas/Config';
 
+import DetailTransaksi from './src/components/akun/DetailTransaksi';
+import SettingKurir from './src/components/akun/SettingKurir';
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
 
@@ -188,7 +190,16 @@ class App extends Component {
               options={{title: 'Laporan Transaksi'}}
               component={LaporanTransaksiToko}
             />
-            {/* <Stack.Screen name="PembayaranStack" component={PembayaranStack} /> */}
+            <Stack.Screen
+              name="DetailTransaksi"
+              options={{title: 'Laporan Transaksi'}}
+              component={DetailTransaksi}
+            />
+            <Stack.Screen
+              options={{title: 'Setting Kurir'}}
+              name="SettingKurir"
+              component={SettingKurir}
+            />
             <Stack.Screen
               name="MetodePembayaran"
               component={MetodePembayaran}

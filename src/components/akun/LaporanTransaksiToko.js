@@ -20,7 +20,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ImageLoad from '../universal/ImageLoad';
-import {Dimensions, Linking} from 'react-native';
+import {Dimensions, Linking, Pressable} from 'react-native';
 import Resource from '../universal/Resource';
 import AsyncStorage from '@react-native-community/async-storage';
 import {BASE_URL} from '../../utilitas/Config';
@@ -28,6 +28,9 @@ import FooterLoading from '../universal/FooterLoading';
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import EmptyCart from './../universal/EmptyCart';
+import axios from 'axios';
+import {Modal} from 'react-native-modal';
+import AlertYesNoV2 from '../universal/AlertYesNoV2';
 
 export default class LaporanTransaksiToko extends React.Component {
   constructor(props) {
@@ -73,6 +76,7 @@ export default class LaporanTransaksiToko extends React.Component {
     } = this.state;
     return (
       <NativeBaseProvider>
+        <AlertYesNoV2 ref={ref => (this.dialog = ref)} />
         <Box bg="white" flex={1} pt={2}>
           <FilterTransaksi filter={this.setFilterStatus} />
           {this.searchBox()}
@@ -126,7 +130,13 @@ export default class LaporanTransaksiToko extends React.Component {
                       this.setState({hasMoreOrder: true});
                       refetch();
                     }}
-                    renderItem={({item}) => this.itemOrder(item)}
+                    renderItem={({item}) => (
+                      <ItemOrder
+                        item={item}
+                        dialog={this.dialog}
+                        navigation={this.props.navigation}
+                      />
+                    )}
                     onContentSizeChange={() => {
                       if (data.data.length == 0) {
                         this.setState({hasMoreOrder: false});
@@ -162,104 +172,6 @@ export default class LaporanTransaksiToko extends React.Component {
       </NativeBaseProvider>
     );
   }
-
-  getStatus = code => {
-    let statusOrder = '';
-    switch (code) {
-      case 1:
-        statusOrder = 'Menunggu Konfirmasi';
-        break;
-      case 2:
-        statusOrder = 'Pesanan Ditolak';
-        break;
-      case 3:
-        statusOrder = 'Pesanan Diterima';
-        break;
-      case 4:
-        statusOrder = 'Siap Diantar';
-        break;
-      case 5:
-        statusOrder = 'Sedang Diantar';
-        break;
-      case 6:
-        statusOrder = 'Sudah Diantar';
-        break;
-      case 7:
-        statusOrder = 'Pesanan Selesai';
-        break;
-    }
-    return statusOrder;
-  };
-
-  getAksiOrder = (code, telp) => {
-    return (
-      <VStack mt={3} space={1} px={4}>
-        <SheetAksiOrder telp={telp} />
-        {code == 1 && (
-          <HStack space={2}>
-            <Button
-              size="sm"
-              colorScheme="success"
-              _text={{color: 'white'}}
-              onPress={() => {}}
-              flex={1}>
-              Terima Pesanan
-            </Button>
-            <Button
-              size="sm"
-              colorScheme="danger"
-              _text={{color: 'white'}}
-              onPress={() => {}}
-              flex={1}>
-              Tolak Pesanan
-            </Button>
-          </HStack>
-        )}
-        {code == 3 && (
-          <Button
-            size="sm"
-            colorScheme="success"
-            _text={{color: 'white'}}
-            onPress={() => {}}
-            flex={1}>
-            Siap Diantar
-          </Button>
-        )}
-      </VStack>
-    );
-  };
-
-  itemOrder = item => {
-    const widthImage = 0.15 * Dimensions.get('window').width;
-    const image = BASE_URL() + '/image/user/' + item.foto_user;
-    return (
-      <Box py={2} mt={4}>
-        <HStack space={3}>
-          <ImageLoad
-            round={widthImage / 4}
-            url={image}
-            w={widthImage}
-            h={widthImage}
-            mx={3}
-          />
-          <VStack>
-            <Text fontSize="xs" color="#0000FF">
-              {item.no_faktur}
-            </Text>
-            <Text fontSize="xs" color="grey">
-              {moment(item.tgl_order).format('DD MMMM yyyy')}
-            </Text>
-            <Text>{item.nama_lengkap}</Text>
-            <Text fontSize="xs" color="grey">
-              {this.getStatus(item.status)}
-            </Text>
-          </VStack>
-        </HStack>
-        {this.getAksiOrder(item.status, item.no_telp)}
-        <Divider my={2} />
-      </Box>
-    );
-  };
 
   dateBox = () => {
     const {tglAkhir, tglAwal, showAwal, showAkhir} = this.state;
@@ -352,7 +264,7 @@ export default class LaporanTransaksiToko extends React.Component {
   };
 }
 
-export function FilterTransaksi({filter}) {
+function FilterTransaksi({filter}) {
   const {isOpen, onOpen, onClose} = useDisclose();
 
   const [filterStatus, setFilterStatus] = React.useState('');
@@ -442,7 +354,7 @@ export function FilterTransaksi({filter}) {
   );
 }
 
-export function SheetAksiOrder({telp}) {
+function SheetAksiOrder({telp}) {
   const {isOpen, onOpen, onClose} = useDisclose();
 
   return (
@@ -514,3 +426,201 @@ export function SheetAksiOrder({telp}) {
     </>
   );
 }
+
+const ItemOrder = ({navigation, item, dialog}) => {
+  const [status, setStatus] = React.useState(item.status);
+  const [loadingAksi, setLoadingAksi] = React.useState(false);
+  const getStatus = code => {
+    let statusOrder = '';
+    switch (code) {
+      case 1:
+        statusOrder = 'Menunggu Konfirmasi';
+        break;
+      case 2:
+        statusOrder = 'Pesanan Ditolak';
+        break;
+      case 3:
+        statusOrder = 'Pesanan Diterima';
+        break;
+      case 4:
+        statusOrder = 'Siap Diantar';
+        break;
+      case 5:
+        statusOrder = 'Sedang Diantar';
+        break;
+      case 6:
+        statusOrder = 'Sudah Diantar';
+        break;
+      case 7:
+        statusOrder = 'Pesanan Selesai';
+        break;
+    }
+    return statusOrder;
+  };
+
+  const terimaOrder = () => {
+    dialog.show(
+      {message: 'Anda yakin ingin menerima pesanan ini ?'},
+      async () => {
+        setLoadingAksi(true);
+        axios
+          .put(`${BASE_URL()}/order/terima/${item.id}`)
+          .then(({data}) => {
+            setStatus(3);
+            setLoadingAksi(false);
+          })
+          .catch(e => {
+            setLoadingAksi(false);
+          });
+      },
+    );
+  };
+
+  const siapAntarOrder = () => {
+    dialog.show(
+      {message: 'Anda yakin ingin siap mengantar pesanan ini ?'},
+      async () => {
+        setLoadingAksi(true);
+        axios
+          .put(`${BASE_URL()}/order/siapantar/${item.id}`)
+          .then(({data}) => {
+            setStatus(4);
+            setLoadingAksi(false);
+          })
+          .catch(e => {
+            setLoadingAksi(false);
+          });
+      },
+    );
+  };
+
+  const simulasi = () => {
+    let statusPesanan = 'Sedang Diantar';
+    let apiAksi = 'antar';
+    switch (status) {
+      case 5:
+        statusPesanan = 'Sudah Diantar';
+        apiAksi = 'sudahantar';
+        break;
+      case 6:
+        statusPesanan = 'Selesai';
+        apiAksi = 'selesai';
+        break;
+    }
+
+    dialog.show(
+      {
+        message: `Anda yakin ingin merubah status pesanan ini menjadi ${statusPesanan} (Simulasi) ?`,
+      },
+      async () => {
+        setLoadingAksi(true);
+        axios
+          .put(`${BASE_URL()}/order/${apiAksi}/${item.id}`)
+          .then(({data}) => {
+            setStatus(status + 1);
+            setLoadingAksi(false);
+          })
+          .catch(e => {
+            setLoadingAksi(false);
+          });
+      },
+    );
+  };
+
+  const getAksiOrder = (code, telp) => {
+    return (
+      <VStack mt={3} space={1} px={4}>
+        <SheetAksiOrder telp={telp} />
+        {code == 1 && (
+          <HStack space={2}>
+            <Button
+              size="sm"
+              isLoading={loadingAksi}
+              isLoadingText="Loading..."
+              colorScheme="success"
+              _text={{color: 'white'}}
+              onPress={() => terimaOrder()}
+              flex={1}>
+              Terima Pesanan
+            </Button>
+            <Button
+              size="sm"
+              isLoading={loadingAksi}
+              isLoadingText="Loading..."
+              colorScheme="danger"
+              _text={{color: 'white'}}
+              onPress={() => {}}
+              flex={1}>
+              Tolak Pesanan
+            </Button>
+          </HStack>
+        )}
+        {code == 3 && (
+          <Button
+            size="sm"
+            isLoading={loadingAksi}
+            isLoadingText="Loading..."
+            colorScheme="success"
+            _text={{color: 'white'}}
+            onPress={() => {
+              siapAntarOrder();
+            }}
+            flex={1}>
+            Siap Diantar
+          </Button>
+        )}
+        {code > 3 && code <= 6 && (
+          <Button
+            size="sm"
+            isLoading={loadingAksi}
+            isLoadingText="Loading..."
+            colorScheme="success"
+            _text={{color: 'white'}}
+            onPress={() => {
+              simulasi();
+            }}
+            flex={1}>
+            {'Ubah ' + getStatus(status + 1)}
+          </Button>
+        )}
+      </VStack>
+    );
+  };
+  const widthImage = 0.15 * Dimensions.get('window').width;
+  const image = BASE_URL() + '/image/user/' + item.foto_user;
+  return (
+    <Pressable
+      flex={1}
+      onPress={() =>
+        navigation.navigate('DetailTransaksi', {
+          idorder: item.id,
+        })
+      }>
+      <Box py={2} mt={4}>
+        <HStack space={3}>
+          <ImageLoad
+            round={widthImage / 4}
+            url={image}
+            w={widthImage}
+            h={widthImage}
+            mx={3}
+          />
+          <VStack flex={1}>
+            <Text fontSize="xs" color="#0000FF">
+              {item.no_faktur}
+            </Text>
+            <Text fontSize="xs" color="grey">
+              {moment(item.tgl_order).format('DD MMMM yyyy')}
+            </Text>
+            <Text flex={1}>{item.nama_lengkap}</Text>
+            <Text fontSize="xs" color="grey">
+              {getStatus(status)}
+            </Text>
+          </VStack>
+        </HStack>
+        {getAksiOrder(status, item.no_telp)}
+        <Divider my={2} />
+      </Box>
+    </Pressable>
+  );
+};

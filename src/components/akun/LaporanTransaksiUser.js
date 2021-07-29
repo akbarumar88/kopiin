@@ -13,6 +13,7 @@ import {
   Actionsheet,
   Fab,
   Divider,
+  Pressable,
 } from 'native-base';
 
 import * as React from 'react';
@@ -223,31 +224,38 @@ export default class LaporanTransaksiUser extends React.Component {
     const widthImage = 0.15 * Dimensions.get('window').width;
     const image = BASE_URL() + '/image/merchant/' + item.foto_merchant;
     return (
-      <Box py={2} mt={4}>
-        <HStack space={3}>
-          <ImageLoad
-            round={widthImage / 4}
-            url={image}
-            w={widthImage}
-            h={widthImage}
-            mx={3}
-          />
-          <VStack>
-            <Text fontSize="sm" color="#0000FF">
-              {item.no_faktur}
-            </Text>
-            <Text fontSize="xs" color="grey">
-              {moment(item.tgl_order).format('DD MMMM yyyy')}
-            </Text>
-            <Text>{item.nama_toko}</Text>
-            <Text fontSize="xs" color="grey">
-              {this.getStatus(item.status)}
-            </Text>
-          </VStack>
-        </HStack>
-        {this.getAksiOrder(item.status, item.no_telp)}
-        <Divider my={2} />
-      </Box>
+      <Pressable
+        onPress={() =>
+          this.props.navigation.navigate('DetailTransaksi', {
+            idorder: item.id,
+          })
+        }>
+        <Box py={2} mt={4}>
+          <HStack space={3}>
+            <ImageLoad
+              round={widthImage / 4}
+              url={image}
+              w={widthImage}
+              h={widthImage}
+              mx={3}
+            />
+            <VStack>
+              <Text fontSize="xs" color="#0000FF">
+                {item.no_faktur}
+              </Text>
+              <Text fontSize="xs" color="grey">
+                {moment(item.tgl_order).format('DD MMMM yyyy')}
+              </Text>
+              <Text>{item.nama_toko}</Text>
+              <Text fontSize="xs" color="grey">
+                {this.getStatus(item.status)}
+              </Text>
+            </VStack>
+          </HStack>
+          {this.getAksiOrder(item.status, item.no_telp)}
+          <Divider my={2} />
+        </Box>
+      </Pressable>
     );
   };
 
