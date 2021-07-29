@@ -233,7 +233,7 @@ export default class LaporanTransaksiUser extends React.Component {
             mx={3}
           />
           <VStack>
-            <Text fontSize="xs" color="#0000FF">
+            <Text fontSize="sm" color="#0000FF">
               {item.no_faktur}
             </Text>
             <Text fontSize="xs" color="grey">

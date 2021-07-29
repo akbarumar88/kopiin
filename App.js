@@ -42,6 +42,9 @@ import MetodePembayaran from './src/components/pembayaran/MetodePembayaran';
 import KonfirmasiPembayaranEwallet from './src/components/pembayaran/KonfirmasiPembayaranEwallet';
 import LaporanTransaksiUser from './src/components/akun/LaporanTransaksiUser';
 import LaporanTransaksiToko from './src/components/akun/LaporanTransaksiToko';
+import OneSignal from 'react-native-onesignal';
+import {ONESIGNAL_APPID} from './src/utilitas/Config';
+
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
 
@@ -59,6 +62,39 @@ class App extends Component {
     setTimeout(() => {
       this.setState({loading: false});
     }, 1000);
+
+    //OneSignal Init Code
+    OneSignal.setLogLevel(6, 0);
+    OneSignal.setAppId(ONESIGNAL_APPID);
+    //END OneSignal Init Code
+    OneSignal.getDeviceState().then(state => {
+      console.warn(state)
+    })
+    //Prompt for push on iOS
+    OneSignal.promptForPushNotificationsWithUserResponse(response => {
+      console.log('Prompt response:', response);
+    });
+
+    //Method for handling notifications received while app in foreground
+    OneSignal.setNotificationWillShowInForegroundHandler(
+      notificationReceivedEvent => {
+        console.log(
+          'OneSignal: notification will show in foreground:',
+          notificationReceivedEvent,
+        );
+        let notification = notificationReceivedEvent.getNotification();
+        console.log('notification: ', notification);
+        const data = notification.additionalData;
+        console.log('additionalData: ', data);
+        // Complete with null means don't show a notification.
+        notificationReceivedEvent.complete(notification);
+      },
+    );
+
+    //Method for handling notifications opened
+    OneSignal.setNotificationOpenedHandler(notification => {
+      console.log('OneSignal: notification opened:', notification);
+    });
   }
 
   render() {

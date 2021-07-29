@@ -26,6 +26,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import AlertYesNoV2 from './../universal/AlertYesNoV2';
 import ItemKeranjang from '../keranjang/ItemKeranjang';
 import AlertOkV2 from '../universal/AlertOkV2';
+import EmptyCart from '../universal/EmptyCart';
 export default class Keranjang extends Component {
   constructor(props) {
     super(props);
@@ -149,6 +150,24 @@ export default class Keranjang extends Component {
                   this.setState({
                     cartData: data.data,
                   });
+                }
+                if (!data.data.length) {
+                  return (
+                    <EmptyCart
+                      title="Data tidak ditemukan"
+                      description="Data yang anda cari tidak ditemukan, Coba cari kata kunci yang lain."
+                      icon={
+                        <Icon
+                          as={MaterialCommunityIcons}
+                          name="file-search"
+                          size="lg"
+                          color="#555"
+                        />
+                      }
+                      refreshButton
+                      onRefresh={refetch}
+                    />
+                  );
                 }
                 return (
                   <>
