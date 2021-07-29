@@ -92,6 +92,7 @@ export default class LaporanTransaksiUser extends React.Component {
                 startdate: tglAwal,
                 enddate: tglAkhir,
                 status: statusOrder,
+                refresh: this.state.refresh
               }}>
               {({loading, error, payload: data, refetch, fetchMore}) => {
                 if (loading) {
@@ -183,8 +184,9 @@ export default class LaporanTransaksiUser extends React.Component {
   };
 
   selesaiOrder = id => {
+    // console.log(id);return
     this.dialog.show(
-      {message: 'Anda yakin untuk membatalkan pesanan ini ?'},
+      {message: 'Anda yakin untuk menyelesaikan pesanan ini ?'},
       async () => {
         Axios.put(`${BASE_URL()}/order/selesai/${id}`)
           .then(({data}) => {
@@ -255,7 +257,7 @@ export default class LaporanTransaksiUser extends React.Component {
               </Text>
             </VStack>
           </HStack>
-          {this.getAksiOrder(item.status, item.no_telp)}
+          {this.getAksiOrder(item.status, item.no_telp, item.id)}
           <Divider my={2} />
         </Box>
       </Pressable>
