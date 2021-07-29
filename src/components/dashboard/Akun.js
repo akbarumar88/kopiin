@@ -20,10 +20,12 @@ import {
   Tabs,
   extendTheme,
 } from 'native-base';
-import {theme} from '../../utilitas/Config';
+import {BASE_URL, theme} from '../../utilitas/Config';
 import {Alert} from 'react-native';
 import AlertYesNoV2 from '../universal/AlertYesNoV2';
 import AsyncStorage from '@react-native-community/async-storage';
+import QueryString from 'qs';
+import axios from 'axios';
 
 export default class Akun extends React.Component {
   constructor(props) {
@@ -210,8 +212,18 @@ export default class Akun extends React.Component {
     this.props.navigation.navigate('MyProduk');
   };
 
-  logout = () => {
+  logout = async () => {
     this.alert.show({message: 'Anda yakin ingin keluar?'}, async () => {
+      let [[k1, id_user], [k2, id_merchant], [k3, deviceid]] =
+        await AsyncStorage.multiGet(['id', 'id_merchant', 'deviceid']);
+      axios.post(
+        `${BASE_URL()}/auth/logout`,
+        QueryString.stringify({
+          id_user,
+          id_merchant,
+          deviceid,
+        }),
+      );
       let sessionData = [
         ['nama', ''],
         ['username', ''],

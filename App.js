@@ -47,6 +47,7 @@ import {ONESIGNAL_APPID} from './src/utilitas/Config';
 
 import DetailTransaksi from './src/components/akun/DetailTransaksi';
 import SettingKurir from './src/components/akun/SettingKurir';
+import AsyncStorage from '@react-native-community/async-storage';
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
 
@@ -71,6 +72,7 @@ class App extends Component {
     //END OneSignal Init Code
     OneSignal.getDeviceState().then(state => {
       console.warn(state)
+      AsyncStorage.setItem('deviceid', state.userId)
     })
     //Prompt for push on iOS
     OneSignal.promptForPushNotificationsWithUserResponse(response => {

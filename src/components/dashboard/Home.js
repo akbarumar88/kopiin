@@ -181,12 +181,14 @@ export default class Home extends Component {
                             {(() => {
                               if (distance) {
                                 if (distance > 20) {
-                                  return 
+                                  return;
                                 } else {
-                                  return `${distance?.toFixed(1)} KM dari lokasi anda.`
+                                  return `${distance?.toFixed(
+                                    1,
+                                  )} KM dari lokasi anda.`;
                                 }
                               } else {
-                                return '?? KM dari lokasi anda.'
+                                return '?? KM dari lokasi anda.';
                               }
                             })()}
                           </Text>
@@ -219,7 +221,7 @@ export default class Home extends Component {
           }
 
           return (
-            <HStack my={4} flexWrap="wrap">
+            <HStack my={4} flexWrap="wrap" alignItems="stretch">
               {data.data.map(
                 (
                   {
@@ -238,6 +240,7 @@ export default class Home extends Component {
                   },
                   index,
                 ) => {
+                  // terjual = index %2 ==1 ? 1 : 0
                   kota = kota.split(/\s/)[1];
                   let imgWidth = Dimensions.get('screen').width / 4;
                   let itemWidth = Dimensions.get('screen').width / 3.7;
@@ -288,7 +291,7 @@ export default class Home extends Component {
                         <Text fontSize="xs" color="grey">
                           Rp {toCurrency(harga)}
                         </Text>
-                        {terjual > 0 ? (
+                        {terjual > 0 || true ? (
                           <HStack alignItems="center" mt={1}>
                             <Icon
                               as={Ionicons}

@@ -150,7 +150,8 @@ export default class Login extends React.Component {
     }
   };
 
-  login = () => {
+  login = async() => {
+    let deviceid = await AsyncStorage.getItem('deviceid');
     const {form} = this.state;
     this.setState({loggingIn: true});
     axios
@@ -159,6 +160,7 @@ export default class Login extends React.Component {
         QueryString.stringify({
           username: form.username,
           password: form.pass,
+          deviceid,
         }),
       )
       .then(async ({data}) => {
