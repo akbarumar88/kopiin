@@ -43,6 +43,7 @@ import KonfirmasiPembayaranEwallet from './src/components/pembayaran/KonfirmasiP
 import LaporanTransaksiUser from './src/components/akun/LaporanTransaksiUser';
 import LaporanTransaksiToko from './src/components/akun/LaporanTransaksiToko';
 import DetailTransaksi from './src/components/akun/DetailTransaksi';
+import SettingKurir from './src/components/akun/SettingKurir';
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
 
@@ -158,7 +159,11 @@ class App extends Component {
               options={{title: 'Laporan Transaksi'}}
               component={DetailTransaksi}
             />
-            {/* <Stack.Screen name="PembayaranStack" component={PembayaranStack} /> */}
+            <Stack.Screen
+              options={{title: 'Setting Kurir'}}
+              name="SettingKurir"
+              component={SettingKurir}
+            />
             <Stack.Screen
               name="MetodePembayaran"
               component={MetodePembayaran}

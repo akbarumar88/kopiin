@@ -29,6 +29,8 @@ import FooterLoading from '../universal/FooterLoading';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import EmptyCart from './../universal/EmptyCart';
 import axios from 'axios';
+import {Modal} from 'react-native-modal';
+import AlertYesNoV2 from '../universal/AlertYesNoV2';
 
 export default class LaporanTransaksiToko extends React.Component {
   constructor(props) {
@@ -74,6 +76,7 @@ export default class LaporanTransaksiToko extends React.Component {
     } = this.state;
     return (
       <NativeBaseProvider>
+        <AlertYesNoV2 ref={ref => (this.dialog = ref)} />
         <Box bg="white" flex={1} pt={2}>
           <FilterTransaksi filter={this.setFilterStatus} />
           {this.searchBox()}
@@ -130,6 +133,7 @@ export default class LaporanTransaksiToko extends React.Component {
                     renderItem={({item}) => (
                       <ItemOrder
                         item={item}
+                        dialog={this.dialog}
                         navigation={this.props.navigation}
                       />
                     )}
@@ -423,7 +427,7 @@ function SheetAksiOrder({telp}) {
   );
 }
 
-const ItemOrder = ({navigation, item}) => {
+const ItemOrder = ({navigation, item, dialog}) => {
   const [status, setStatus] = React.useState(item.status);
   const [loadingAksi, setLoadingAksi] = React.useState(false);
   const getStatus = code => {
@@ -455,29 +459,72 @@ const ItemOrder = ({navigation, item}) => {
   };
 
   const terimaOrder = () => {
-    setLoadingAksi(true);
-    axios
-      .put(`${BASE_URL()}/order/terima/${item.id}`)
-      .then(({data}) => {
-        setStatus(3);
-        setLoadingAksi(false);
-      })
-      .catch(e => {
-        setLoadingAksi(false);
-      });
+    dialog.show(
+      {message: 'Anda yakin ingin menerima pesanan ini ?'},
+      async () => {
+        setLoadingAksi(true);
+        axios
+          .put(`${BASE_URL()}/order/terima/${item.id}`)
+          .then(({data}) => {
+            setStatus(3);
+            setLoadingAksi(false);
+          })
+          .catch(e => {
+            setLoadingAksi(false);
+          });
+      },
+    );
   };
 
   const siapAntarOrder = () => {
-    setLoadingAksi(true);
-    axios
-      .put(`${BASE_URL()}/order/terima/${item.id}`)
-      .then(({data}) => {
-        setStatus(3);
-        setLoadingAksi(false);
-      })
-      .catch(e => {
-        setLoadingAksi(false);
-      });
+    dialog.show(
+      {message: 'Anda yakin ingin siap mengantar pesanan ini ?'},
+      async () => {
+        setLoadingAksi(true);
+        axios
+          .put(`${BASE_URL()}/order/siapantar/${item.id}`)
+          .then(({data}) => {
+            setStatus(4);
+            setLoadingAksi(false);
+          })
+          .catch(e => {
+            setLoadingAksi(false);
+          });
+      },
+    );
+  };
+
+  const simulasi = () => {
+    let statusPesanan = 'Sedang Diantar';
+    let apiAksi = 'antar';
+    switch (status) {
+      case 5:
+        statusPesanan = 'Sudah Diantar';
+        apiAksi = 'sudahantar';
+        break;
+      case 6:
+        statusPesanan = 'Selesai';
+        apiAksi = 'selesai';
+        break;
+    }
+
+    dialog.show(
+      {
+        message: `Anda yakin ingin merubah status pesanan ini menjadi ${statusPesanan} (Simulasi) ?`,
+      },
+      async () => {
+        setLoadingAksi(true);
+        axios
+          .put(`${BASE_URL()}/order/${apiAksi}/${item.id}`)
+          .then(({data}) => {
+            setStatus(status + 1);
+            setLoadingAksi(false);
+          })
+          .catch(e => {
+            setLoadingAksi(false);
+          });
+      },
+    );
   };
 
   const getAksiOrder = (code, telp) => {
@@ -520,6 +567,20 @@ const ItemOrder = ({navigation, item}) => {
             }}
             flex={1}>
             Siap Diantar
+          </Button>
+        )}
+        {code > 3 && code <= 6 && (
+          <Button
+            size="sm"
+            isLoading={loadingAksi}
+            isLoadingText="Loading..."
+            colorScheme="success"
+            _text={{color: 'white'}}
+            onPress={() => {
+              simulasi();
+            }}
+            flex={1}>
+            {'Ubah ' + getStatus(status + 1)}
           </Button>
         )}
       </VStack>
