@@ -151,19 +151,11 @@ export default class Keranjang extends Component {
                     cartData: data.data,
                   });
                 }
-                if (!data.data.length) {
+                if (!data.data?.length) {
                   return (
                     <EmptyCart
-                      title="Data tidak ditemukan"
-                      description="Data yang anda cari tidak ditemukan, Coba cari kata kunci yang lain."
-                      icon={
-                        <Icon
-                          as={MaterialCommunityIcons}
-                          name="file-search"
-                          size="lg"
-                          color="#555"
-                        />
-                      }
+                      title="Keranjang Kosong"
+                      description="Cari barang di kolom pencarian untuk menambahkan barang ke keranjang anda."
                       refreshButton
                       onRefresh={refetch}
                     />
