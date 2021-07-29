@@ -30,6 +30,8 @@ import FooterLoading from './../universal/FooterLoading';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import EmptyCart from './../universal/EmptyCart';
 import { getListStatus } from '../../utilitas/Function';
+import AlertYesNoV2 from '../universal/AlertYesNoV2';
+import Axios from 'axios';
 
 export default class LaporanTransaksiUser extends React.Component {
   constructor(props) {
@@ -47,6 +49,7 @@ export default class LaporanTransaksiUser extends React.Component {
       initialLoading: true,
       limit: 10,
       statusorder: '',
+      refresh: new Date(),
     };
   }
 
@@ -75,6 +78,7 @@ export default class LaporanTransaksiUser extends React.Component {
     } = this.state;
     return (
       <NativeBaseProvider>
+        <AlertYesNoV2 ref={ref => (this.dialog = ref)} />
         <Box bg="white" flex={1} pt={2}>
           <FilterTransaksi filter={this.setFilterStatus} />
           {this.searchBox()}
@@ -196,7 +200,20 @@ export default class LaporanTransaksiUser extends React.Component {
     return statusOrder;
   };
 
-  getAksiOrder = (code, telp) => {
+  batalOrder = id => {
+    this.dialog.show(
+      {message: 'Anda yakin untuk membatalkan pesanan ini ?'},
+      async () => {
+        Axios.put(`${BASE_URL()}/order/batalkan/${id}`)
+          .then(({data}) => {
+            this.setState({refresh: new Date()});
+          })
+          .catch(e => {});
+      },
+    );
+  };
+
+  getAksiOrder = (code, telp, id) => {
     return (
       <HStack mt={3} space={2} px={4}>
         <SheetAksiOrder telp={telp} />
@@ -205,7 +222,7 @@ export default class LaporanTransaksiUser extends React.Component {
             size="sm"
             colorScheme="danger"
             _text={{color: 'white'}}
-            onPress={() => {}}
+            onPress={() => this.batalOrder(id)}
             flex={1}>
             Batalkan Pesanan
           </Button>

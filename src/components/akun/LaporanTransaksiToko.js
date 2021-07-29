@@ -14,29 +14,38 @@ import {
   Fab,
   Divider,
 } from 'native-base';
-
-import * as React from 'react';
+import PropTypes from 'prop-types';
+import React, {Component} from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ImageLoad from '../universal/ImageLoad';
-import {Dimensions, Linking, Pressable} from 'react-native';
+import {
+  Dimensions,
+  Linking,
+  Pressable,
+  View,
+  TouchableNativeFeedback,
+  ToastAndroid,
+} from 'react-native';
 import Resource from '../universal/Resource';
 import AsyncStorage from '@react-native-community/async-storage';
-import {BASE_URL} from '../../utilitas/Config';
+import {BASE_URL, theme} from '../../utilitas/Config';
 import FooterLoading from '../universal/FooterLoading';
 
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import EmptyCart from './../universal/EmptyCart';
 import axios from 'axios';
-import {Modal} from 'react-native-modal';
+import Modal from 'react-native-modal';
 import AlertYesNoV2 from '../universal/AlertYesNoV2';
 import { getListStatus } from '../../utilitas/Function';
+import QueryString from 'qs';
 
 export default class LaporanTransaksiToko extends React.Component {
   constructor(props) {
     super(props);
     this.setFilterStatus = this.setFilterStatus.bind(this);
+    this.batalkanPesanan = this.batalkanPesanan.bind(this);
     this.state = {
       cari: '',
       pencarian: '',
@@ -49,6 +58,11 @@ export default class LaporanTransaksiToko extends React.Component {
       initialLoading: true,
       limit: 10,
       statusorder: '',
+      isVisible: false,
+      alasan: '',
+      idorderBatal: '',
+      refresh: new Date(),
+      loadingBatal: false,
     };
   }
 
@@ -65,6 +79,52 @@ export default class LaporanTransaksiToko extends React.Component {
     });
   }
 
+  batalkanPesanan(idorder) {
+    this.setState({isVisible: true, idorderBatal: idorder});
+  }
+
+  simpanBatal() {
+    const {idorderBatal, alasan, loadingBatal} = this.state;
+    if (loadingBatal) {
+      ToastAndroid.show('Harap tunggu sebentar', ToastAndroid.SHORT);
+      return;
+    } else if (alasan.trim() == '') {
+      ToastAndroid.show('Harap isi alasan dengan benar', ToastAndroid.SHORT);
+      return;
+    }
+    this.setState({
+      loadingBatal: true,
+    });
+    console.log(alasan);
+    axios
+      .put(
+        `${BASE_URL()}/order/tolak/${idorderBatal}`,
+        QueryString.stringify({
+          alasan: this.state.alasan,
+        }),
+      )
+      .then(({data}) => {
+        this.setState({
+          idorderBatal: '',
+          alasan: '',
+          isVisible: false,
+          refresh: new Date(),
+          loadingBatal: true,
+        });
+
+        ToastAndroid.show('Berhasil disimpan', ToastAndroid.SHORT);
+      })
+      .catch(e => {
+        ToastAndroid.show(
+          'Terjadi kesalahan saat menyimpan',
+          ToastAndroid.SHORT,
+        );
+        this.setState({
+          loadingBatal: true,
+        });
+      });
+  }
+
   render() {
     const {
       initialLoading,
@@ -74,10 +134,105 @@ export default class LaporanTransaksiToko extends React.Component {
       tglAkhir,
       statusOrder,
       pencarian,
+      isVisible,
+      alasan,
     } = this.state;
     return (
       <NativeBaseProvider>
         <AlertYesNoV2 ref={ref => (this.dialog = ref)} />
+        <Modal
+          isVisible={isVisible}
+          onBackdropPress={() => this.setState({isVisible: false})}
+          onBackButtonPress={() => this.setState({isVisible: false})}
+          onModalHide={() => this.setState({isVisible: false})}>
+          <View
+            style={{
+              backgroundColor: 'white',
+              // alignItems: "center",
+              paddingHorizontal: 16,
+              paddingTop: 24,
+              paddingBottom: 16,
+              borderRadius: 8,
+            }}>
+            <Text
+              style={{
+                fontWeight: 'bold',
+                color: '#333',
+                fontSize: 20,
+                textAlign: 'center',
+              }}>
+              Tolak Pesanan
+            </Text>
+
+            <Text
+              style={{
+                color: '#777',
+                marginTop: 16,
+                textAlign: 'center',
+                fontSize: 14,
+              }}>
+              Alasan Tolak Pesanan
+            </Text>
+            <Input
+              mt={3}
+              value={alasan}
+              onChangeText={e => this.setState({alasan: e})}
+            />
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 24,
+              }}>
+              <TouchableNativeFeedback
+                onPress={() => this.setState({isVisible: false})}
+                style={{}}>
+                <View
+                  style={{
+                    flex: 1,
+                    paddingVertical: 12,
+                    backgroundColor: '#de3535',
+                    borderRadius: 8,
+                    marginRight: 6,
+                  }}>
+                  <Text
+                    style={{
+                      textAlign: 'center',
+                      color: 'white',
+                      fontSize: 14,
+                      fontWeight: 'bold',
+                    }}>
+                    Batal
+                  </Text>
+                </View>
+              </TouchableNativeFeedback>
+
+              <TouchableNativeFeedback
+                onPress={() => this.simpanBatal()}
+                style={{}}>
+                <View
+                  style={{
+                    paddingVertical: 12,
+                    backgroundColor: theme.primary,
+                    borderRadius: 8,
+                    marginLeft: 6,
+                    flex: 1,
+                  }}>
+                  <Text
+                    style={{
+                      textAlign: 'center',
+                      color: 'white',
+                      fontSize: 14,
+                      fontWeight: 'bold',
+                    }}>
+                    Simpan
+                  </Text>
+                </View>
+              </TouchableNativeFeedback>
+            </View>
+          </View>
+        </Modal>
+
         <Box bg="white" flex={1} pt={2}>
           <FilterTransaksi filter={this.setFilterStatus} />
           {this.searchBox()}
@@ -91,6 +246,7 @@ export default class LaporanTransaksiToko extends React.Component {
                 startdate: tglAwal,
                 enddate: tglAkhir,
                 status: statusOrder,
+                refresh: this.state.refresh,
               }}>
               {({loading, error, payload: data, refetch, fetchMore}) => {
                 if (loading) {
@@ -133,6 +289,7 @@ export default class LaporanTransaksiToko extends React.Component {
                     }}
                     renderItem={({item}) => (
                       <ItemOrder
+                        batal={this.batalkanPesanan}
                         item={item}
                         dialog={this.dialog}
                         navigation={this.props.navigation}
@@ -420,11 +577,12 @@ function SheetAksiOrder({telp}) {
   );
 }
 
-const ItemOrder = ({navigation, item, dialog}) => {
+const ItemOrder = ({navigation, item, dialog, batal}) => {
   const [status, setStatus] = React.useState(item.status);
   const [loadingAksi, setLoadingAksi] = React.useState(false);
   const getStatus = code => {
     let statusOrder = '';
+
     switch (code) {
       case 1:
         statusOrder = 'Menunggu Konfirmasi';
@@ -446,6 +604,9 @@ const ItemOrder = ({navigation, item, dialog}) => {
         break;
       case 7:
         statusOrder = 'Pesanan Selesai';
+        break;
+      case -1:
+        statusOrder = 'Pesanan Dibatalkan';
         break;
     }
     return statusOrder;
@@ -520,7 +681,7 @@ const ItemOrder = ({navigation, item, dialog}) => {
     );
   };
 
-  const getAksiOrder = (code, telp) => {
+  const getAksiOrder = (code, telp, id) => {
     return (
       <VStack mt={3} space={1} px={4}>
         <SheetAksiOrder telp={telp} />
@@ -542,7 +703,7 @@ const ItemOrder = ({navigation, item, dialog}) => {
               isLoadingText="Loading..."
               colorScheme="danger"
               _text={{color: 'white'}}
-              onPress={() => {}}
+              onPress={() => batal(id)}
               flex={1}>
               Tolak Pesanan
             </Button>
@@ -611,7 +772,7 @@ const ItemOrder = ({navigation, item, dialog}) => {
             </Text>
           </VStack>
         </HStack>
-        {getAksiOrder(status, item.no_telp)}
+        {getAksiOrder(status, item.no_telp, item.id)}
         <Divider my={2} />
       </Box>
     </Pressable>

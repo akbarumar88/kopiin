@@ -16,8 +16,9 @@ import {
   Button,
   useDisclose,
   Actionsheet,
-  IconButton,
+  Fab,
   Stack,
+  VStack,
 } from 'native-base';
 import {toCurrency} from '../../utilitas/Function';
 import Resource from './../universal/Resource';
@@ -28,7 +29,7 @@ import ImageLoad from './../universal/ImageLoad';
 import EmptyCart from '../universal/EmptyCart';
 import AsyncStorage from '@react-native-community/async-storage';
 
-export function FilterProduk({sorting}) {
+export function FilterProduk({sorting, index}) {
   const {isOpen, onOpen, onClose} = useDisclose();
   const [filterRating, setfilterRating] = useState(false);
   const [filterKategori, setfilterKategori] = useState('');
@@ -60,21 +61,20 @@ export function FilterProduk({sorting}) {
   }
   return (
     <>
-      <Button
-        startIcon={
-          <Icon
-            as={<MaterialCommunityIcons name="sort" />}
-            color="white"
-            size="sm"
-          />
-        }
-        size="sm"
-        rounded={0}
-        mb={1}
-        onPress={onOpen}>
-        Filter
-      </Button>
-
+      {index == 0 && (
+        <Fab
+          size="lg"
+          style={{overflow: 'hidden', display: 'none'}}
+          onPress={onOpen}
+          icon={
+            <Icon
+              color="white"
+              as={<MaterialCommunityIcons name="filter" />}
+              size={4}
+            />
+          }
+        />
+      )}
       <Actionsheet
         isOpen={isOpen}
         onClose={() => {
@@ -214,7 +214,7 @@ export function FilterProduk({sorting}) {
   );
 }
 
-export function FilterToko({sorting}) {
+export function FilterToko({sorting, index}) {
   const {isOpen, onOpen, onClose} = useDisclose();
   const [sortingToko, setSortingToko] = useState('');
   const [filterJenisToko, setfilterJenisToko] = useState('');
@@ -224,20 +224,20 @@ export function FilterToko({sorting}) {
   }
   return (
     <>
-      <Button
-        startIcon={
-          <Icon
-            as={<MaterialCommunityIcons name="sort" />}
-            color="white"
-            size="sm"
-          />
-        }
-        size="sm"
-        rounded={0}
-        mb={1}
-        onPress={onOpen}>
-        Filter
-      </Button>
+      {index == 1 && (
+        <Fab
+          position="absolute"
+          size="lg"
+          onPress={onOpen}
+          icon={
+            <Icon
+              color="white"
+              as={<MaterialCommunityIcons name="filter" />}
+              size={4}
+            />
+          }
+        />
+      )}
 
       <Actionsheet
         isOpen={isOpen}
@@ -360,6 +360,7 @@ export default class HasilPencarian extends Component {
       cari: this.props.route.params.cari,
       pencarian: this.props.route.params.cari,
       tabIndex: 0,
+      fabIndex: 0,
       tabRoutes: [
         {key: 'barang', title: 'Barang'},
         {key: 'toko', title: 'Toko'},
@@ -404,7 +405,7 @@ export default class HasilPencarian extends Component {
   }
 
   render() {
-    const {tabIndex, tabRoutes} = this.state;
+    const {tabIndex, fabIndex, tabRoutes} = this.state;
     return (
       <NativeBaseProvider>
         <Box flex={1} pt={3} bg="white">
@@ -428,12 +429,14 @@ export default class HasilPencarian extends Component {
               />
             )}
             onIndexChange={i => {
-              this.setState({tabIndex: i});
+              this.setState({tabIndex: i, fabIndex: i});
             }}
             initialLayout={{width: Dimensions.get('window').width}}
             style={{marginTop: 0}}
             swipeEnabled
           />
+          <FilterProduk sorting={this.setSortingProduk} index={fabIndex} />
+          <FilterToko sorting={this.setSortingToko} index={fabIndex} />
         </Box>
       </NativeBaseProvider>
     );
@@ -444,10 +447,9 @@ export default class HasilPencarian extends Component {
       this.state;
     const urlGambar = `${BASE_URL()}/image/barang/`;
 
-    const imgWidth = (Dimensions.get('screen').width * 0.5) / 2;
+    const imgWidth = (Dimensions.get('screen').width * 0.9) / 2;
     return (
       <>
-        <FilterProduk sorting={this.setSortingProduk} />
         <Resource
           url={`${BASE_URL()}/barang`}
           params={{
@@ -513,13 +515,7 @@ export default class HasilPencarian extends Component {
                           mt={2}
                           mb={2}
                           flex={1}
-                          style={[
-                            {width: imgWidth, height: imgWidth},
-                            {
-                              borderTopLeftRadius: 10,
-                              borderTopRightRadius: 10,
-                            },
-                          ]}
+                          style={[{width: imgWidth, height: imgWidth}]}
                           url={urlGambar + item.foto_barang + '?' + new Date()}
                           alt={item.nama}
                         />
@@ -541,20 +537,23 @@ export default class HasilPencarian extends Component {
                             {item.deskripsi}
                           </Text>
                           <HStack px={1} alignItems="center">
-                            <Text fontSize="xs" flex={1} isTruncated>
+                            <Text fontSize="xs" isTruncated>
                               {item.rating}
-                              <Icon
-                                color="orange"
-                                size="xs"
-                                as={<MaterialCommunityIcons name="star" />}
-                              />
                             </Text>
+                            <Icon
+                              color="orange"
+                              size="xs"
+                              as={<MaterialCommunityIcons name="star" />}
+                            />
                             <Text color="grey" fontSize="xs" isTruncated>
-                              Terjual {item.terjual}
+                              {' | '} Terjual {item.terjual}
                             </Text>
                           </HStack>
                           <Text fontSize="xs" isTruncated mx={1} color="grey">
                             Rp.{toCurrency(item.harga)}
+                          </Text>
+                          <Text fontSize="xs" isTruncated mx={1}>
+                            {item.kota}
                           </Text>
                         </Box>
                       </Box>
@@ -611,10 +610,9 @@ export default class HasilPencarian extends Component {
     } = this.state;
     const urlGambar = `${BASE_URL()}/image/merchant/`;
 
-    const imgWidth = (Dimensions.get('screen').width * 0.5) / 2;
+    const imgWidth = (Dimensions.get('screen').width * 0.4) / 2;
     return (
       <>
-        <FilterToko sorting={this.setSortingToko} />
         {!initialLoading && (
           <Resource
             url={`${BASE_URL()}/shop`}
@@ -654,7 +652,6 @@ export default class HasilPencarian extends Component {
 
               return (
                 <FlatList
-                  numColumns={2}
                   horizontal={false}
                   flex={1}
                   px={2}
@@ -667,46 +664,52 @@ export default class HasilPencarian extends Component {
                         this.props.navigation.navigate('DetailToko', {
                           idtoko: item.id,
                         });
-                      }}
-                      flex={0.5}>
+                      }}>
                       <Box
                         bgColor="white"
                         mx={1}
                         key={index}
                         borderRadius={8}
                         shadow={3}
-                        pb={4}
-                        my={1}
-                        alignItems="center">
-                        <ImageLoad
-                          alignSelf="center"
-                          resizeMode="contain"
-                          mt={2}
-                          mb={2}
-                          style={[
-                            {width: imgWidth, height: imgWidth},
-                            {
-                              borderTopLeftRadius: 10,
-                              borderTopRightRadius: 10,
-                            },
-                          ]}
-                          onError={() => {}}
-                          url={
-                            urlGambar + item.foto_merchant + '?' + new Date()
-                          }
-                          alt={item.nama_toko}
-                        />
-                        <Text fontSize="sm" isTruncated mx={2}>
-                          {item.nama_toko}
-                        </Text>
-                        <Text
-                          fontSize="xs"
-                          isTruncated
-                          mx={2}
-                          bold
-                          color="grey">
-                          {item.alamat_toko}
-                        </Text>
+                        px={2}
+                        py={1}
+                        my={1}>
+                        <HStack space={1}>
+                          <ImageLoad
+                            alignSelf="center"
+                            resizeMode="contain"
+                            mt={2}
+                            mb={2}
+                            ml={1}
+                            style={[{width: imgWidth, height: imgWidth}]}
+                            onError={() => {}}
+                            url={
+                              urlGambar + item.foto_merchant + '?' + new Date()
+                            }
+                            alt={item.nama_toko}
+                          />
+                          <VStack flex={1} py={1} justifyContent="center">
+                            <Text fontSize="sm" isTruncated mx={2}>
+                              {item.nama_toko}
+                            </Text>
+                            <Text
+                              fontSize="xs"
+                              isTruncated
+                              mx={2}
+                              bold
+                              color="grey">
+                              {item.alamat_toko}
+                            </Text>
+                            <Text fontSize="xs" isTruncated mx={2} color="grey">
+                              {item.kota}
+                            </Text>
+                            <Text fontSize="xs" isTruncated mx={2} color="grey">
+                              {`${item.distance?.toFixed(
+                                1,
+                              )} KM dari lokasi anda.`}
+                            </Text>
+                          </VStack>
+                        </HStack>
                       </Box>
                     </Pressable>
                   )}
