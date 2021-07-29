@@ -20,17 +20,14 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Resource from './../universal/Resource';
 import {BASE_URL, theme} from './../../utilitas/Config';
-import {toCurrency} from './../../utilitas/Function';
+import {errMsg, toCurrency} from './../../utilitas/Function';
 import axios from 'axios';
 import AsyncStorage from '@react-native-community/async-storage';
 import AlertYesNoV2 from './../universal/AlertYesNoV2';
 import ItemKeranjang from '../keranjang/ItemKeranjang';
 import AlertOkV2 from '../universal/AlertOkV2';
-<<<<<<< HEAD
-import EmptyCart from './../universal/EmptyCart';
-=======
 import EmptyCart from '../universal/EmptyCart';
->>>>>>> 2bb37b2a8a0e6556f73ca6123b7fc4da800437f8
+import FooterLoading from '../universal/FooterLoading';
 export default class Keranjang extends Component {
   constructor(props) {
     super(props);
@@ -145,22 +142,10 @@ export default class Keranjang extends Component {
                 updateQuery,
               }) => {
                 const {cartData, refresh} = this.state;
-
-                if (!data.data?.length && !loading) {
-                  return (
-                    <EmptyCart
-                      title="Keranjang Kosong"
-                      description="Data tidak ditemukan, Coba Masukkan produk ke dalam keranjang"
-                      icon={
-                        <Icon
-                          as={MaterialCommunityIcons}
-                          name="cart"
-                          size="lg"
-                          color="#555"
-                        />
-                      }
-                    />
-                  );
+                if (loading) {
+                  return <FooterLoading full />
+                } else if (error) {
+                  return <Text>{errMsg('Load Keranjang')}</Text>
                 }
                 if (
                   JSON.stringify(cartData) != JSON.stringify(data.data) &&
