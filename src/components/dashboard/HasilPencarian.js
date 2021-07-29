@@ -17,6 +17,7 @@ import {
   useDisclose,
   Actionsheet,
   IconButton,
+  Stack,
 } from 'native-base';
 import {toCurrency} from '../../utilitas/Function';
 import Resource from './../universal/Resource';
@@ -26,6 +27,7 @@ import FooterLoading from '../universal/FooterLoading';
 import ImageLoad from './../universal/ImageLoad';
 import EmptyCart from '../universal/EmptyCart';
 import AsyncStorage from '@react-native-community/async-storage';
+import StarReview from '../universal/StarRating';
 
 export function FilterProduk({sorting}) {
   const {isOpen, onOpen, onClose} = useDisclose();
@@ -482,6 +484,7 @@ export default class HasilPencarian extends Component {
               );
             }
             let nextOffset = data.data.length;
+
             return (
               <>
                 <FlatList
@@ -504,13 +507,13 @@ export default class HasilPencarian extends Component {
                         my={1}
                         borderRadius={8}
                         shadow={3}
-                        alignItems="center">
+                        flex={1}>
                         <ImageLoad
                           alignSelf="center"
                           resizeMode="contain"
                           mt={2}
                           mb={2}
-                          onError={() => {}}
+                          flex={1}
                           style={[
                             {width: imgWidth, height: imgWidth},
                             {
@@ -521,20 +524,40 @@ export default class HasilPencarian extends Component {
                           url={urlGambar + item.foto_barang + '?' + new Date()}
                           alt={item.nama}
                         />
-                        <Text fontSize="sm" isTruncated mx={2}>
-                          {item.nama}
-                        </Text>
-                        <Text
-                          fontSize="xs"
-                          isTruncated
-                          mx={2}
-                          bold
-                          color="grey">
-                          {item.deskripsi}
-                        </Text>
-                        <Text fontSize="xs" color="grey">
-                          Rp.{toCurrency(item.harga)}
-                        </Text>
+                        <Box flex={1} px={2}>
+                          <Text
+                            textAlign="left"
+                            fontSize="sm"
+                            isTruncated
+                            mx={1}>
+                            {item.nama}
+                          </Text>
+
+                          <Text
+                            fontSize="xs"
+                            isTruncated
+                            mx={1}
+                            bold
+                            color="grey">
+                            {item.deskripsi}
+                          </Text>
+                          <HStack px={1} alignItems="center">
+                            <Text fontSize="xs" flex={1} isTruncated>
+                              {item.rating}
+                              <Icon
+                                color="orange"
+                                size="xs"
+                                as={<MaterialCommunityIcons name="star" />}
+                              />
+                            </Text>
+                            <Text color="grey" fontSize="xs" isTruncated>
+                              Terjual {item.terjual}
+                            </Text>
+                          </HStack>
+                          <Text fontSize="xs" isTruncated mx={1} color="grey">
+                            Rp.{toCurrency(item.harga)}
+                          </Text>
+                        </Box>
                       </Box>
                     </Pressable>
                   )}

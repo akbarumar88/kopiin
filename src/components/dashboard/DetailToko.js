@@ -145,18 +145,23 @@ export default class DetailToko extends Component {
                         ]}
                         alt={item.nama}
                       />
-                      <VStack ml={3}>
+                      <VStack ml={3} flex={1}>
                         <Text fontSize="sm" bold={true} isTruncated>
                           {item.nama}
                         </Text>
-                        <HStack alignItems="center" mt={1} pr={2}>
-                          <Icon
-                            mr={1}
-                            size="xs"
-                            color="orange"
-                            as={<MaterialCommunityIcons name="star" />}
-                          />
-                          <Text sub={true}>{item.rating}</Text>
+
+                        <HStack my={1} alignItems="center">
+                          <Text fontSize="xs" flex={1} isTruncated>
+                            {item.rating}
+                            <Icon
+                              color="orange"
+                              size="xs"
+                              as={<MaterialCommunityIcons name="star" />}
+                            />
+                          </Text>
+                          <Text color="grey" fontSize="xs" isTruncated>
+                            Terjual {item.terjual}
+                          </Text>
                         </HStack>
                         <Text fontSize="xs" bold color="grey">
                           {item.deskripsi}
